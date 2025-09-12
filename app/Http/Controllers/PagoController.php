@@ -9,67 +9,57 @@ use Carbon\Carbon;
 
 class PagoController extends Controller
 {
-    const MENSUALIDAD = 280;
-
     public function index()
     {
-        return response()->json(Pago::with('vecino')->get());
+        $pagos = Pago::with('vecino')->latest()->get();
+        return view('pagos.index', compact('pagos'));
+    }
+
+    public function create()
+    {
+        $vecinos = Vecino::all();
+        return view('pagos.create', compact('vecinos'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'vecino_id' => 'required|exists:vecinos,id',
-            'monto' => 'required|numeric|min:1'
+            'vecino_id' => 'required',
+            'cantidad' => 'required|numeric|min:1',
+            'tipo' => 'required|in:ordinario,extraordinario',
+            'mes' => 'required',
         ]);
 
         $vecino = Vecino::findOrFail($request->vecino_id);
-        $monto = $request->monto;
-        $mesesPagados = intdiv($monto, self::MENSUALIDAD); // cuántos meses cubre
-        $resto = $monto % self::MENSUALIDAD;
+        $cantidad = $request->cantidad;
+        $mes = Carbon::parse($request->mes)->startOfMonth();
 
-        $pagos = [];
-        $fecha = Carbon::now();
+        $mensualidad = 280;
 
-        for ($i = 0; $i < $mesesPagados; $i++) {
-            $pagos[] = Pago::create([
+        // Distribuir pagos
+        while ($cantidad >= $mensualidad) {
+            Pago::create([
                 'vecino_id' => $vecino->id,
-                'monto' => self::MENSUALIDAD,
-                'fecha_pago' => $fecha->copy()->addMonths($i),
-                'estado' => 'Pagado'
+                'cantidad' => $mensualidad,
+                'mes' => $mes->format('Y-m'),
+                'tipo' => $request->tipo,
+                'restante' => 0,
+            ]);
+            $cantidad -= $mensualidad;
+            $mes->addMonth();
+        }
+
+        // Si sobra algo que no completa otra mensualidad
+        if ($cantidad > 0) {
+            Pago::create([
+                'vecino_id' => $vecino->id,
+                'cantidad' => $cantidad,
+                'mes' => $mes->format('Y-m'),
+                'tipo' => $request->tipo,
+                'restante' => $mensualidad - $cantidad,
             ]);
         }
 
-        if ($resto > 0) {
-            $pagos[] = Pago::create([
-                'vecino_id' => $vecino->id,
-                'monto' => $resto,
-                'fecha_pago' => $fecha,
-                'estado' => 'Parcial'
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Pagos registrados correctamente',
-            'pagos' => $pagos
-        ]);
-    }
-
-    public function show($id)
-    {
-        return response()->json(Pago::with('vecino')->findOrFail($id));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $pago = Pago::findOrFail($id);
-        $pago->update($request->all());
-        return response()->json($pago);
-    }
-
-    public function destroy($id)
-    {
-        Pago::destroy($id);
-        return response()->json(['message' => 'Pago eliminado']);
+        return redirect()->route('pagos.index')->with('success', 'Pago registrado correctamente');
     }
 }

@@ -9,9 +9,10 @@ class Pago extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['vecino_id','monto','fecha_pago','estado'];
+    protected $fillable = ['vecino_id', 'cantidad', 'mes', 'tipo', 'restante'];
 
-    public function vecino() {
+    public function vecino()
+    {
         return $this->belongsTo(Vecino::class);
     }
 }

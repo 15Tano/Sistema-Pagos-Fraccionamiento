@@ -37,3 +37,4 @@ Route::post('/vecinos', [VecinoController::class, 'store'])->name('vecinos.store
 Route::get('/vecinos/{id}/edit', [VecinoController::class, 'edit'])->name('vecinos.edit');
 Route::put('/vecinos/{id}', [VecinoController::class, 'update'])->name('vecinos.update');
 Route::delete('/vecinos/{id}', [VecinoController::class, 'destroy'])->name('vecinos.destroy');
+Route::resource('pagos', PagoController::class);
