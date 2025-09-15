@@ -21,4 +21,8 @@ class Vecino extends Model
     return $this->hasMany(\App\Models\Pago::class);
 }
 
+    public function tag() {
+        return $this->belongsTo(\App\Models\Tag::class, 'numero_tag', 'codigo');
+    }
+
 }

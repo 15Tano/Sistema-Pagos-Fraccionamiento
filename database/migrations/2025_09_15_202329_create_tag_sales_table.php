@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pagos', function (Blueprint $table) {
+        Schema::create('tag_sales', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vecino_id')->constrained()->onDelete('cascade');
-            $table->decimal('monto', 8, 2);
-            $table->date('fecha_pago')->nullable();
-            $table->string('estado')->default('Pendiente'); // Pagado / Pendiente
+            $table->foreignId('tag_id')->constrained('tags')->onDelete('cascade');
+            $table->timestamp('sold_at');
+            $table->decimal('price', 8, 2)->default(150);
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pagos');
+        Schema::dropIfExists('tag_sales');
     }
 };

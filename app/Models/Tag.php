@@ -14,4 +14,8 @@ class Tag extends Model
     public function vecino() {
         return $this->belongsTo(Vecino::class);
     }
+
+    public function tagSale() {
+        return $this->hasOne(\App\Models\TagSale::class);
+    }
 }

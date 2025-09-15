@@ -9,9 +9,14 @@ use Carbon\Carbon;
 
 class PagoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $pagos = Pago::with('vecino')->latest()->get();
+
+        if ($request->wantsJson()) {
+            return response()->json($pagos);
+        }
+
         return view('pagos.index', compact('pagos'));
     }
 
@@ -61,5 +66,36 @@ class PagoController extends Controller
         }
 
         return redirect()->route('pagos.index')->with('success', 'Pago registrado correctamente');
+    }
+
+    public function show($id)
+    {
+        $pago = Pago::with('vecino')->findOrFail($id);
+        return response()->json($pago);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $pago = Pago::findOrFail($id);
+
+        $request->validate([
+            'vecino_id' => 'required',
+            'cantidad' => 'required|numeric|min:0.01',
+            'tipo' => 'required|in:ordinario,extraordinario',
+            'mes' => 'required',
+            'restante' => 'required|numeric|min:0',
+        ]);
+
+        $pago->update($request->all());
+
+        return response()->json(['message' => 'Pago actualizado.', 'pago' => $pago]);
+    }
+
+    public function destroy($id)
+    {
+        $pago = Pago::findOrFail($id);
+        $pago->delete();
+
+        return response()->json(['message' => 'Pago eliminado.']);
     }
 }

@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(TagSeeder::class);
         $this->call(VecinoSeeder::class);
 
         User::factory()->create([
