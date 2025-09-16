@@ -9,7 +9,7 @@ class Pago extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['vecino_id', 'cantidad', 'mes', 'tipo', 'restante'];
+    protected $fillable = ['vecino_id', 'cantidad', 'mes', 'tipo', 'restante', 'fecha_de_cobro'];
 
     public function vecino()
     {

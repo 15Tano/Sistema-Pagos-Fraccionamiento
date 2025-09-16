@@ -28,5 +28,10 @@
         </select>
     </div>
 
+    <div>
+        <label for="fecha_de_cobro">Fecha de Cobro</label>
+        <input type="date" name="fecha_de_cobro" id="fecha_de_cobro">
+    </div>
+
     <button type="submit">Registrar Pago</button>
 </form>

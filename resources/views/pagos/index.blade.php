@@ -18,6 +18,7 @@
                 <th class="p-2">Cantidad</th>
                 <th class="p-2">Tipo</th>
                 <th class="p-2">Restante</th>
+                <th class="p-2">Fecha de Cobro</th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +35,7 @@
                         <span class="text-green-600">✔</span>
                     @endif
                 </td>
+                <td class="p-2">{{ $pago->fecha_de_cobro ? date('d/m/Y', strtotime($pago->fecha_de_cobro)) : '-' }}</td>
             </tr>
             @endforeach
         </tbody>
