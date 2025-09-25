@@ -15,7 +15,7 @@
                 <th>Nombre</th>
                 <th>Calle</th>
                 <th>No. Casa</th>
-                <th>Tag</th>
+                <th>Tags</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -25,7 +25,7 @@
                     <td>{{ $vecino->nombre }}</td>
                     <td>{{ $vecino->calle }}</td>
                     <td>{{ $vecino->numero_casa }}</td>
-                    <td>{{ $vecino->numero_tag }}</td>
+                    <td>{{ $vecino->tags->pluck('codigo')->join(', ') }}</td>
                     <td>
                         <a href="{{ route('vecinos.edit', $vecino->id) }}" class="btn btn-warning btn-sm">Editar</a>
                         <form action="{{ route('vecinos.destroy', $vecino->id) }}" method="POST" class="d-inline">

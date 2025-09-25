@@ -21,7 +21,7 @@ const GuestView = () => {
             </h2>
             <input
                 type="text"
-                placeholder="Nombre o ID del vecino"
+                placeholder="Número de tag del vecino"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="border p-2 mr-2 rounded"

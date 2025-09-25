@@ -12,7 +12,6 @@ class VecinoFactory extends Factory
             'nombre' => $this->faker->name(),
             'calle' => $this->faker->streetName(),
             'numero_casa' => $this->faker->numberBetween(1, 200),
-            'numero_tag' => strtoupper($this->faker->bothify('TAG-####')),
         ];
     }
 }

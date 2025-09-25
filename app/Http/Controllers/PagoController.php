@@ -65,37 +65,63 @@ class PagoController extends Controller
         ]);
 
         $vecino = Vecino::findOrFail($request->vecino_id);
-        $cantidad = $request->cantidad;
-        $mes = Carbon::parse($request->mes)->startOfMonth();
+        $cantidadTotal = $request->cantidad;
+        $mesInicial = Carbon::parse($request->mes)->startOfMonth();
 
         $mensualidad = 280;
+        $remainingAmount = $cantidadTotal;
+        $currentMonth = $mesInicial->copy();
 
-        // Calculate total paid for the month so far
-        $totalPagadoMes = Pago::where('vecino_id', $vecino->id)
-            ->where('mes', $mes->format('Y-m'))
-            ->sum('cantidad');
+        // Process payments month by month until the amount is fully distributed
+        while ($remainingAmount > 0) {
+            $mesString = $currentMonth->format('Y-m');
 
-        $restante = max(0, $mensualidad - $totalPagadoMes - $cantidad);
+            // Calculate total paid for this month so far
+            $totalPagadoMes = Pago::where('vecino_id', $vecino->id)
+                ->where('mes', $mesString)
+                ->sum('cantidad');
 
-        // Always create a new pago record
-        Pago::create([
-            'vecino_id' => $vecino->id,
-            'cantidad' => $cantidad,
-            'mes' => $mes->format('Y-m'),
-            'tipo' => $request->tipo,
-            'restante' => $restante,
-            'fecha_de_cobro' => $request->fecha_de_cobro ?: Carbon::now()->toDateString(),
-        ]);
+            $neededForMonth = max(0, $mensualidad - $totalPagadoMes);
+            $amountForThisMonth = min($remainingAmount, $neededForMonth);
 
-        // Update tag status to active if vecino has a tag and total paid >= mensualidad
-        if ($vecino->tag) {
-            $currentMonth = Carbon::now()->format('Y-m');
-            $totalPagadoCurrent = $vecino->pagos()->where('mes', $currentMonth)->sum('cantidad');
-            if ($totalPagadoCurrent >= $mensualidad) {
-                $vecino->tag->update(['activo' => true]);
-            } else {
-                $vecino->tag->update(['activo' => false]);
+            if ($amountForThisMonth > 0) {
+                // Check if a payment already exists for this month
+                $existingPago = Pago::where('vecino_id', $vecino->id)
+                    ->where('mes', $mesString)
+                    ->where('tipo', $request->tipo)
+                    ->first();
+
+                if ($existingPago) {
+                    // Add to existing payment
+                    $existingPago->cantidad += $amountForThisMonth;
+                    $existingPago->save();
+                    // Recalculate restante for this month
+                    $this->recalculateRestanteForMonth($mesString, $vecino->id);
+                } else {
+                    // Create new payment
+                    $restante = max(0, $mensualidad - $totalPagadoMes - $amountForThisMonth);
+                    Pago::create([
+                        'vecino_id' => $vecino->id,
+                        'cantidad' => $amountForThisMonth,
+                        'mes' => $mesString,
+                        'tipo' => $request->tipo,
+                        'restante' => $restante,
+                        'fecha_de_cobro' => $request->fecha_de_cobro ?: Carbon::now()->toDateString(),
+                    ]);
+                }
+
+                $remainingAmount -= $amountForThisMonth;
             }
+
+            // Move to next month
+            $currentMonth->addMonth();
+        }
+
+        // Update tag status for the current month
+        $this->updateTagStatusForMonth($vecino, Carbon::now()->format('Y-m'));
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Pago registrado correctamente']);
         }
 
         return redirect()->route('pagos.index')->with('success', 'Pago registrado correctamente');
@@ -120,10 +146,27 @@ class PagoController extends Controller
             'fecha_de_cobro' => 'nullable|date',
         ]);
 
+        $oldMes = $pago->mes;
+        $oldVecinoId = $pago->vecino_id;
+        $oldCantidad = $pago->cantidad;
+
         $pago->update($request->all());
 
-        // Recalculate restante for all pagos in the month
-        $this->recalculateRestanteForMonth($pago->mes, $pago->vecino_id);
+        // If month or vecino changed, we need to recalculate for both old and new
+        if ($oldMes !== $pago->mes || $oldVecinoId !== $pago->vecino_id) {
+            $this->recalculateRestanteForMonth($oldMes, $oldVecinoId);
+            $this->recalculateRestanteForMonth($pago->mes, $pago->vecino_id);
+        } else {
+            // Recalculate restante for the month
+            $this->recalculateRestanteForMonth($pago->mes, $pago->vecino_id);
+        }
+
+        // Update tag status if month changed
+        if ($oldMes !== $pago->mes) {
+            $vecino = $pago->vecino;
+            $this->updateTagStatusForMonth($vecino, $oldMes);
+            $this->updateTagStatusForMonth($vecino, $pago->mes);
+        }
 
         return response()->json(['message' => 'Pago actualizado.', 'pago' => $pago]);
     }
@@ -133,10 +176,14 @@ class PagoController extends Controller
         $pago = Pago::findOrFail($id);
         $mes = $pago->mes;
         $vecino_id = $pago->vecino_id;
+        $vecino = $pago->vecino;
         $pago->delete();
 
-        // Recalculate restante for the remaining pagos in the month
+        // Recalculate restante for the month
         $this->recalculateRestanteForMonth($mes, $vecino_id);
+
+        // Update tag status for the month
+        $this->updateTagStatusForMonth($vecino, $mes);
 
         return response()->json(['message' => 'Pago eliminado.']);
     }
@@ -157,4 +204,112 @@ class PagoController extends Controller
             $p->save();
         }
     }
+
+    private function updateTagStatusForMonth($vecino, $mes)
+    {
+        if ($vecino->tag) {
+            $mensualidad = 280;
+            $totalPagadoMes = $vecino->pagos()->where('mes', $mes)->sum('cantidad');
+            $vecino->tag->update(['activo' => $totalPagadoMes >= $mensualidad]);
+        }
+    }
+
+    // Only replace the getHistorico method in your existing PagoController.php
+
+    public function getHistorico(Request $request)
+{
+    $query = Pago::with(['vecino.tags']);
+
+    // Filter by specific month (for monthly view)
+    if ($request->has('mes')) {
+        $query->where('mes', $request->mes);
+    }
+
+    // Filter by vecino ID (for individual view)  
+    if ($request->has('vecino_id')) {
+        $query->where('vecino_id', $request->vecino_id);
+    }
+
+    // Filter for advance payments only (payments for future months)
+    if ($request->has('adelantados') && $request->adelantados == 'true') {
+        $currentMonth = Carbon::now()->format('Y-m');
+        $query->where('mes', '>', $currentMonth);
+    }
+
+    // Filter by street (via vecino relationship)
+    if ($request->has('calle')) {
+        $query->whereHas('vecino', function($q) use ($request) {
+            $q->where('calle', $request->calle);
+        });
+    }
+
+    // Filter by payment type
+    if ($request->has('tipo')) {
+        $query->where('tipo', $request->tipo);
+    }
+
+    // In your getHistorico method, add:
+    if ($request->has('fecha_cobro')) {
+        $query->whereDate('fecha_de_cobro', $request->fecha_cobro);
+    }
+
+    // Order by month descending, then by creation date
+    $pagos = $query->orderBy('mes', 'desc')
+                   ->orderBy('created_at', 'desc')
+                   ->get();
+
+    return response()->json($pagos);
 }
+/*public function getHistorico(Request $request)
+{
+    $query = Pago::with(['vecino.tags']);
+
+    // Filter by specific month (for monthly view)
+    if ($request->has('mes')) {
+        $query->where('mes', $request->mes);
+    }
+
+    // Filter by vecino ID (for individual view)  
+    if ($request->has('vecino_id')) {
+        $query->where('vecino_id', $request->vecino_id);
+    }
+
+    // Filter for advance payments only (payments for future months)
+    if ($request->has('adelantados') && $request->adelantados == 'true') {
+        $currentMonth = Carbon::now()->format('Y-m');
+        $query->where('mes', '>', $currentMonth);
+    }
+
+    // Filter by street (via vecino relationship)
+    if ($request->has('calle')) {
+        $query->whereHas('vecino', function($q) use ($request) {
+            $q->where('calle', $request->calle);
+        });
+    }
+
+    // Filter by payment type
+    if ($request->has('tipo')) {
+        $query->where('tipo', $request->tipo);
+    }
+
+    // Filter by payment collection date (for daily view)
+    if ($request->has('fecha_cobro')) {
+        // Try to parse the date and handle any format issues
+        try {
+            $date = Carbon::parse($request->fecha_cobro)->toDateString();
+            $query->whereDate('fecha_de_cobro', $date);
+        } catch (\Exception $e) {
+            // If parsing fails, try the raw value
+            $query->whereDate('fecha_de_cobro', $request->fecha_cobro);
+        }
+    }
+
+    // Order by month descending, then by creation date
+    $pagos = $query->orderBy('mes', 'desc')
+                   ->orderBy('created_at', 'desc')
+                   ->get();
+
+    return response()->json($pagos);
+}
+
+*/}

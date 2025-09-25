@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Vecino;
+use App\Models\Tag;
 
 class VecinoController extends Controller
 {
     // Mostrar todos los vecinos
     public function index()
     {
-        $vecinos = Vecino::with('tag', 'pagos')->get();
+        $vecinos = Vecino::with('tags', 'pagos')->get();
         if (request()->wantsJson()) {
             return response()->json($vecinos);
         }
@@ -20,7 +21,8 @@ class VecinoController extends Controller
     // Formulario para crear
     public function create()
     {
-        return view('vecinos.create');
+        $tags = Tag::whereHas('tagSale')->get();
+        return view('vecinos.create', compact('tags'));
     }
 
     // Guardar nuevo vecino
@@ -30,10 +32,23 @@ class VecinoController extends Controller
             'nombre' => 'required|string|max:255',
             'calle' => 'required|string|max:255',
             'numero_casa' => 'required|integer',
-            'numero_tag' => 'required|string|max:50',
+            'tag_ids' => 'required|array',
+            'tag_ids.*' => 'exists:tags,id',
         ]);
 
-        $vecino = Vecino::create($request->all());
+        // Verify tags have been sold
+        $soldTagIds = Tag::whereIn('id', $request->tag_ids)
+            ->whereHas('tagSale')
+            ->pluck('id')
+            ->toArray();
+
+        if (count($soldTagIds) !== count($request->tag_ids)) {
+            return back()->withErrors(['tag_ids' => 'One or more tags have not been sold.']);
+        }
+
+        $vecino = Vecino::create($request->only(['nombre', 'calle', 'numero_casa']));
+
+        $vecino->tags()->sync($soldTagIds);
 
         if (request()->wantsJson()) {
             return response()->json(['message' => 'Vecino registrado correctamente.', 'vecino' => $vecino], 201);
@@ -44,7 +59,7 @@ class VecinoController extends Controller
     // Formulario de edición
     public function edit($id)
     {
-        $vecino = Vecino::findOrFail($id);
+        $vecino = Vecino::with('tags')->findOrFail($id);
         return view('vecinos.edit', compact('vecino'));
     }
 
@@ -57,10 +72,23 @@ class VecinoController extends Controller
             'nombre' => 'required|string|max:255',
             'calle' => 'required|string|max:255',
             'numero_casa' => 'required|integer',
-            'numero_tag' => 'required|string|max:50',
+            'tag_ids' => 'required|array',
+            'tag_ids.*' => 'exists:tags,id',
         ]);
 
-        $vecino->update($request->all());
+        // Verify tags have been sold
+        $soldTagIds = Tag::whereIn('id', $request->tag_ids)
+            ->whereHas('tagSale')
+            ->pluck('id')
+            ->toArray();
+
+        if (count($soldTagIds) !== count($request->tag_ids)) {
+            return back()->withErrors(['tag_ids' => 'One or more tags have not been sold.']);
+        }
+
+        $vecino->update($request->only(['nombre', 'calle', 'numero_casa']));
+
+        $vecino->tags()->sync($soldTagIds);
 
         if (request()->wantsJson()) {
             return response()->json(['message' => 'Vecino actualizado.', 'vecino' => $vecino]);
@@ -78,5 +106,19 @@ class VecinoController extends Controller
             return response()->json(['message' => 'Vecino eliminado.']);
         }
         return redirect()->route('vecinos.index')->with('success', 'Vecino eliminado.');
+    }
+
+    // New method to get historial by numero_tag
+    public function historial($numero_tag)
+    {
+        $vecino = Vecino::whereHas('tags', function ($query) use ($numero_tag) {
+            $query->where('codigo', $numero_tag);
+        })->with('pagos')->first();
+
+        if (!$vecino) {
+            return response()->json(['message' => 'Vecino no encontrado'], 404);
+        }
+
+        return response()->json($vecino->pagos);
     }
 }

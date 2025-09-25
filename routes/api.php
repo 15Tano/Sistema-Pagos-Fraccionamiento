@@ -22,7 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('vecinos', VecinoController::class);
+Route::get('vecinos/{numero_tag}/historial', [VecinoController::class, 'historial']);
 Route::resource('tags', TagController::class);
+Route::get('pagos/historico', [PagoController::class, 'historico']);
 Route::resource('pagos', PagoController::class);
 Route::patch('tags/{id}/toggle', [TagController::class, 'toggle']);
 
@@ -34,3 +36,5 @@ Route::delete('tag_sales/reset', [TagSaleController::class, 'reset']);
 Route::get('tags/stock', [TagController::class, 'stock']);
 Route::get('tags/total_sales', [TagController::class, 'totalSales']);
 Route::get('tags/sales', [TagController::class, 'sales']);
+// Add new route for enhanced historico endpoint
+Route::get('/pagos/historico', [PagoController::class, 'getHistorico']);

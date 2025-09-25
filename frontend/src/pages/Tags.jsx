@@ -46,8 +46,13 @@ function Tags() {
     const fetchVecinos = async () => {
         try {
             const response = await api.get("/vecinos");
-            setVecinos(response.data);
-            return response.data;
+            // Map vecinos to set v.tag as the first tag or null
+            const vecinosWithTag = response.data.map((v) => ({
+                ...v,
+                tag: v.tags && v.tags.length > 0 ? v.tags[0] : null,
+            }));
+            setVecinos(vecinosWithTag);
+            return vecinosWithTag;
         } catch (error) {
             console.error("Error fetching vecinos:", error);
             return [];
@@ -402,7 +407,14 @@ function Tags() {
                                                     {v.nombre}
                                                 </td>
                                                 <td className="p-2">
-                                                    {v.numero_tag || "Sin tag"}
+                                                    {v.tags && v.tags.length > 0
+                                                        ? v.tags
+                                                              .map(
+                                                                  (t) =>
+                                                                      t.codigo
+                                                              )
+                                                              .join(", ")
+                                                        : "Sin tag"}
                                                 </td>
                                                 <td className="p-2">
                                                     <span

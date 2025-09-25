@@ -9,13 +9,17 @@ class Tag extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['codigo','activo','vecino_id'];
+    protected $fillable = ['codigo','activo'];
 
-    public function vecino() {
-        return $this->belongsTo(Vecino::class);
+    public function vecinos() {
+        return $this->belongsToMany(Vecino::class, 'tag_vecino');
     }
 
     public function tagSale() {
         return $this->hasOne(\App\Models\TagSale::class);
+    }
+
+    public function scopeSold($query) {
+        return $query->whereHas('tagSale');
     }
 }

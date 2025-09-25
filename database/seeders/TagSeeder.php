@@ -12,13 +12,13 @@ class TagSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create 500 tags numbered from 001 to 500
+        // Create 500 tags numbered from 001 to 500, if they don't exist
         for ($i = 1; $i <= 500; $i++) {
             $codigo = str_pad($i, 3, '0', STR_PAD_LEFT);
-            Tag::create([
+            Tag::firstOrCreate([
                 'codigo' => $codigo,
+            ], [
                 'activo' => false,
-                'vecino_id' => null,
             ]);
         }
     }

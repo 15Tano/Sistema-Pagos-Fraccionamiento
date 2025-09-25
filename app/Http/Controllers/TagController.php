@@ -10,21 +10,19 @@ class TagController extends Controller
 {
     public function index()
     {
-        return response()->json(Tag::with('vecino')->get());
+        return response()->json(Tag::with('vecinos')->get());
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'codigo' => 'required|unique:tags',
-            'vecino_id' => 'nullable|exists:vecinos,id'
-        ]);
+    'codigo' => 'required|unique:tags',
+    ]);
 
         $tag = Tag::create([
-            'codigo' => $request->codigo,
-            'activo' => false,
-            'vecino_id' => $request->vecino_id
-        ]);
+    'codigo' => $request->codigo,
+    'activo' => false,
+    ]);
 
         return response()->json($tag);
     }

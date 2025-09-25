@@ -20,8 +20,14 @@
             <input type="number" name="numero_casa" value="{{ $vecino->numero_casa }}" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label>No. Tag</label>
-            <input type="text" name="numero_tag" value="{{ $vecino->numero_tag }}" class="form-control" required>
+            <label>Tags</label>
+            <select name="tag_ids[]" class="form-control" multiple required>
+                @foreach($tags as $tag)
+                    <option value="{{ $tag->id }}" {{ $vecino->tags->contains($tag->id) ? 'selected' : '' }}>
+                        {{ $tag->codigo }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <button class="btn btn-primary">Actualizar</button>
