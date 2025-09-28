@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import api from "../api";
+import { useLocation } from "react-router-dom";
 
 function Pagos() {
     const [pagos, setPagos] = useState([]);
@@ -18,6 +19,23 @@ function Pagos() {
     const [showVecinoDropdown, setShowVecinoDropdown] = useState(false);
     const [selectedVecinoForSearch, setSelectedVecinoForSearch] =
         useState(null);
+    const location = useLocation();
+
+    useEffect(() => {
+        fetchInitialData();
+    }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const vecinoIdFromUrl = params.get("vecinoId");
+
+        if (vecinoIdFromUrl && vecinos.length > 0) {
+            const vecinoToSelect = vecinos.find((v) => v.id == vecinoIdFromUrl);
+            if (vecinoToSelect) {
+                handleVecinoSelect(vecinoToSelect);
+            }
+        }
+    }, [location.search, vecinos]);
 
     useEffect(() => {
         fetchInitialData();

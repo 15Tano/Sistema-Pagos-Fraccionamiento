@@ -33,6 +33,7 @@ use App\Http\Controllers\TagSaleController;
 
 Route::resource('tag_sales', TagSaleController::class);
 Route::delete('tag_sales/reset', [TagSaleController::class, 'reset']);
+Route::delete('/tag_sales/{id}', [TagSaleController::class, 'destroy']);
 Route::get('tags/stock', [TagController::class, 'stock']);
 Route::get('tags/total_sales', [TagController::class, 'totalSales']);
 Route::get('tags/sales', [TagController::class, 'sales']);

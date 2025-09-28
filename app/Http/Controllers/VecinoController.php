@@ -5,16 +5,45 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Vecino;
 use App\Models\Tag;
+use Carbon\Carbon; // <-- Asegúrate de que Carbon esté importado
 
 class VecinoController extends Controller
 {
-    // Mostrar todos los vecinos
+    /**
+     * =========================================================================
+     * MÉTODO MODIFICADO
+     * =========================================================================
+     * Este método ahora calcula el estado de cada tag para el mes actual
+     * y lo añade a la respuesta JSON.
+     */
     public function index()
     {
+        // 1. Obtenemos los vecinos con sus relaciones como antes
         $vecinos = Vecino::with('tags', 'pagos')->get();
+
+        // 2. Definimos el mes actual para el cálculo
+        $currentMonth = Carbon::now()->format('Y-m');
+
+        // 3. Procesamos los datos ANTES de enviarlos al frontend
+        $vecinos->each(function ($vecino) use ($currentMonth) {
+            
+            // Verificamos si el vecino tiene un pago completo para el mes actual
+            $hasCompletePago = $vecino->pagos->contains(function ($pago) use ($currentMonth) {
+                return $pago->mes === $currentMonth && $pago->restante == 0;
+            });
+
+            // Añadimos un nuevo atributo a CADA tag del vecino
+            $vecino->tags->each(function ($tag) use ($hasCompletePago) {
+                // El tag se considera "activo" solo si su estado base es activo Y el vecino ha pagado el mes
+                $tag->is_active_for_month = $tag->activo && $hasCompletePago;
+            });
+        });
+
+        // 4. Devolvemos los vecinos ya procesados
         if (request()->wantsJson()) {
             return response()->json($vecinos);
         }
+        
         return view('vecinos.index', compact('vecinos'));
     }
 

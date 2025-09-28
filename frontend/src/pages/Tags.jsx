@@ -1,5 +1,168 @@
 import { useState, useEffect, useCallback } from "react";
 import api from "../api";
+import { Link } from "react-router-dom";
+const CheckCircle2Icon = () => (
+    <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+    </svg>
+);
+
+// Custom SVG Icons
+const TrashIcon = () => (
+    <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        />
+    </svg>
+);
+
+const UserIcon = () => (
+    <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+    </svg>
+);
+
+const CreditCardIcon = () => (
+    <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+        />
+    </svg>
+);
+
+const BarChartIcon = () => (
+    <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        />
+    </svg>
+);
+
+const ShoppingCartIcon = () => (
+    <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13v6a2 2 0 002 2h6a2 2 0 002-2v-6m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.01"
+        />
+    </svg>
+);
+
+const TagIcon = () => (
+    <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+        />
+    </svg>
+);
+
+const AlertCircleIcon = () => (
+    <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+    </svg>
+);
+
+const CheckCircleIcon = () => (
+    <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+    </svg>
+);
+
+const XCircleIcon = () => (
+    <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+    </svg>
+);
+
+// Import your actual API instance
 
 function Tags() {
     const [vecinos, setVecinos] = useState([]);
@@ -8,21 +171,66 @@ function Tags() {
     const [totalSales, setTotalSales] = useState(0);
     const [unsoldTags, setUnsoldTags] = useState([]);
     const [saleForm, setSaleForm] = useState({ tag_id: "" });
-    const [loading, setLoading] = useState(false);
-    const currentMonth = new Date().toISOString().slice(0, 7);
+    const [loading, setLoading] = useState(true);
+    const [currentMonth, setCurrentMonth] = useState("");
+    const [payments, setPayments] = useState([]);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+
+    const showMessage = useCallback((message, type = "success") => {
+        if (type === "success") {
+            setSuccessMessage(message);
+            setError(null);
+        } else {
+            setError(message);
+            setSuccessMessage(null);
+        }
+        setTimeout(() => {
+            setSuccessMessage(null);
+            setError(null);
+        }, 3000);
+    }, []);
 
     const fetchAllData = useCallback(async () => {
         setLoading(true);
+        setError(null);
         try {
-            await Promise.all([
-                fetchTags(),
-                fetchVecinos(),
-                fetchSales(),
-                fetchStock(),
-                fetchTotalSales(),
-            ]);
+            const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+
+            const [tagsRes, vecinosRes, salesRes, paymentsRes] =
+                await Promise.all([
+                    api.get("/tags"),
+                    api.get("/vecinos"),
+                    api.get("/tag_sales"),
+                    api.get(`/pagos/historico?mes=${currentMonth}`), // Get current month payments
+                ]);
+
+            const tags = tagsRes.data || [];
+            const vecinos = vecinosRes.data || [];
+            const sales = salesRes.data || [];
+            const payments = paymentsRes.data || [];
+
+            setVecinos(vecinos);
+            setSales(sales);
+            setPayments(payments);
+
+            // Filter unsold tags - tags that don't have a tag_sale record
+            const soldTagIds = new Set(sales.map((s) => s.tag_id));
+            const unsold = tags.filter((t) => !soldTagIds.has(t.id));
+            setUnsoldTags(unsold);
+            setStock(unsold.length);
+
+            // Calculate total from sales
+            const total = sales.reduce(
+                (sum, sale) => sum + parseFloat(sale.price || 150),
+                0
+            );
+            setTotalSales(total);
         } catch (error) {
             console.error("Error fetching data:", error);
+            setError(
+                "Error al cargar los datos. Por favor intente nuevamente."
+            );
         } finally {
             setLoading(false);
         }
@@ -30,447 +238,475 @@ function Tags() {
 
     useEffect(() => {
         fetchAllData();
+        // Set current month for payment tracking
+        const now = new Date();
+        const monthStr = `${now.getFullYear()}-${String(
+            now.getMonth() + 1
+        ).padStart(2, "0")}`;
+        setCurrentMonth(monthStr);
     }, [fetchAllData]);
-
-    const fetchTags = async () => {
-        try {
-            const response = await api.get("/tags");
-            // We don't need to store tags in state since we only use them for calculations
-            return response.data;
-        } catch (error) {
-            console.error("Error fetching tags:", error);
-            return [];
-        }
-    };
-
-    const fetchVecinos = async () => {
-        try {
-            const response = await api.get("/vecinos");
-            // Map vecinos to set v.tag as the first tag or null
-            const vecinosWithTag = response.data.map((v) => ({
-                ...v,
-                tag: v.tags && v.tags.length > 0 ? v.tags[0] : null,
-            }));
-            setVecinos(vecinosWithTag);
-            return vecinosWithTag;
-        } catch (error) {
-            console.error("Error fetching vecinos:", error);
-            return [];
-        }
-    };
-
-    const fetchSales = async () => {
-        try {
-            const response = await api.get("/tag_sales");
-            setSales(response.data);
-
-            // Calculate unsold tags based on current sales
-            const tagsResponse = await api.get("/tags");
-            const soldTagIds = response.data.map((s) => s.tag_id);
-            const unsold = tagsResponse.data.filter(
-                (t) => !soldTagIds.includes(t.id)
-            );
-            setUnsoldTags(unsold);
-
-            return response.data;
-        } catch (error) {
-            console.error("Error fetching sales:", error);
-            return [];
-        }
-    };
-
-    const fetchStock = async () => {
-        try {
-            // Calculate stock based on actual data instead of relying on backend endpoint
-            const [tagsResponse, salesResponse] = await Promise.all([
-                api.get("/tags"),
-                api.get("/tag_sales"),
-            ]);
-
-            const totalTags = tagsResponse.data.length;
-            const soldTags = salesResponse.data.length;
-            const calculatedStock = totalTags - soldTags;
-
-            setStock(calculatedStock);
-            return calculatedStock;
-        } catch (error) {
-            console.error("Error calculating stock:", error);
-            // Fallback to backend endpoint if available
-            try {
-                const response = await api.get("/tags/stock");
-                setStock(response.data.stock || 0);
-                return response.data.stock || 0;
-            } catch (fallbackError) {
-                console.error(
-                    "Error fetching stock from backend:",
-                    fallbackError
-                );
-                setStock(0);
-                return 0;
-            }
-        }
-    };
-
-    const fetchTotalSales = async () => {
-        try {
-            const response = await api.get("/tag_sales");
-            // Calculate total sales locally to ensure accuracy
-            const total = response.data.reduce(
-                (sum, sale) => sum + (sale.price || 150),
-                0
-            );
-            setTotalSales(total);
-            return total;
-        } catch (error) {
-            console.error("Error calculating total sales:", error);
-            // Fallback to backend endpoint if available
-            try {
-                const response = await api.get("/tags/total_sales");
-                setTotalSales(response.data.total_sales || 0);
-                return response.data.total_sales || 0;
-            } catch (fallbackError) {
-                console.error(
-                    "Error fetching total sales from backend:",
-                    fallbackError
-                );
-                setTotalSales(0);
-                return 0;
-            }
-        }
-    };
 
     const handleSaleChange = (e) => {
         setSaleForm({ ...saleForm, [e.target.name]: e.target.value });
     };
 
-    const handleSaleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSaleSubmit = async () => {
         if (!saleForm.tag_id) {
-            alert("Por favor seleccione un tag");
+            setError("Por favor seleccione un tag");
             return;
         }
 
-        setLoading(true);
         try {
-            await api.post("/tag_sales", saleForm);
+            const response = await api.post("/tag_sales", {
+                tag_id: saleForm.tag_id,
+            });
+            showMessage("Venta registrada exitosamente");
             setSaleForm({ tag_id: "" });
-
-            // Refresh all relevant data
-            await Promise.all([fetchSales(), fetchStock(), fetchTotalSales()]);
-
-            alert("Tag vendido exitosamente");
+            await fetchAllData();
         } catch (error) {
-            console.error("Error selling tag:", error);
-            alert("Error al vender el tag. Por favor intente nuevamente.");
-        } finally {
-            setLoading(false);
+            console.error("Error creating sale:", error);
+            if (error.response?.data?.error) {
+                setError(error.response.data.error);
+            } else {
+                setError(
+                    "Error al registrar la venta. Por favor intente nuevamente."
+                );
+            }
         }
     };
 
-    const handleToggle = async (id) => {
-        if (!id) {
-            alert("ID de tag no válido");
-            return;
-        }
+    const handleDeleteSale = async (saleId) => {
+        if (!window.confirm("¿Está seguro de eliminar esta venta?")) return;
 
-        setLoading(true);
         try {
-            const response = await api.patch(`/tags/${id}/toggle`);
-
-            // Update the local state immediately for better UX
-            setVecinos((prevVecinos) =>
-                prevVecinos.map((vecino) => {
-                    if (vecino.tag && vecino.tag.id === id) {
-                        return {
-                            ...vecino,
-                            tag: {
-                                ...vecino.tag,
-                                activo: !vecino.tag.activo,
-                            },
-                        };
-                    }
-                    return vecino;
-                })
+            await api.delete(`/tag_sales/${saleId}`);
+            showMessage("Venta eliminada exitosamente");
+            await fetchAllData();
+        } catch (error) {
+            console.error("Error deleting sale:", error);
+            setError(
+                "Error al eliminar la venta. Por favor intente nuevamente."
             );
+        }
+    };
 
-            // Refresh data from server to ensure consistency (optional, but good practice)
-            setTimeout(async () => {
-                try {
-                    await Promise.all([fetchVecinos()]);
-                } catch (error) {
-                    console.error("Error refreshing data after toggle:", error);
-                }
-            }, 500);
+    // Helper function to check if vecino has paid this month
+    const hasVecinoPaidThisMonth = (vecinoId) => {
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        const vecinoPayments = payments.filter(
+            (p) => p.vecino_id === vecinoId && p.mes === currentMonth
+        );
+        const totalPaid = vecinoPayments.reduce(
+            (sum, payment) => sum + parseFloat(payment.cantidad),
+            0
+        );
+        return totalPaid >= 280; // Monthly payment amount
+    };
 
-            console.log("Tag toggled successfully:", response.data);
+    // Toggle individual tag status (manual override)
+    const handleToggleTag = async (tagId) => {
+        try {
+            const response = await api.patch(`/tags/${tagId}/toggle`);
+            showMessage(response.data.message);
+            await fetchAllData();
         } catch (error) {
             console.error("Error toggling tag:", error);
-            alert(
+            setError(
                 "Error al cambiar el estado del tag. Por favor intente nuevamente."
             );
-
-            // If there was an error, refresh the data to ensure UI is consistent
-            await fetchVecinos();
-        } finally {
-            setLoading(false);
         }
     };
 
-    const handleResetSales = async () => {
-        if (
-            !window.confirm(
-                "¿Está seguro que desea reiniciar las ventas? Esta acción eliminará todos los registros de ventas y es permanente."
-            )
-        ) {
-            return;
-        }
-
-        setLoading(true);
+    // Create a quick payment for a vecino (activates their tags)
+    const handleCreatePayment = async (vecinoId) => {
         try {
-            const response = await api.delete("/tag_sales/reset");
-            console.log("Sales reset response:", response);
-
-            // Refresh all data after reset
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const response = await api.post("/pagos", {
+                vecino_id: vecinoId,
+                cantidad: 280,
+                tipo: "ordinario",
+                mes: currentMonth,
+                fecha_de_cobro: new Date().toISOString().split("T")[0],
+            });
+            showMessage("Pago registrado y tags activados automáticamente");
             await fetchAllData();
-
-            alert("Ventas reiniciadas exitosamente");
         } catch (error) {
-            console.error("Error resetting sales:", error);
-            alert(
-                "Error al reiniciar las ventas. Por favor intente nuevamente."
+            console.error("Error creating payment:", error);
+            setError(
+                "Error al registrar el pago. Por favor intente nuevamente."
             );
-        } finally {
-            setLoading(false);
         }
     };
 
     if (loading) {
         return (
-            <div className="p-6">
-                <div className="flex justify-center items-center h-64">
-                    <div className="text-lg">Cargando...</div>
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                    <p className="mt-4 text-slate-600 font-medium">
+                        Cargando datos...
+                    </p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="p-6">
-            <h2 className="text-xl font-bold mb-4">Tags</h2>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-6">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                        Gestión de Tags
+                    </h1>
+                    <p className="text-slate-600">
+                        Administra los tags de acceso de tu comunidad
+                    </p>
+                </div>
 
-            <div className="grid grid-cols-2 gap-6">
-                {/* Left Column: Venta de Tags */}
-                <div>
-                    <h3 className="text-lg font-semibold mb-4">
-                        Venta de Tags
-                    </h3>
+                {/* Messages */}
+                {error && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-800">
+                        <AlertCircleIcon />
+                        <span>{error}</span>
+                    </div>
+                )}
 
-                    <form onSubmit={handleSaleSubmit} className="mb-4">
-                        <select
-                            name="tag_id"
-                            value={saleForm.tag_id}
-                            onChange={handleSaleChange}
-                            className="border rounded-lg px-3 py-2 w-full mb-2"
-                            required
-                            disabled={loading}
-                        >
-                            <option value="">Seleccionar Tag</option>
-                            {unsoldTags.map((t) => (
-                                <option key={t.id} value={t.id}>
-                                    {t.codigo}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            type="submit"
-                            disabled={loading || !saleForm.tag_id}
-                            className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed w-full"
-                        >
-                            {loading ? "Procesando..." : "Vender Tag ($150)"}
-                        </button>
-                    </form>
+                {successMessage && (
+                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-800">
+                        <CheckCircleIcon />
+                        <span>{successMessage}</span>
+                    </div>
+                )}
 
-                    <div className="mb-4 p-3 bg-gray-100 rounded-lg">
-                        <p className="text-sm font-medium">
-                            Stock: {stock} tags disponibles
-                        </p>
-                        <p className="text-sm font-medium">
-                            Total Ventas: ${totalSales}
-                        </p>
-                        <button
-                            onClick={handleResetSales}
-                            disabled={loading}
-                            className="mt-2 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed w-full"
-                        >
-                            {loading ? "Procesando..." : "Reiniciar Ventas"}
-                        </button>
+                {/* Main Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    {/* Vender Tag */}
+                    <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <ShoppingCartIcon />
+                            </div>
+                            <h3 className="text-xl font-semibold text-slate-800">
+                                Vender Tag
+                            </h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Seleccionar Tag
+                                </label>
+                                <select
+                                    name="tag_id"
+                                    value={saleForm.tag_id}
+                                    onChange={handleSaleChange}
+                                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                >
+                                    <option value="">Seleccione un tag</option>
+                                    {unsoldTags.map((tag) => (
+                                        <option key={tag.id} value={tag.id}>
+                                            {tag.codigo}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <button
+                                onClick={handleSaleSubmit}
+                                className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                            >
+                                Registrar Venta
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-md">
-                            <thead className="bg-green-600 text-white">
-                                <tr>
-                                    <th className="p-2 text-left">Tag</th>
-                                    <th className="p-2 text-left">
-                                        Fecha Venta
-                                    </th>
-                                    <th className="p-2 text-left">Precio</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {sales.length === 0 ? (
-                                    <tr>
-                                        <td
-                                            colSpan="3"
-                                            className="p-4 text-center text-gray-500"
-                                        >
-                                            No hay ventas registradas
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    sales.map((s) => (
-                                        <tr
-                                            key={s.id}
-                                            className="border-b hover:bg-gray-50"
-                                        >
-                                            <td className="p-2">
-                                                {s.tag ? s.tag.codigo : "N/A"}
-                                            </td>
-                                            <td className="p-2">
-                                                {new Date(
-                                                    s.sold_at
-                                                ).toLocaleDateString()}
-                                            </td>
-                                            <td className="p-2">
-                                                ${s.price || 150}
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                    {/* Estadísticas */}
+                    <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                                <BarChartIcon />
+                            </div>
+                            <h3 className="text-xl font-semibold text-slate-800">
+                                Estadísticas
+                            </h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center p-4 bg-blue-50 rounded-xl">
+                                <div className="flex items-center gap-2">
+                                    <TagIcon />
+                                    <span className="font-medium text-blue-800">
+                                        Stock Disponible
+                                    </span>
+                                </div>
+                                <span className="text-2xl font-bold text-blue-600">
+                                    {stock}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center p-4 bg-green-50 rounded-xl">
+                                <div className="flex items-center gap-2">
+                                    <CreditCardIcon />
+                                    <span className="font-medium text-green-800">
+                                        Total Ventas
+                                    </span>
+                                </div>
+                                <span className="text-2xl font-bold text-green-600">
+                                    ${totalSales}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Ventas Recientes */}
+                    <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                                <CreditCardIcon />
+                            </div>
+                            <h3 className="text-xl font-semibold text-slate-800">
+                                Ventas Recientes
+                            </h3>
+                        </div>
+
+                        <div className="max-h-64 overflow-y-auto space-y-2">
+                            {sales.length > 0 ? (
+                                sales.slice(0, 5).map((sale) => (
+                                    <div
+                                        key={sale.id}
+                                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                    >
+                                        <div className="flex-1">
+                                            <p className="font-medium text-slate-800 text-sm">
+                                                {sale.tag
+                                                    ? sale.tag.codigo
+                                                    : `Tag #${sale.tag_id}`}
+                                            </p>
+                                            <p className="text-xs text-slate-600">
+                                                {sale.sold_at
+                                                    ? new Date(
+                                                          sale.sold_at
+                                                      ).toLocaleDateString()
+                                                    : "Sin fecha"}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-semibold text-green-600">
+                                                ${sale.price}
+                                            </span>
+                                            <button
+                                                onClick={() =>
+                                                    handleDeleteSale(sale.id)
+                                                }
+                                                className="p-1 text-red-500 hover:bg-red-100 rounded transition-colors"
+                                            >
+                                                <TrashIcon />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-slate-500 text-center py-8">
+                                    No hay ventas registradas
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {/* Right Column: Vecinos */}
-                <div>
-                    <h3 className="text-lg font-semibold mb-4">Vecinos</h3>
+                {/* Tabla de Vecinos */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 overflow-hidden">
+                    <div className="p-6 border-b border-slate-200">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-indigo-100 rounded-lg">
+                                <UserIcon />
+                            </div>
+                            <h3 className="text-xl font-semibold text-slate-800">
+                                Estado de Vecinos y Tags
+                            </h3>
+                        </div>
+                    </div>
 
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-md">
-                            <thead className="bg-blue-600 text-white">
+                        <table className="w-full">
+                            <thead className="bg-slate-100/50">
                                 <tr>
-                                    <th className="p-2 text-left">Vecino</th>
-                                    <th className="p-2 text-left">Tag</th>
-                                    <th className="p-2 text-left">Estado</th>
-                                    <th className="p-2 text-left">Acción</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                                        Vecino
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                                        Tags Asignados
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                                        Estado de Pago
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                                        Estado de Tags
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                                        Acciones
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {vecinos.length === 0 ? (
-                                    <tr>
-                                        <td
-                                            colSpan="4"
-                                            className="p-4 text-center text-gray-500"
-                                        >
-                                            No hay vecinos registrados
+                            <tbody className="divide-y divide-slate-200">
+                                {vecinos.map((vecino) => (
+                                    <tr
+                                        key={vecino.id}
+                                        className="hover:bg-slate-50/50 transition-colors"
+                                    >
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <p className="font-semibold text-slate-800">
+                                                    {vecino.nombre}
+                                                </p>
+                                                <p className="text-sm text-slate-600">
+                                                    {vecino.calle} #
+                                                    {vecino.numero_casa}
+                                                </p>
+                                            </div>
                                         </td>
-                                    </tr>
-                                ) : (
-                                    vecinos.map((v) => {
-                                        const hasCompletePago =
-                                            v.pagos &&
-                                            v.pagos.some(
-                                                (p) =>
-                                                    p.mes === currentMonth &&
-                                                    p.restante === 0
-                                            );
-                                        const tagActivo = v.tag && v.tag.activo;
-                                        // Tag is active only if it has a complete payment (restante = 0) for the current month
-                                        const isActive =
-                                            tagActivo && hasCompletePago;
 
-                                        // Debug logging (remove in production)
-                                        console.log(`Vecino ${v.nombre}:`, {
-                                            hasCompletePago,
-                                            tagActivo,
-                                            isActive,
-                                            tag: v.tag,
-                                        });
-
-                                        return (
-                                            <tr
-                                                key={v.id}
-                                                className="border-b hover:bg-gray-50"
-                                            >
-                                                <td className="p-2">
-                                                    {v.nombre}
-                                                </td>
-                                                <td className="p-2">
-                                                    {v.tags && v.tags.length > 0
-                                                        ? v.tags
-                                                              .map(
-                                                                  (t) =>
-                                                                      t.codigo
-                                                              )
-                                                              .join(", ")
-                                                        : "Sin tag"}
-                                                </td>
-                                                <td className="p-2">
-                                                    <span
-                                                        className={`px-2 py-1 rounded text-xs font-medium ${
-                                                            isActive
-                                                                ? "bg-green-500 text-white"
-                                                                : "bg-gray-500 text-white"
-                                                        }`}
-                                                    >
-                                                        {isActive
-                                                            ? "Activo"
-                                                            : "Inactivo"}
-                                                        {/* Debug info (remove in production) */}
-                                                        <span className="ml-1 text-xs">
-                                                            (
-                                                            {hasCompletePago
-                                                                ? "P"
-                                                                : ""}
-                                                            {tagActivo
-                                                                ? "T"
-                                                                : ""}
+                                        {vecino.tags &&
+                                        vecino.tags.length > 0 ? (
+                                            <>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {vecino.tags.map(
+                                                            (tag) => (
+                                                                <span
+                                                                    key={tag.id}
+                                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                                                        tag.activo
+                                                                            ? "bg-green-100 text-green-800"
+                                                                            : "bg-red-100 text-red-800"
+                                                                    }`}
+                                                                >
+                                                                    {tag.codigo}
+                                                                </span>
                                                             )
-                                                        </span>
-                                                    </span>
+                                                        )}
+                                                    </div>
                                                 </td>
-                                                <td className="p-2">
-                                                    {v.tag ? (
-                                                        <button
-                                                            onClick={() =>
-                                                                handleToggle(
-                                                                    v.tag.id
-                                                                )
-                                                            }
-                                                            disabled={loading}
-                                                            className={`px-3 py-1 rounded text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
-                                                                v.tag.activo
-                                                                    ? "bg-red-500 text-white hover:bg-red-600"
-                                                                    : "bg-green-500 text-white hover:bg-green-600"
-                                                            }`}
-                                                        >
-                                                            {loading
-                                                                ? "..."
-                                                                : v.tag.activo
-                                                                ? "Desactivar"
-                                                                : "Activar"}
-                                                        </button>
+                                                <td className="px-6 py-4">
+                                                    {hasVecinoPaidThisMonth(
+                                                        vecino.id
+                                                    ) ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2Icon />
+                                                            <span className="text-sm text-green-700 font-medium">
+                                                                Pagado
+                                                            </span>
+                                                        </div>
                                                     ) : (
-                                                        <span className="text-gray-400 text-xs">
-                                                            Sin tag
-                                                        </span>
+                                                        <div className="flex items-center gap-2">
+                                                            <XCircleIcon />
+                                                            <span className="text-sm text-red-700 font-medium">
+                                                                Pendiente $280
+                                                            </span>
+                                                        </div>
                                                     )}
+                                                    <p className="text-xs text-slate-500 mt-1">
+                                                        {new Date().toLocaleDateString(
+                                                            "es-ES",
+                                                            {
+                                                                month: "long",
+                                                                year: "numeric",
+                                                            }
+                                                        )}
+                                                    </p>
                                                 </td>
-                                            </tr>
-                                        );
-                                    })
-                                )}
+                                                <td className="px-6 py-4">
+                                                    <div className="space-y-2">
+                                                        {vecino.tags.map(
+                                                            (tag) => (
+                                                                <div
+                                                                    key={tag.id}
+                                                                    className="flex items-center gap-2"
+                                                                >
+                                                                    {tag.activo ? (
+                                                                        <CheckCircleIcon />
+                                                                    ) : (
+                                                                        <XCircleIcon />
+                                                                    )}
+                                                                    <span
+                                                                        className={`text-sm ${
+                                                                            tag.activo
+                                                                                ? "text-green-700"
+                                                                                : "text-red-700"
+                                                                        }`}
+                                                                    >
+                                                                        {tag.activo
+                                                                            ? "Activo"
+                                                                            : "Inactivo"}
+                                                                    </span>
+                                                                    <span className="text-xs text-slate-500">
+                                                                        (
+                                                                        {
+                                                                            tag.codigo
+                                                                        }
+                                                                        )
+                                                                    </span>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="space-y-2">
+                                                        {!hasVecinoPaidThisMonth(
+                                                            vecino.id
+                                                        ) && (
+                                                            <Link
+                                                                to={`/pagos?vecinoId=${vecino.id}`}
+                                                                className="block text-center w-full px-3 py-2 rounded-lg text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200"
+                                                            >
+                                                                Registrar Pago
+                                                            </Link>
+                                                        )}
+                                                        <div className="text-xs text-slate-600 border-t pt-2">
+                                                            <p className="font-medium mb-1">
+                                                                Control Manual:
+                                                            </p>
+                                                            {vecino.tags.map(
+                                                                (tag) => (
+                                                                    <button
+                                                                        key={
+                                                                            tag.id
+                                                                        }
+                                                                        onClick={() =>
+                                                                            handleToggleTag(
+                                                                                tag.id
+                                                                            )
+                                                                        }
+                                                                        className={`px-2 py-1 rounded text-xs font-semibold mr-1 mb-1 transition-all duration-200 ${
+                                                                            tag.activo
+                                                                                ? "bg-red-500 hover:bg-red-600 text-white"
+                                                                                : "bg-green-500 hover:bg-green-600 text-white"
+                                                                        }`}
+                                                                    >
+                                                                        {tag.activo
+                                                                            ? "Desactivar"
+                                                                            : "Activar"}{" "}
+                                                                        {
+                                                                            tag.codigo
+                                                                        }
+                                                                    </button>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </>
+                                        ) : (
+                                            <td
+                                                colSpan="4"
+                                                className="px-6 py-4 text-center text-slate-500 italic"
+                                            >
+                                                Sin tags asignados
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>

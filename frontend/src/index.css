@@ -1,2 +1,24 @@
 @import "tailwindcss/preflight";
 @import "tailwindcss/utilities";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fix for Tailwind preflight button transparency */
+button[class*="bg-gradient"],
+button[class*="bg-orange"],
+button[class*="bg-green"],
+button[class*="bg-red"],
+button[class*="bg-blue"],
+button[class*="bg-"] {
+    /*background-color: revert !important;
+    //*background-image: revert !important;
+*/
+}
+
+/* Or more specifically target your custom buttons */
+.btn-custom {
+    background-color: revert !important;
+    background-image: revert !important;
+}
