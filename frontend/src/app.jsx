@@ -201,7 +201,7 @@ function App() {
                             <div className="flex items-center space-x-4">
                                 <div className="hidden sm:block">
                                     <div className="flex items-center">
-                                        <div className="w-8 h-8 bg-orange-300 rounded-full flex items-center justify-center mr-2">
+                                        <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mr-2">
                                             <span className="text-white font-semibold text-sm">
                                                 {user.name
                                                     ? user.name

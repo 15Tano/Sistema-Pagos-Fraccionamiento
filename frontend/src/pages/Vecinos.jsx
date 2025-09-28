@@ -318,7 +318,7 @@ function Vecinos() {
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
                     <div className="bg-orange-500 px-6 py-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-orange-600 rounded-lg">
+                            <div className="p-2 bg-orange-500 rounded-lg">
                                 <UserPlusIcon className="w-6 h-6 text-white" />
                             </div>
                             <h3 className="text-xl font-semibold text-white">

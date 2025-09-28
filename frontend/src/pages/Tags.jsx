@@ -93,7 +93,7 @@ const ShoppingCartIcon = () => (
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13v6a2 2 0 002 2h6a2 2 0 002-2v-6m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.01"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
         />
     </svg>
 );
@@ -340,7 +340,7 @@ function Tags() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+            <div className="min-h-screen bg-white-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
                     <p className="mt-4 text-slate-600 font-medium">
@@ -352,11 +352,11 @@ function Tags() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-6">
+        <div className="min-h-screen bg-white-50 p-4 md:p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                    <h1 className="text-4xl font-bold bg-orange-600 bg-clip-text text-transparent mb-2">
                         Gestión de Tags
                     </h1>
                     <p className="text-slate-600">
@@ -384,7 +384,7 @@ function Tags() {
                     {/* Vender Tag */}
                     <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-blue-100 rounded-lg">
+                            <div className="p-2 bg-orange-100 rounded-lg">
                                 <ShoppingCartIcon />
                             </div>
                             <h3 className="text-xl font-semibold text-slate-800">
@@ -413,7 +413,7 @@ function Tags() {
                             </div>
                             <button
                                 onClick={handleSaleSubmit}
-                                className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                                className="w-full py-3 px-4 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
                             >
                                 Registrar Venta
                             </button>
@@ -423,7 +423,7 @@ function Tags() {
                     {/* Estadísticas */}
                     <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 bg-green-100 rounded-lg">
+                            <div className="p-2 bg-orange-100 rounded-lg">
                                 <BarChartIcon />
                             </div>
                             <h3 className="text-xl font-semibold text-slate-800">
@@ -432,26 +432,26 @@ function Tags() {
                         </div>
 
                         <div className="space-y-4">
-                            <div className="flex justify-between items-center p-4 bg-blue-50 rounded-xl">
+                            <div className="flex justify-between items-center p-4 bg-orange-50 rounded-xl">
                                 <div className="flex items-center gap-2">
                                     <TagIcon />
-                                    <span className="font-medium text-blue-800">
+                                    <span className="font-medium text-orange-800">
                                         Stock Disponible
                                     </span>
                                 </div>
-                                <span className="text-2xl font-bold text-blue-600">
+                                <span className="text-2xl font-bold text-orange-600">
                                     {stock}
                                 </span>
                             </div>
 
-                            <div className="flex justify-between items-center p-4 bg-green-50 rounded-xl">
+                            <div className="flex justify-between items-center p-4 bg-orange-50 rounded-xl">
                                 <div className="flex items-center gap-2">
                                     <CreditCardIcon />
-                                    <span className="font-medium text-green-800">
+                                    <span className="font-medium text-orange-800">
                                         Total Ventas
                                     </span>
                                 </div>
-                                <span className="text-2xl font-bold text-green-600">
+                                <span className="text-2xl font-bold text-orange-600">
                                     ${totalSales}
                                 </span>
                             </div>
@@ -459,9 +459,9 @@ function Tags() {
                     </div>
 
                     {/* Ventas Recientes */}
-                    <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
+                    <div className="bg-orange/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-purple-100 rounded-lg">
+                            <div className="p-2 bg-orange-100 rounded-lg">
                                 <CreditCardIcon />
                             </div>
                             <h3 className="text-xl font-semibold text-slate-800">
@@ -471,7 +471,7 @@ function Tags() {
 
                         <div className="max-h-64 overflow-y-auto space-y-2">
                             {sales.length > 0 ? (
-                                sales.slice(0, 5).map((sale) => (
+                                sales.slice(0, 50).map((sale) => (
                                     <div
                                         key={sale.id}
                                         className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
@@ -491,7 +491,7 @@ function Tags() {
                                             </p>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-sm font-semibold text-green-600">
+                                            <span className="text-sm font-semibold text-orange-600">
                                                 ${sale.price}
                                             </span>
                                             <button
@@ -516,12 +516,12 @@ function Tags() {
 
                 {/* Tabla de Vecinos */}
                 <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 overflow-hidden">
-                    <div className="p-6 border-b border-slate-200">
+                    <div className="bg-orange-500 p-6 border-b border-slate-200">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-indigo-100 rounded-lg">
+                            <div className="p-2 rounded-lg text-white">
                                 <UserIcon />
                             </div>
-                            <h3 className="text-xl font-semibold text-slate-800">
+                            <h3 className="text-xl font-semibold text-white">
                                 Estado de Vecinos y Tags
                             </h3>
                         </div>
@@ -529,7 +529,7 @@ function Tags() {
 
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-slate-100/50">
+                            <thead className="bg-slate-200/50">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
                                         Vecino
@@ -658,7 +658,7 @@ function Tags() {
                                                         ) && (
                                                             <Link
                                                                 to={`/pagos?vecinoId=${vecino.id}`}
-                                                                className="block text-center w-full px-3 py-2 rounded-lg text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200"
+                                                                className="block text-center w-full px-3 py-2 rounded-lg text-sm font-semibold bg-orange-500 hover:bg-orange-600 text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
                                                             >
                                                                 Registrar Pago
                                                             </Link>
@@ -680,8 +680,8 @@ function Tags() {
                                                                         }
                                                                         className={`px-2 py-1 rounded text-xs font-semibold mr-1 mb-1 transition-all duration-200 ${
                                                                             tag.activo
-                                                                                ? "bg-red-500 hover:bg-red-600 text-white"
-                                                                                : "bg-green-500 hover:bg-green-600 text-white"
+                                                                                ? "bg-red-500 hover:bg-red-600 text-white transform hover:scale-[1.02] active:scale-[0.98]"
+                                                                                : "bg-green-500 hover:bg-green-600 text-white transform hover:scale-[1.02] active:scale-[0.98]"
                                                                         }`}
                                                                     >
                                                                         {tag.activo

@@ -205,15 +205,15 @@ function Historico() {
             onClick={() => setActiveTab(id)}
             className={`px-4 py-2 font-medium text-sm rounded-lg transition ${
                 activeTab === id
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-orange-600 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-orange-200 transform hover:scale-105"
             }`}
         >
             {label}
             {count !== undefined && (
                 <span
                     className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                        activeTab === id ? "bg-blue-500" : "bg-gray-300"
+                        activeTab === id ? "bg-orange-500" : "bg-gray-300"
                     }`}
                 >
                     {count}
@@ -241,7 +241,7 @@ function Historico() {
         <div className="max-w-7xl mx-auto p-6 space-y-6">
             {/* Header */}
             <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-orange-600">
                     Histórico de Pagos
                 </h1>
                 <p className="text-gray-600 mt-2">
@@ -284,7 +284,7 @@ function Historico() {
                                     if (activeTab === "individual")
                                         setSelectedVecino("");
                                 }}
-                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                             >
                                 <option value="">Todas las calles</option>
                                 {uniqueCalles.map((calle) => (
@@ -305,7 +305,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedVecino(e.target.value)
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                                 >
                                     <option value="">Seleccionar vecino</option>
                                     {filteredVecinos.map((v) => (
@@ -329,7 +329,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedMonth(e.target.value)
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                                 />
                             </div>
                         )}
@@ -345,7 +345,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedDate(e.target.value)
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                                 />
                             </div>
                         )}
@@ -360,7 +360,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSearchTipo(e.target.value)
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                                 >
                                     <option value="">Todos los tipos</option>
                                     <option value="ordinario">Ordinario</option>
@@ -374,14 +374,14 @@ function Historico() {
                         <div className="flex gap-2">
                             <button
                                 onClick={clearFilters}
-                                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition transform hover:scale-105"
                             >
                                 Limpiar
                             </button>
                             {activeTab !== "resumen" && (
                                 <button
                                     onClick={fetchPagos}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition transform hover:scale-105"
                                 >
                                     Actualizar
                                 </button>
@@ -396,36 +396,36 @@ function Historico() {
                 {/* Resumen General Tab */}
                 {activeTab === "resumen" && (
                     <div>
-                        <div className="px-6 py-4 bg-blue-50 border-b border-blue-200">
-                            <h3 className="text-xl font-semibold text-blue-900">
+                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
+                            <h3 className="text-xl font-semibold text-orange-900">
                                 Resumen del Mes Actual (
                                 {formatMonth(CURRENT_MONTH_ISO)})
                             </h3>
-                            <p className="text-blue-700 text-sm">
+                            <p className="text-orange-700 text-sm">
                                 Estado de pagos de todos los vecinos
                             </p>
                         </div>
 
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-orange-600 text-white">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Vecino
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Dirección
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Estado
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Pagado
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Restante
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Tag
                                         </th>
                                     </tr>
@@ -504,19 +504,7 @@ function Historico() {
                                         Pagos Completos
                                     </div>
                                 </div>
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-orange-600">
-                                        {
-                                            currentMonthSummary.filter(
-                                                (v) =>
-                                                    v.hasPaid && !v.isComplete
-                                            ).length
-                                        }
-                                    </div>
-                                    <div className="text-sm text-gray-600">
-                                        Pagos Parciales
-                                    </div>
-                                </div>
+                                <div className="text-center"></div>
                                 <div className="text-center">
                                     <div className="text-2xl font-bold text-red-600">
                                         {
@@ -532,7 +520,7 @@ function Historico() {
                             </div>
                             <div className="grid grid-cols-2 gap-6 mt-4 pt-4 border-t border-gray-200">
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-blue-600">
+                                    <div className="text-2xl font-bold text-orange-600">
                                         $
                                         {paymentTypeSummary.ordinarioTotal.toFixed(
                                             2
@@ -543,7 +531,7 @@ function Historico() {
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-orange-600">
+                                    <div className="text-2xl font-bold text-orange-700">
                                         $
                                         {paymentTypeSummary.extraordinarioTotal.toFixed(
                                             2
@@ -561,12 +549,12 @@ function Historico() {
                 {/* Individual Tab */}
                 {activeTab === "individual" && (
                     <div>
-                        <div className="px-6 py-4 bg-green-50 border-b border-green-200">
-                            <h3 className="text-xl font-semibold text-green-900">
+                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
+                            <h3 className="text-xl font-semibold text-orange-900">
                                 Historial Individual
                             </h3>
                             {selectedVecino && (
-                                <p className="text-green-700 text-sm">
+                                <p className="text-orange-700 text-sm">
                                     Mostrando pagos de:{" "}
                                     {
                                         filteredVecinos.find(
@@ -591,7 +579,7 @@ function Historico() {
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full">
-                                    <thead className="bg-green-600 text-white">
+                                    <thead className="bg-orange-600 text-white">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                                 Mes
@@ -667,13 +655,11 @@ function Historico() {
                                                             </span>
                                                         )}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td className="px-6 py-4 text-sm text-gray-700">
                                                         {pago.fecha_de_cobro
-                                                            ? new Date(
-                                                                  pago.fecha_de_cobro
-                                                              ).toLocaleDateString(
-                                                                  "es-ES"
-                                                              )
+                                                            ? pago.fecha_de_cobro.split(
+                                                                  "T"
+                                                              )[0] // → "2025-09-15"
                                                             : "-"}
                                                     </td>
                                                 </tr>
@@ -689,18 +675,18 @@ function Historico() {
                 {/* Mensual Tab */}
                 {activeTab === "mensual" && (
                     <div>
-                        <div className="px-6 py-4 bg-purple-50 border-b border-purple-200">
-                            <h3 className="text-xl font-semibold text-purple-900">
+                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
+                            <h3 className="text-xl font-semibold text-orange-900">
                                 Pagos Mensuales - {formatMonth(selectedMonth)}
                             </h3>
-                            <p className="text-purple-700 text-sm">
+                            <p className="text-orange-700 text-sm">
                                 Todos los pagos del mes seleccionado
                             </p>
                         </div>
 
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-purple-600 text-white">
+                                <thead className="bg-orange-600 text-white">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Vecino
@@ -793,13 +779,11 @@ function Historico() {
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <td className="px-6 py-4 text-sm text-gray-700">
                                                     {pago.fecha_de_cobro
-                                                        ? new Date(
-                                                              pago.fecha_de_cobro
-                                                          ).toLocaleDateString(
-                                                              "es-ES"
-                                                          )
+                                                        ? pago.fecha_de_cobro.split(
+                                                              "T"
+                                                          )[0] // → "2025-09-15"
                                                         : "-"}
                                                 </td>
                                             </tr>
@@ -814,27 +798,32 @@ function Historico() {
                 {/* Por Día Tab */}
                 {activeTab === "por_dia" && (
                     <div>
-                        <div className="px-6 py-4 bg-emerald-50 border-b border-emerald-200">
-                            <h3 className="text-xl font-semibold text-emerald-900">
+                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
+                            <h3 className="text-xl font-semibold text-orange-900">
                                 Pagos del Día:{" "}
-                                {new Date(selectedDate).toLocaleDateString(
-                                    "es-ES",
-                                    {
-                                        weekday: "long",
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    }
-                                )}
+                                {selectedDate
+                                    ? new Date(
+                                          selectedDate.includes("T")
+                                              ? selectedDate
+                                              : selectedDate + "T00:00:00Z" // si viene sin hora, se la añadimos en UTC
+                                      ).toLocaleDateString("es-ES", {
+                                          weekday: "long",
+                                          year: "numeric",
+                                          month: "long",
+                                          day: "numeric",
+                                          timeZone: "UTC", // <- forzamos UTC
+                                      })
+                                    : "-"}
                             </h3>
-                            <p className="text-emerald-700 text-sm">
+
+                            <p className="text-orange-700 text-sm">
                                 Pagos cobrados en la fecha seleccionada
                             </p>
                         </div>
 
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-emerald-600 text-white">
+                                <thead className="bg-orange-600 text-white">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Vecino
@@ -959,18 +948,18 @@ function Historico() {
                 {/* Adelantados Tab */}
                 {activeTab === "adelantados" && (
                     <div>
-                        <div className="px-6 py-4 bg-indigo-50 border-b border-indigo-200">
-                            <h3 className="text-xl font-semibold text-indigo-900">
+                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
+                            <h3 className="text-xl font-semibold text-orange-900">
                                 Pagos Adelantados
                             </h3>
-                            <p className="text-indigo-700 text-sm">
+                            <p className="text-orange-700 text-sm">
                                 Pagos realizados para meses futuros
                             </p>
                         </div>
 
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-indigo-600 text-white">
+                                <thead className="bg-orange-600 text-white">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                             Vecino
@@ -1027,7 +1016,7 @@ function Historico() {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="px-2 py-1 bg-indigo-100 text-indigo-800 text-sm font-medium rounded">
+                                                    <span className="px-2 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded">
                                                         {formatMonth(pago.mes)}
                                                     </span>
                                                 </td>
@@ -1051,13 +1040,11 @@ function Historico() {
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <td className="px-6 py-4 text-sm text-gray-700">
                                                     {pago.fecha_de_cobro
-                                                        ? new Date(
-                                                              pago.fecha_de_cobro
-                                                          ).toLocaleDateString(
-                                                              "es-ES"
-                                                          )
+                                                        ? pago.fecha_de_cobro.split(
+                                                              "T"
+                                                          )[0] // → "2025-09-15"
                                                         : "-"}
                                                 </td>
                                             </tr>
@@ -1074,7 +1061,7 @@ function Historico() {
                     <div className="px-6 py-4 bg-gray-50 border-t">
                         <div className="grid grid-cols-2 gap-6">
                             <div className="text-center">
-                                <div className="text-xl font-bold text-gray-900">
+                                <div className="text-xl font-bold text-gray-800">
                                     $
                                     {pagos
                                         .reduce(
@@ -1089,7 +1076,7 @@ function Historico() {
                                 </div>
                             </div>
                             <div className="text-center">
-                                <div className="text-xl font-bold text-gray-900">
+                                <div className="text-xl font-bold text-red-600">
                                     $
                                     {pagos
                                         .reduce(

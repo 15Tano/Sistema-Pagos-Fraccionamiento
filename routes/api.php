@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VecinoController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\TagSaleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +30,6 @@ Route::resource('pagos', PagoController::class);
 Route::patch('tags/{id}/toggle', [TagController::class, 'toggle']);
 
 // New routes for tag sales and tag controller extra methods
-use App\Http\Controllers\TagSaleController;
 
 Route::resource('tag_sales', TagSaleController::class);
 Route::delete('tag_sales/reset', [TagSaleController::class, 'reset']);
