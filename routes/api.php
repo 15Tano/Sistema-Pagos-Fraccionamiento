@@ -6,6 +6,7 @@ use App\Http\Controllers\VecinoController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\TagSaleController;
+use App\Http\Controllers\Api\ZkApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,3 +40,6 @@ Route::get('tags/total_sales', [TagController::class, 'totalSales']);
 Route::get('tags/sales', [TagController::class, 'sales']);
 // Add new route for enhanced historico endpoint
 Route::get('/pagos/historico', [PagoController::class, 'getHistorico']);
+
+//Route for ZKTeco to connect
+Route::get('/vencimientos', [ZkApiController::class, 'index']);

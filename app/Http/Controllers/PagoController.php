@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Pago;
 use App\Models\Vecino;
+use App\Services\ZkAccessService; // Importante: Tu servicio nuevo
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log; // Importante: Para que funcionen los logs
 
 class PagoController extends Controller
 {
@@ -14,7 +16,6 @@ class PagoController extends Controller
 
     public function index(Request $request)
     {
-        // ... (Este método no necesita cambios)
         $query = Pago::with('vecino')->latest();
 
         if ($request->has('month') && $request->has('year')) {
@@ -74,11 +75,11 @@ class PagoController extends Controller
         $remainingAmount = $cantidadTotal;
         $currentMonth = $mesInicial->copy();
         
-        $affectedMonths = []; // Guardaremos los meses afectados
+        $affectedMonths = []; 
 
         while ($remainingAmount > 0) {
             $mesString = $currentMonth->format('Y-m');
-            $affectedMonths[] = $mesString; // Agregamos el mes a la lista de afectados
+            $affectedMonths[] = $mesString; 
 
             $totalPagadoMes = Pago::where('vecino_id', $vecino->id)
                 ->where('mes', $mesString)
@@ -86,7 +87,6 @@ class PagoController extends Controller
 
             $neededForMonth = max(0, self::MENSUALIDAD - $totalPagadoMes);
             
-            // Si no se necesita nada para este mes (ya está pagado), pasamos al siguiente
             if ($neededForMonth <= 0) {
                  $currentMonth->addMonth();
                  continue;
@@ -95,8 +95,10 @@ class PagoController extends Controller
             $amountForThisMonth = min($remainingAmount, $neededForMonth);
 
             if ($amountForThisMonth > 0) {
-                // ... (lógica de creación/actualización de pago sin cambios) ...
-                $existingPago = Pago::where('vecino_id', $vecino->id)->where('mes', $mesString)->where('tipo', $request->tipo)->first();
+                $existingPago = Pago::where('vecino_id', $vecino->id)
+                    ->where('mes', $mesString)
+                    ->where('tipo', $request->tipo)
+                    ->first();
 
                 if ($existingPago) {
                     $existingPago->cantidad += $amountForThisMonth;
@@ -119,13 +121,11 @@ class PagoController extends Controller
         }
 
         // =========================================================================
-        // LÓGICA MODIFICADA
+        // SINCRONIZACIÓN CON ZKTECO (PLUMA)
         // =========================================================================
-        // Ahora, recalculamos el estado de los tags para cada mes que fue afectado por el pago.
-        foreach (array_unique($affectedMonths) as $mes) {
-            $this->recalculateRestanteForMonth($mes, $vecino->id);
-            $this->syncVecinoTagStatusForMonth($vecino->id, $mes);
-        }
+        // Solo necesitamos sincronizar una vez por transacción, ya que el cálculo 
+        // revisa todo el historial del vecino, no solo el mes actual.
+        $this->syncVecinoTagStatusForMonth($vecino->id, null);
 
         if ($request->wantsJson()) {
             return response()->json(['message' => 'Pago registrado correctamente']);
@@ -163,13 +163,10 @@ class PagoController extends Controller
             $this->recalculateRestanteForMonth($oldMes, $oldVecinoId);
         }
         
-        // =========================================================================
-        // LÓGICA MODIFICADA
-        // =========================================================================
-        // Sincronizar estado de tags para el mes nuevo y el viejo (si cambiaron)
-        $this->syncVecinoTagStatusForMonth($pago->vecino_id, $pago->mes);
-        if ($oldMes !== $pago->mes || $oldVecinoId !== $pago->vecino_id) {
-             $this->syncVecinoTagStatusForMonth($oldVecinoId, $oldMes);
+        // Sincronizar ZKTeco
+        $this->syncVecinoTagStatusForMonth($pago->vecino_id, null);
+        if ($oldVecinoId !== $pago->vecino_id) {
+             $this->syncVecinoTagStatusForMonth($oldVecinoId, null);
         }
 
         return response()->json(['message' => 'Pago actualizado.', 'pago' => $pago]);
@@ -185,18 +182,14 @@ class PagoController extends Controller
         // Recalcular saldo del mes afectado
         $this->recalculateRestanteForMonth($mes, $vecino_id);
         
-        // =========================================================================
-        // LÓGICA MODIFICADA
-        // =========================================================================
-        // Sincronizar estado de tags para el mes afectado
-        $this->syncVecinoTagStatusForMonth($vecino_id, $mes);
+        // Sincronizar ZKTeco (se recalcula la fecha de expiración tras borrar el pago)
+        $this->syncVecinoTagStatusForMonth($vecino_id, null);
 
         return response()->json(['message' => 'Pago eliminado.']);
     }
 
     private function recalculateRestanteForMonth($mes, $vecino_id)
     {
-        // ... (Este método no necesita cambios)
         $pagos = Pago::where('vecino_id', $vecino_id)
             ->where('mes', $mes)
             ->orderBy('fecha_de_cobro')
@@ -210,66 +203,98 @@ class PagoController extends Controller
         }
     }
 
+    // ==========================================
+    // NUEVA LÓGICA PARA ZKTECO
+    // ==========================================
+
     /**
-     * =========================================================================
-     * NUEVO MÉTODO CENTRALIZADO
-     * =========================================================================
-     * Calcula si un vecino ha pagado la mensualidad completa para un mes
-     * y actualiza el estado 'activo' de TODOS sus tags a la vez.
-     *
-     * @param int $vecino_id
-     * @param string $mes (Formato 'Y-m')
-     * @return void
+     * Calcula la fecha de expiración. 
+     * El ": \Carbon\Carbon" al final le asegura al editor que siempre devolveremos una fecha.
      */
+    private function calculateExpirationDate($vecino_id): \Carbon\Carbon 
+    {
+        // Busca meses pagados completos
+        $pagosCompletos = Pago::where('vecino_id', $vecino_id)
+            ->selectRaw('mes, SUM(cantidad) as total')
+            ->groupBy('mes')
+            ->having('total', '>=', self::MENSUALIDAD)
+            ->pluck('mes')->toArray();
+
+        $currentDate = Carbon::now()->startOfMonth();
+        $expirationDate = Carbon::now()->subDay()->endOfDay(); // Vencido por defecto
+
+        // Revisa continuidad de pagos los próximos 12 meses
+        for ($i = 0; $i < 12; $i++) {
+            if (in_array($currentDate->format('Y-m'), $pagosCompletos)) {
+                $expirationDate = $currentDate->copy()->endOfMonth()->endOfDay();
+            } else {
+                break; // Si hay un hueco, cortamos el acceso
+            }
+            $currentDate->addMonth();
+        }
+        return $expirationDate;
+    }
+
     private function syncVecinoTagStatusForMonth($vecino_id, $mes)
     {
-        $vecino = Vecino::find($vecino_id);
+        $vecino = Vecino::with('tags')->find($vecino_id);
         
-        // Si el vecino no existe o no tiene tags, no hacemos nada.
-        if (!$vecino || !$vecino->tags()->exists()) {
-            return;
+        if (!$vecino || $vecino->tags->isEmpty()) return;
+
+        // 1. Calcular fecha (Ahora esto funciona perfecto con el type hinting de arriba)
+        $newExpirationDate = $this->calculateExpirationDate($vecino_id);
+
+        // 2. Llamar al servicio ZK
+        $zkService = new ZkAccessService();
+
+        foreach ($vecino->tags as $tag) {
+            // OJO: Cambia 'codigo_tag' por el nombre real de tu columna en la BD si es diferente (ej: 'uid', 'folio')
+            if (!empty($tag->codigo)) { 
+                $zkService->updateTagExpiration($tag->codigo, $newExpirationDate);
+            }
         }
-
-        // 1. Calculamos el total pagado por el vecino en el mes dado.
-        $totalPagadoMes = $vecino->pagos()->where('mes', $mes)->sum('cantidad');
-        
-        // 2. Determinamos si el pago está completo.
-        $pagoCompleto = $totalPagadoMes >= self::MENSUALIDAD;
-
-        // 3. Actualizamos TODOS los tags del vecino con el nuevo estado en una sola consulta.
-        $vecino->tags()->update(['activo' => $pagoCompleto]);
     }
 
     public function getHistorico(Request $request)
     {
-        // ... (Este método no necesita cambios)
         $query = Pago::with(['vecino.tags']);
 
         if ($request->has('mes')) {
             $query->where('mes', $request->mes);
         }
+
         if ($request->has('vecino_id')) {
             $query->where('vecino_id', $request->vecino_id);
         }
+
         if ($request->has('adelantados') && $request->adelantados == 'true') {
             $currentMonth = Carbon::now()->format('Y-m');
             $query->where('mes', '>', $currentMonth);
         }
+
         if ($request->has('calle')) {
             $query->whereHas('vecino', function($q) use ($request) {
                 $q->where('calle', $request->calle);
             });
         }
+
         if ($request->has('tipo')) {
             $query->where('tipo', $request->tipo);
         }
+
         if ($request->has('fecha_cobro')) {
             $query->whereDate('fecha_de_cobro', $request->fecha_cobro);
         }
 
+        if ($request->has('mes_cobro')) {
+            $collectionMonth = $request->mes_cobro;
+            $query->whereYear('fecha_de_cobro', substr($collectionMonth, 0, 4))
+                  ->whereMonth('fecha_de_cobro', substr($collectionMonth, 5, 2));
+        }
+
         $pagos = $query->orderBy('mes', 'desc')
-                      ->orderBy('created_at', 'desc')
-                      ->get();
+                           ->orderBy('created_at', 'desc')
+                           ->get();
 
         return response()->json($pagos);
     }

@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import api from "../api";
 
-// Constants for repeated values
 const MONTHLY_FEE = 280;
 const CURRENT_MONTH_ISO = new Date().toISOString().slice(0, 7);
 
@@ -9,23 +8,24 @@ function Historico() {
     const [pagos, setPagos] = useState([]);
     const [vecinos, setVecinos] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState("resumen"); // resumen, individual, mensual, por_dia, adelantados
+    const [activeTab, setActiveTab] = useState("resumen");
 
-    // Filters
     const [selectedCalle, setSelectedCalle] = useState("");
     const [selectedVecino, setSelectedVecino] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(CURRENT_MONTH_ISO);
     const [selectedDate, setSelectedDate] = useState(
         new Date().toISOString().slice(0, 10)
     );
+    const [selectedCollectionMonth, setSelectedCollectionMonth] =
+        useState(CURRENT_MONTH_ISO);
     const [searchTipo, setSearchTipo] = useState("");
+    const [showOnlyDue, setShowOnlyDue] = useState(false);
 
     useEffect(() => {
         fetchInitialData();
     }, []);
 
     useEffect(() => {
-        // Fetch payments when tab or filters change, except for 'resumen'
         if (activeTab !== "resumen") {
             fetchPagos();
         }
@@ -35,6 +35,7 @@ function Historico() {
         selectedVecino,
         selectedMonth,
         selectedDate,
+        selectedCollectionMonth,
         searchTipo,
     ]);
 
@@ -59,10 +60,7 @@ function Historico() {
     };
 
     const fetchPagos = async () => {
-        // For 'resumen', we only fetch once on initial load.
-        if (activeTab === "resumen" && pagos.length > 0) {
-            return;
-        }
+        if (activeTab === "resumen" && pagos.length > 0) return;
 
         setLoading(true);
         try {
@@ -76,6 +74,8 @@ function Historico() {
                 params.adelantados = true;
             } else if (activeTab === "por_dia") {
                 params.fecha_cobro = selectedDate;
+            } else if (activeTab === "mes_cobro") {
+                params.mes_cobro = selectedCollectionMonth;
             }
 
             if (selectedCalle && activeTab !== "individual") {
@@ -94,7 +94,6 @@ function Historico() {
         }
     };
 
-    // Computed values
     const uniqueCalles = useMemo(
         () => [...new Set(vecinos.map((v) => v.calle))].sort(),
         [vecinos]
@@ -110,7 +109,6 @@ function Historico() {
         [vecinos, selectedCalle]
     );
 
-    // Create payment summary for current month
     const currentMonthSummary = useMemo(() => {
         const currentMonthPayments = pagos.filter(
             (p) => p.mes === CURRENT_MONTH_ISO
@@ -144,6 +142,17 @@ function Historico() {
         });
     }, [vecinos, pagos]);
 
+    const filteredCurrentMonthSummary = useMemo(() => {
+        let filtered = currentMonthSummary;
+        if (selectedCalle) {
+            filtered = filtered.filter((v) => v.calle === selectedCalle);
+        }
+        if (showOnlyDue) {
+            filtered = filtered.filter((v) => v.totalRemaining > 0);
+        }
+        return filtered;
+    }, [currentMonthSummary, selectedCalle, showOnlyDue]);
+
     const paymentTypeSummary = useMemo(() => {
         const currentMonthPayments = pagos.filter(
             (p) => p.mes === CURRENT_MONTH_ISO
@@ -168,6 +177,14 @@ function Historico() {
             year: "numeric",
             month: "long",
         });
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return "-";
+        // Extract just the date part (YYYY-MM-DD)
+        const datePart = dateString.split("T")[0];
+        const [year, month, day] = datePart.split("-");
+        return `${day}/${month}/${year}`; // DD/MM/YYYY format
     };
 
     const getPaymentStatusBadge = (totalPaid, totalRemaining) => {
@@ -197,7 +214,9 @@ function Historico() {
         setSelectedVecino("");
         setSelectedMonth(CURRENT_MONTH_ISO);
         setSelectedDate(new Date().toISOString().slice(0, 10));
+        setSelectedCollectionMonth(CURRENT_MONTH_ISO);
         setSearchTipo("");
+        setShowOnlyDue(false);
     };
 
     const TabButton = ({ id, label, count }) => (
@@ -206,7 +225,7 @@ function Historico() {
             className={`px-4 py-2 font-medium text-sm rounded-lg transition ${
                 activeTab === id
                     ? "bg-orange-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-orange-200 transform hover:scale-105"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
         >
             {label}
@@ -239,9 +258,8 @@ function Historico() {
 
     return (
         <div className="max-w-7xl mx-auto p-6 space-y-6">
-            {/* Header */}
             <div className="text-center">
-                <h1 className="text-3xl font-bold text-orange-600">
+                <h1 className="text-3xl font-bold text-gray-900">
                     Histórico de Pagos
                 </h1>
                 <p className="text-gray-600 mt-2">
@@ -249,7 +267,6 @@ function Historico() {
                 </p>
             </div>
 
-            {/* Tab Navigation */}
             <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
                 <div className="flex flex-wrap gap-2 mb-6">
                     <TabButton
@@ -258,7 +275,8 @@ function Historico() {
                         count={vecinos.length}
                     />
                     <TabButton id="individual" label="Por Vecino" />
-                    <TabButton id="mensual" label="Por Mes" />
+                    <TabButton id="mensual" label="Por Mes Pagado" />
+                    <TabButton id="mes_cobro" label="Por Mes de Cobro" />
                     <TabButton id="por_dia" label="Por Día de Cobro" />
                     <TabButton
                         id="adelantados"
@@ -270,7 +288,6 @@ function Historico() {
                     />
                 </div>
 
-                {/* Filters */}
                 <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex flex-wrap gap-4 items-center">
                         <div className="flex-1 min-w-48">
@@ -321,13 +338,31 @@ function Historico() {
                         {activeTab === "mensual" && (
                             <div className="flex-1 min-w-48">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Mes
+                                    Mes Pagado
                                 </label>
                                 <input
                                     type="month"
                                     value={selectedMonth}
                                     onChange={(e) =>
                                         setSelectedMonth(e.target.value)
+                                    }
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                />
+                            </div>
+                        )}
+
+                        {activeTab === "mes_cobro" && (
+                            <div className="flex-1 min-w-48">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Mes de Cobro
+                                </label>
+                                <input
+                                    type="month"
+                                    value={selectedCollectionMonth}
+                                    onChange={(e) =>
+                                        setSelectedCollectionMonth(
+                                            e.target.value
+                                        )
                                     }
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                                 />
@@ -371,17 +406,37 @@ function Historico() {
                             </div>
                         )}
 
+                        {activeTab === "resumen" && (
+                            <div className="flex items-center pt-6">
+                                <input
+                                    type="checkbox"
+                                    id="showOnlyDue"
+                                    checked={showOnlyDue}
+                                    onChange={(e) =>
+                                        setShowOnlyDue(e.target.checked)
+                                    }
+                                    className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                                />
+                                <label
+                                    htmlFor="showOnlyDue"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    Solo con adeudos
+                                </label>
+                            </div>
+                        )}
+
                         <div className="flex gap-2">
                             <button
                                 onClick={clearFilters}
-                                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition transform hover:scale-105"
+                                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
                             >
                                 Limpiar
                             </button>
                             {activeTab !== "resumen" && (
                                 <button
                                     onClick={fetchPagos}
-                                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition transform hover:scale-105"
+                                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
                                 >
                                     Actualizar
                                 </button>
@@ -391,9 +446,7 @@ function Historico() {
                 </div>
             </div>
 
-            {/* Content Area */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-                {/* Resumen General Tab */}
                 {activeTab === "resumen" && (
                     <div>
                         <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
@@ -405,39 +458,33 @@ function Historico() {
                                 Estado de pagos de todos los vecinos
                             </p>
                         </div>
-
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-orange-600 text-white">
+                                <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Vecino
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Dirección
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Estado
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Pagado
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Restante
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Tag
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                    {currentMonthSummary
-                                        .filter(
-                                            (v) =>
-                                                !selectedCalle ||
-                                                v.calle === selectedCalle
-                                        )
-                                        .map((vecino) => (
+                                    {filteredCurrentMonthSummary.map(
+                                        (vecino) => (
                                             <tr
                                                 key={vecino.id}
                                                 className="hover:bg-gray-50"
@@ -485,17 +532,17 @@ function Historico() {
                                                     )}
                                                 </td>
                                             </tr>
-                                        ))}
+                                        )
+                                    )}
                                 </tbody>
                             </table>
                         </div>
-
                         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                             <div className="grid grid-cols-3 gap-6">
                                 <div className="text-center">
                                     <div className="text-2xl font-bold text-green-600">
                                         {
-                                            currentMonthSummary.filter(
+                                            filteredCurrentMonthSummary.filter(
                                                 (v) => v.isComplete
                                             ).length
                                         }
@@ -504,11 +551,23 @@ function Historico() {
                                         Pagos Completos
                                     </div>
                                 </div>
-                                <div className="text-center"></div>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold text-orange-600">
+                                        {
+                                            filteredCurrentMonthSummary.filter(
+                                                (v) =>
+                                                    v.hasPaid && !v.isComplete
+                                            ).length
+                                        }
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                        Pagos Parciales
+                                    </div>
+                                </div>
                                 <div className="text-center">
                                     <div className="text-2xl font-bold text-red-600">
                                         {
-                                            currentMonthSummary.filter(
+                                            filteredCurrentMonthSummary.filter(
                                                 (v) => !v.hasPaid
                                             ).length
                                         }
@@ -531,7 +590,7 @@ function Historico() {
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-orange-700">
+                                    <div className="text-2xl font-bold text-orange-600">
                                         $
                                         {paymentTypeSummary.extraordinarioTotal.toFixed(
                                             2
@@ -546,26 +605,36 @@ function Historico() {
                     </div>
                 )}
 
-                {/* Individual Tab */}
-                {activeTab === "individual" && (
+                {[
+                    "individual",
+                    "mensual",
+                    "mes_cobro",
+                    "por_dia",
+                    "adelantados",
+                ].includes(activeTab) && (
                     <div>
-                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
-                            <h3 className="text-xl font-semibold text-orange-900">
-                                Historial Individual
+                        <div className="px-6 py-4 bg-green-50 border-b border-green-200">
+                            <h3 className="text-xl font-semibold text-green-900">
+                                {activeTab === "individual" &&
+                                    `Historial Individual`}
+                                {activeTab === "mensual" &&
+                                    `Pagos del Mes: ${formatMonth(
+                                        selectedMonth
+                                    )}`}
+                                {activeTab === "mes_cobro" &&
+                                    `Pagos Cobrados en: ${formatMonth(
+                                        selectedCollectionMonth
+                                    )}`}
+                                {activeTab === "por_dia" &&
+                                    `Pagos del Día: ${formatDate(
+                                        selectedDate
+                                    )}`}
+                                {activeTab === "adelantados" &&
+                                    `Pagos Adelantados`}
                             </h3>
-                            {selectedVecino && (
-                                <p className="text-orange-700 text-sm">
-                                    Mostrando pagos de:{" "}
-                                    {
-                                        filteredVecinos.find(
-                                            (v) => v.id == selectedVecino
-                                        )?.nombre
-                                    }
-                                </p>
-                            )}
                         </div>
 
-                        {!selectedVecino ? (
+                        {activeTab === "individual" && !selectedVecino ? (
                             <div className="p-12 text-center text-gray-500">
                                 <div className="text-4xl mb-4">👤</div>
                                 <div className="text-lg font-medium mb-2">
@@ -579,10 +648,16 @@ function Historico() {
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full">
-                                    <thead className="bg-orange-600 text-white">
+                                    <thead className="bg-green-600 text-white">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                                Mes
+                                                Vecino
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                                Dirección
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                                Mes Pagado
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                                 Tipo
@@ -591,7 +666,7 @@ function Historico() {
                                                 Cantidad
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                                Restante
+                                                Estado
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                                                 Fecha Cobro
@@ -602,11 +677,10 @@ function Historico() {
                                         {pagos.length === 0 ? (
                                             <tr>
                                                 <td
-                                                    colSpan="5"
+                                                    colSpan="7"
                                                     className="px-6 py-8 text-center text-gray-500"
                                                 >
                                                     No hay pagos registrados
-                                                    para este vecino
                                                 </td>
                                             </tr>
                                         ) : (
@@ -615,6 +689,18 @@ function Historico() {
                                                     key={pago.id}
                                                     className="hover:bg-gray-50"
                                                 >
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="font-medium text-gray-900">
+                                                            {pago.vecino.nombre}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {pago.vecino.calle} #
+                                                        {
+                                                            pago.vecino
+                                                                .numero_casa
+                                                        }
+                                                    </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                         {formatMonth(pago.mes)}
                                                     </td>
@@ -655,11 +741,11 @@ function Historico() {
                                                             </span>
                                                         )}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-700">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                         {pago.fecha_de_cobro
-                                                            ? pago.fecha_de_cobro.split(
-                                                                  "T"
-                                                              )[0] // → "2025-09-15"
+                                                            ? formatDate(
+                                                                  pago.fecha_de_cobro
+                                                              )
                                                             : "-"}
                                                     </td>
                                                 </tr>
@@ -672,396 +758,11 @@ function Historico() {
                     </div>
                 )}
 
-                {/* Mensual Tab */}
-                {activeTab === "mensual" && (
-                    <div>
-                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
-                            <h3 className="text-xl font-semibold text-orange-900">
-                                Pagos Mensuales - {formatMonth(selectedMonth)}
-                            </h3>
-                            <p className="text-orange-700 text-sm">
-                                Todos los pagos del mes seleccionado
-                            </p>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-orange-600 text-white">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Vecino
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Dirección
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Tipo
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Cantidad
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Estado
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Fecha Cobro
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    {pagos.length === 0 ? (
-                                        <tr>
-                                            <td
-                                                colSpan="6"
-                                                className="px-6 py-8 text-center text-gray-500"
-                                            >
-                                                <div className="text-4xl mb-4">
-                                                    📊
-                                                </div>
-                                                <div className="text-lg font-medium mb-2">
-                                                    No hay pagos registrados
-                                                    para{" "}
-                                                    {formatMonth(selectedMonth)}
-                                                </div>
-                                                <div className="text-sm">
-                                                    Los pagos de este mes
-                                                    aparecerán aquí
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        pagos.map((pago) => (
-                                            <tr
-                                                key={pago.id}
-                                                className="hover:bg-gray-50"
-                                            >
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="font-medium text-gray-900">
-                                                        {pago.vecino.nombre}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {pago.vecino.calle} #
-                                                    {pago.vecino.numero_casa}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span
-                                                        className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                                            pago.tipo ===
-                                                            "extraordinario"
-                                                                ? "bg-orange-100 text-orange-800"
-                                                                : "bg-blue-100 text-blue-800"
-                                                        }`}
-                                                    >
-                                                        {pago.tipo
-                                                            .charAt(0)
-                                                            .toUpperCase() +
-                                                            pago.tipo.slice(1)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    $
-                                                    {parseFloat(
-                                                        pago.cantidad
-                                                    ).toFixed(2)}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    {pago.restante > 0 ? (
-                                                        <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
-                                                            Resta $
-                                                            {parseFloat(
-                                                                pago.restante
-                                                            ).toFixed(2)}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                                            Completo
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-gray-700">
-                                                    {pago.fecha_de_cobro
-                                                        ? pago.fecha_de_cobro.split(
-                                                              "T"
-                                                          )[0] // → "2025-09-15"
-                                                        : "-"}
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-
-                {/* Por Día Tab */}
-                {activeTab === "por_dia" && (
-                    <div>
-                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
-                            <h3 className="text-xl font-semibold text-orange-900">
-                                Pagos del Día:{" "}
-                                {selectedDate
-                                    ? new Date(
-                                          selectedDate.includes("T")
-                                              ? selectedDate
-                                              : selectedDate + "T00:00:00Z" // si viene sin hora, se la añadimos en UTC
-                                      ).toLocaleDateString("es-ES", {
-                                          weekday: "long",
-                                          year: "numeric",
-                                          month: "long",
-                                          day: "numeric",
-                                          timeZone: "UTC", // <- forzamos UTC
-                                      })
-                                    : "-"}
-                            </h3>
-
-                            <p className="text-orange-700 text-sm">
-                                Pagos cobrados en la fecha seleccionada
-                            </p>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-orange-600 text-white">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Vecino
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Dirección
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Mes Pagado
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Tipo
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Cantidad
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Estado
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    {pagos.length === 0 ? (
-                                        <tr>
-                                            <td
-                                                colSpan="6"
-                                                className="px-6 py-8 text-center text-gray-500"
-                                            >
-                                                <div className="text-4xl mb-4">
-                                                    📅
-                                                </div>
-                                                <div className="text-lg font-medium mb-2">
-                                                    No hay pagos registrados
-                                                    para esta fecha
-                                                </div>
-                                                <div className="text-sm">
-                                                    Los pagos cobrados en{" "}
-                                                    {new Date(
-                                                        selectedDate
-                                                    ).toLocaleDateString(
-                                                        "es-ES"
-                                                    )}{" "}
-                                                    aparecerán aquí
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        pagos.map((pago) => (
-                                            <tr
-                                                key={pago.id}
-                                                className="hover:bg-gray-50"
-                                            >
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="font-medium text-gray-900">
-                                                        {pago.vecino.nombre}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {pago.vecino.calle} #
-                                                    {pago.vecino.numero_casa}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="px-2 py-1 bg-emerald-100 text-emerald-800 text-sm font-medium rounded">
-                                                        {formatMonth(pago.mes)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span
-                                                        className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                                            pago.tipo ===
-                                                            "extraordinario"
-                                                                ? "bg-orange-100 text-orange-800"
-                                                                : "bg-blue-100 text-blue-800"
-                                                        }`}
-                                                    >
-                                                        {pago.tipo
-                                                            .charAt(0)
-                                                            .toUpperCase() +
-                                                            pago.tipo.slice(1)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    $
-                                                    {parseFloat(
-                                                        pago.cantidad
-                                                    ).toFixed(2)}
-                                                    <div className="text-xs text-gray-500">
-                                                        {Math.round(
-                                                            pago.cantidad / 280
-                                                        )}{" "}
-                                                        mes
-                                                        {Math.round(
-                                                            pago.cantidad / 280
-                                                        ) > 1
-                                                            ? "es"
-                                                            : ""}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    {pago.restante > 0 ? (
-                                                        <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
-                                                            Resta $
-                                                            {parseFloat(
-                                                                pago.restante
-                                                            ).toFixed(2)}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                                            Completo
-                                                        </span>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-
-                {/* Adelantados Tab */}
-                {activeTab === "adelantados" && (
-                    <div>
-                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
-                            <h3 className="text-xl font-semibold text-orange-900">
-                                Pagos Adelantados
-                            </h3>
-                            <p className="text-orange-700 text-sm">
-                                Pagos realizados para meses futuros
-                            </p>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-orange-600 text-white">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Vecino
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Mes Adelantado
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Cantidad
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Estado
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                                            Fecha Pago
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    {pagos.length === 0 ? (
-                                        <tr>
-                                            <td
-                                                colSpan="5"
-                                                className="px-6 py-8 text-center text-gray-500"
-                                            >
-                                                <div className="text-4xl mb-4">
-                                                    📅
-                                                </div>
-                                                <div className="text-lg font-medium mb-2">
-                                                    No hay pagos adelantados
-                                                </div>
-                                                <div className="text-sm">
-                                                    Los pagos para meses futuros
-                                                    aparecerán aquí
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        pagos.map((pago) => (
-                                            <tr
-                                                key={pago.id}
-                                                className="hover:bg-gray-50"
-                                            >
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="font-medium text-gray-900">
-                                                        {pago.vecino.nombre}
-                                                    </div>
-                                                    <div className="text-sm text-gray-500">
-                                                        {pago.vecino.calle} #
-                                                        {
-                                                            pago.vecino
-                                                                .numero_casa
-                                                        }
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="px-2 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded">
-                                                        {formatMonth(pago.mes)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    $
-                                                    {parseFloat(
-                                                        pago.cantidad
-                                                    ).toFixed(2)}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    {pago.restante > 0 ? (
-                                                        <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
-                                                            Resta $
-                                                            {parseFloat(
-                                                                pago.restante
-                                                            ).toFixed(2)}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                                            Completo
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-gray-700">
-                                                    {pago.fecha_de_cobro
-                                                        ? pago.fecha_de_cobro.split(
-                                                              "T"
-                                                          )[0] // → "2025-09-15"
-                                                        : "-"}
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-
-                {/* Summary Stats for non-resumen tabs */}
                 {activeTab !== "resumen" && pagos.length > 0 && (
                     <div className="px-6 py-4 bg-gray-50 border-t">
                         <div className="grid grid-cols-2 gap-6">
                             <div className="text-center">
-                                <div className="text-xl font-bold text-gray-800">
+                                <div className="text-xl font-bold text-orange-500">
                                     $
                                     {pagos
                                         .reduce(
@@ -1076,7 +777,7 @@ function Historico() {
                                 </div>
                             </div>
                             <div className="text-center">
-                                <div className="text-xl font-bold text-red-600">
+                                <div className="text-xl font-bold text-gray-900">
                                     $
                                     {pagos
                                         .reduce(

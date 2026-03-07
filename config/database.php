@@ -98,6 +98,13 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'zkteco' => [
+            'driver' => 'sqlite', // CAMBIA A 'odbc' O 'sqlsrv' CUANDO ESTÉS EN LA CASETA REAL
+            'database' => database_path('zk_simulation.sqlite'), // O la ruta al .mdb real
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

@@ -17,7 +17,6 @@ const CheckCircle2Icon = () => (
     </svg>
 );
 
-// Custom SVG Icons
 const TrashIcon = () => (
     <svg
         className="w-5 h-5"
@@ -162,8 +161,6 @@ const XCircleIcon = () => (
     </svg>
 );
 
-// Import your actual API instance
-
 function Tags() {
     const [vecinos, setVecinos] = useState([]);
     const [sales, setSales] = useState([]);
@@ -176,6 +173,22 @@ function Tags() {
     const [payments, setPayments] = useState([]);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(20);
+
+    // Pagination calculations
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentSales = sales.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(sales.length / itemsPerPage);
+
+    const goToNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const goToPreviousPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
 
     const showMessage = useCallback((message, type = "success") => {
         if (type === "success") {
@@ -195,14 +208,14 @@ function Tags() {
         setLoading(true);
         setError(null);
         try {
-            const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+            const currentMonth = new Date().toISOString().slice(0, 7);
 
             const [tagsRes, vecinosRes, salesRes, paymentsRes] =
                 await Promise.all([
                     api.get("/tags"),
                     api.get("/vecinos"),
                     api.get("/tag_sales"),
-                    api.get(`/pagos/historico?mes=${currentMonth}`), // Get current month payments
+                    api.get(`/pagos/historico?mes=${currentMonth}`),
                 ]);
 
             const tags = tagsRes.data || [];
@@ -214,13 +227,11 @@ function Tags() {
             setSales(sales);
             setPayments(payments);
 
-            // Filter unsold tags - tags that don't have a tag_sale record
             const soldTagIds = new Set(sales.map((s) => s.tag_id));
             const unsold = tags.filter((t) => !soldTagIds.has(t.id));
             setUnsoldTags(unsold);
             setStock(unsold.length);
 
-            // Calculate total from sales
             const total = sales.reduce(
                 (sum, sale) => sum + parseFloat(sale.price || 150),
                 0
@@ -238,7 +249,6 @@ function Tags() {
 
     useEffect(() => {
         fetchAllData();
-        // Set current month for payment tracking
         const now = new Date();
         const monthStr = `${now.getFullYear()}-${String(
             now.getMonth() + 1
@@ -290,7 +300,6 @@ function Tags() {
         }
     };
 
-    // Helper function to check if vecino has paid this month
     const hasVecinoPaidThisMonth = (vecinoId) => {
         const currentMonth = new Date().toISOString().slice(0, 7);
         const vecinoPayments = payments.filter(
@@ -300,10 +309,9 @@ function Tags() {
             (sum, payment) => sum + parseFloat(payment.cantidad),
             0
         );
-        return totalPaid >= 280; // Monthly payment amount
+        return totalPaid >= 280;
     };
 
-    // Toggle individual tag status (manual override)
     const handleToggleTag = async (tagId) => {
         try {
             const response = await api.patch(`/tags/${tagId}/toggle`);
@@ -317,7 +325,6 @@ function Tags() {
         }
     };
 
-    // Create a quick payment for a vecino (activates their tags)
     const handleCreatePayment = async (vecinoId) => {
         try {
             const currentMonth = new Date().toISOString().slice(0, 7);
@@ -354,7 +361,6 @@ function Tags() {
     return (
         <div className="min-h-screen bg-white-50 p-4 md:p-6">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold bg-orange-600 bg-clip-text text-transparent mb-2">
                         Gestión de Tags
@@ -364,7 +370,6 @@ function Tags() {
                     </p>
                 </div>
 
-                {/* Messages */}
                 {error && (
                     <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-800">
                         <AlertCircleIcon />
@@ -379,9 +384,7 @@ function Tags() {
                     </div>
                 )}
 
-                {/* Main Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    {/* Vender Tag */}
                     <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="p-2 bg-orange-100 rounded-lg">
@@ -420,7 +423,6 @@ function Tags() {
                         </div>
                     </div>
 
-                    {/* Estadísticas */}
                     <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-orange-100 rounded-lg">
@@ -458,7 +460,6 @@ function Tags() {
                         </div>
                     </div>
 
-                    {/* Ventas Recientes */}
                     <div className="bg-orange/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="p-2 bg-orange-100 rounded-lg">
@@ -471,7 +472,7 @@ function Tags() {
 
                         <div className="max-h-64 overflow-y-auto space-y-2">
                             {sales.length > 0 ? (
-                                sales.slice(0, 50).map((sale) => (
+                                currentSales.map((sale) => (
                                     <div
                                         key={sale.id}
                                         className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
@@ -511,10 +512,49 @@ function Tags() {
                                 </p>
                             )}
                         </div>
+
+                        {sales.length > itemsPerPage && (
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-200 mt-4">
+                                <span className="text-sm text-slate-600">
+                                    {indexOfFirstItem + 1}-
+                                    {Math.min(indexOfLastItem, sales.length)} de{" "}
+                                    {sales.length}
+                                </span>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={goToPreviousPage}
+                                        disabled={currentPage === 1}
+                                        className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                                            currentPage === 1
+                                                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                                : "bg-orange-500 text-white hover:bg-orange-600"
+                                        }`}
+                                    >
+                                        ← Anterior
+                                    </button>
+
+                                    <span className="px-3 py-1 text-sm text-slate-700 flex items-center">
+                                        Página {currentPage} de {totalPages}
+                                    </span>
+
+                                    <button
+                                        onClick={goToNextPage}
+                                        disabled={currentPage === totalPages}
+                                        className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                                            currentPage === totalPages
+                                                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                                : "bg-orange-500 text-white hover:bg-orange-600"
+                                        }`}
+                                    >
+                                        Siguiente →
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Tabla de Vecinos */}
                 <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 overflow-hidden">
                     <div className="bg-orange-500 p-6 border-b border-slate-200">
                         <div className="flex items-center gap-3">
