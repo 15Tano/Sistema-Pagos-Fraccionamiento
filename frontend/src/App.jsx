@@ -2,14 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import useAuthStore from "./store/authStore";
 import Layout from "./components/layout/Layout";
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Vecinos from "./pages/Vecinos";
-import Pagos from "./pages/Pagos";
-import Tags from "./pages/Tags";
-import Historico from "./pages/Historico";
-import ResidentDashboard from "./pages/ResidentDashboard";
-import GuestView from "./pages/GuestView";
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Vecinos from "./pages/Vecinos.jsx";
+import Pagos from "./pages/Pagos.jsx";
+import Tags from "./pages/Tags.jsx";
+import Historico from "./pages/Historico.jsx";
+import ResidentDashboard from "./pages/ResidentDashboard.jsx";
+import GuestView from "./pages/GuestView.jsx";
 
 const PrivateRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, user } = useAuthStore();
