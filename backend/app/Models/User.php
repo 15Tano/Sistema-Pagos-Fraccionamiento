@@ -18,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, \Laravel\Sanctum\HasApiTokens;
 
     /**
      * Los atributos que se pueden asignar masivamente.
@@ -27,7 +27,6 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
         'password',
         'username', // Tu campo nuevo
         'role',     // Tu campo nuevo

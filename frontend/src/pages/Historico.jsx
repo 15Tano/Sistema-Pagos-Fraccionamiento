@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import api from "../api";
+import api from "../lib/axios";
 
 const MONTHLY_FEE = 280;
 const CURRENT_MONTH_ISO = new Date().toISOString().slice(0, 7);
@@ -14,7 +14,7 @@ function Historico() {
     const [selectedVecino, setSelectedVecino] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(CURRENT_MONTH_ISO);
     const [selectedDate, setSelectedDate] = useState(
-        new Date().toISOString().slice(0, 10)
+        new Date().toISOString().slice(0, 10),
     );
     const [selectedCollectionMonth, setSelectedCollectionMonth] =
         useState(CURRENT_MONTH_ISO);
@@ -96,7 +96,7 @@ function Historico() {
 
     const uniqueCalles = useMemo(
         () => [...new Set(vecinos.map((v) => v.calle))].sort(),
-        [vecinos]
+        [vecinos],
     );
 
     const filteredVecinos = useMemo(
@@ -106,21 +106,21 @@ function Historico() {
                       .filter((v) => v.calle === selectedCalle)
                       .sort((a, b) => a.nombre.localeCompare(b.nombre))
                 : vecinos.sort((a, b) => a.nombre.localeCompare(b.nombre)),
-        [vecinos, selectedCalle]
+        [vecinos, selectedCalle],
     );
 
     const currentMonthSummary = useMemo(() => {
         const currentMonthPayments = pagos.filter(
-            (p) => p.mes === CURRENT_MONTH_ISO
+            (p) => p.mes === CURRENT_MONTH_ISO,
         );
 
         return vecinos.map((vecino) => {
             const vecinoPayments = currentMonthPayments.filter(
-                (p) => p.vecino_id === vecino.id
+                (p) => p.vecino_id === vecino.id,
             );
             const totalPaid = vecinoPayments.reduce(
                 (sum, p) => sum + parseFloat(p.cantidad),
-                0
+                0,
             );
 
             const totalRemaining =
@@ -155,7 +155,7 @@ function Historico() {
 
     const paymentTypeSummary = useMemo(() => {
         const currentMonthPayments = pagos.filter(
-            (p) => p.mes === CURRENT_MONTH_ISO
+            (p) => p.mes === CURRENT_MONTH_ISO,
         );
 
         const ordinarioTotal = currentMonthPayments
@@ -361,7 +361,7 @@ function Historico() {
                                     value={selectedCollectionMonth}
                                     onChange={(e) =>
                                         setSelectedCollectionMonth(
-                                            e.target.value
+                                            e.target.value,
                                         )
                                     }
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
@@ -501,19 +501,19 @@ function Historico() {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {getPaymentStatusBadge(
                                                         vecino.totalPaid,
-                                                        vecino.totalRemaining
+                                                        vecino.totalRemaining,
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     $
                                                     {vecino.totalPaid.toFixed(
-                                                        2
+                                                        2,
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     $
                                                     {vecino.totalRemaining.toFixed(
-                                                        2
+                                                        2,
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -522,7 +522,7 @@ function Historico() {
                                                         vecino.tags
                                                             .map(
                                                                 (tag) =>
-                                                                    tag.codigo
+                                                                    tag.codigo,
                                                             )
                                                             .join(", ")
                                                     ) : (
@@ -532,7 +532,7 @@ function Historico() {
                                                     )}
                                                 </td>
                                             </tr>
-                                        )
+                                        ),
                                     )}
                                 </tbody>
                             </table>
@@ -543,7 +543,7 @@ function Historico() {
                                     <div className="text-2xl font-bold text-green-600">
                                         {
                                             filteredCurrentMonthSummary.filter(
-                                                (v) => v.isComplete
+                                                (v) => v.isComplete,
                                             ).length
                                         }
                                     </div>
@@ -556,7 +556,7 @@ function Historico() {
                                         {
                                             filteredCurrentMonthSummary.filter(
                                                 (v) =>
-                                                    v.hasPaid && !v.isComplete
+                                                    v.hasPaid && !v.isComplete,
                                             ).length
                                         }
                                     </div>
@@ -568,7 +568,7 @@ function Historico() {
                                     <div className="text-2xl font-bold text-red-600">
                                         {
                                             filteredCurrentMonthSummary.filter(
-                                                (v) => !v.hasPaid
+                                                (v) => !v.hasPaid,
                                             ).length
                                         }
                                     </div>
@@ -582,7 +582,7 @@ function Historico() {
                                     <div className="text-2xl font-bold text-orange-600">
                                         $
                                         {paymentTypeSummary.ordinarioTotal.toFixed(
-                                            2
+                                            2,
                                         )}
                                     </div>
                                     <div className="text-sm text-gray-600">
@@ -593,7 +593,7 @@ function Historico() {
                                     <div className="text-2xl font-bold text-orange-600">
                                         $
                                         {paymentTypeSummary.extraordinarioTotal.toFixed(
-                                            2
+                                            2,
                                         )}
                                     </div>
                                     <div className="text-sm text-gray-600">
@@ -619,15 +619,15 @@ function Historico() {
                                     `Historial Individual`}
                                 {activeTab === "mensual" &&
                                     `Pagos del Mes: ${formatMonth(
-                                        selectedMonth
+                                        selectedMonth,
                                     )}`}
                                 {activeTab === "mes_cobro" &&
                                     `Pagos Cobrados en: ${formatMonth(
-                                        selectedCollectionMonth
+                                        selectedCollectionMonth,
                                     )}`}
                                 {activeTab === "por_dia" &&
                                     `Pagos del Día: ${formatDate(
-                                        selectedDate
+                                        selectedDate,
                                     )}`}
                                 {activeTab === "adelantados" &&
                                     `Pagos Adelantados`}
@@ -717,14 +717,14 @@ function Historico() {
                                                                 .charAt(0)
                                                                 .toUpperCase() +
                                                                 pago.tipo.slice(
-                                                                    1
+                                                                    1,
                                                                 )}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                         $
                                                         {parseFloat(
-                                                            pago.cantidad
+                                                            pago.cantidad,
                                                         ).toFixed(2)}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -732,7 +732,7 @@ function Historico() {
                                                             <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
                                                                 Resta $
                                                                 {parseFloat(
-                                                                    pago.restante
+                                                                    pago.restante,
                                                                 ).toFixed(2)}
                                                             </span>
                                                         ) : (
@@ -744,7 +744,7 @@ function Historico() {
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                         {pago.fecha_de_cobro
                                                             ? formatDate(
-                                                                  pago.fecha_de_cobro
+                                                                  pago.fecha_de_cobro,
                                                               )
                                                             : "-"}
                                                     </td>
@@ -768,7 +768,7 @@ function Historico() {
                                         .reduce(
                                             (sum, p) =>
                                                 sum + parseFloat(p.cantidad),
-                                            0
+                                            0,
                                         )
                                         .toFixed(2)}
                                 </div>
@@ -783,7 +783,7 @@ function Historico() {
                                         .reduce(
                                             (sum, p) =>
                                                 sum + parseFloat(p.restante),
-                                            0
+                                            0,
                                         )
                                         .toFixed(2)}
                                 </div>

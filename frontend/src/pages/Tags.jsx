@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import api from "../api";
+import api from "../lib/axios";
 import { Link } from "react-router-dom";
 const CheckCircle2Icon = () => (
     <svg
@@ -234,13 +234,13 @@ function Tags() {
 
             const total = sales.reduce(
                 (sum, sale) => sum + parseFloat(sale.price || 150),
-                0
+                0,
             );
             setTotalSales(total);
         } catch (error) {
             console.error("Error fetching data:", error);
             setError(
-                "Error al cargar los datos. Por favor intente nuevamente."
+                "Error al cargar los datos. Por favor intente nuevamente.",
             );
         } finally {
             setLoading(false);
@@ -251,7 +251,7 @@ function Tags() {
         fetchAllData();
         const now = new Date();
         const monthStr = `${now.getFullYear()}-${String(
-            now.getMonth() + 1
+            now.getMonth() + 1,
         ).padStart(2, "0")}`;
         setCurrentMonth(monthStr);
     }, [fetchAllData]);
@@ -279,7 +279,7 @@ function Tags() {
                 setError(error.response.data.error);
             } else {
                 setError(
-                    "Error al registrar la venta. Por favor intente nuevamente."
+                    "Error al registrar la venta. Por favor intente nuevamente.",
                 );
             }
         }
@@ -295,7 +295,7 @@ function Tags() {
         } catch (error) {
             console.error("Error deleting sale:", error);
             setError(
-                "Error al eliminar la venta. Por favor intente nuevamente."
+                "Error al eliminar la venta. Por favor intente nuevamente.",
             );
         }
     };
@@ -303,11 +303,11 @@ function Tags() {
     const hasVecinoPaidThisMonth = (vecinoId) => {
         const currentMonth = new Date().toISOString().slice(0, 7);
         const vecinoPayments = payments.filter(
-            (p) => p.vecino_id === vecinoId && p.mes === currentMonth
+            (p) => p.vecino_id === vecinoId && p.mes === currentMonth,
         );
         const totalPaid = vecinoPayments.reduce(
             (sum, payment) => sum + parseFloat(payment.cantidad),
-            0
+            0,
         );
         return totalPaid >= 280;
     };
@@ -320,7 +320,7 @@ function Tags() {
         } catch (error) {
             console.error("Error toggling tag:", error);
             setError(
-                "Error al cambiar el estado del tag. Por favor intente nuevamente."
+                "Error al cambiar el estado del tag. Por favor intente nuevamente.",
             );
         }
     };
@@ -340,7 +340,7 @@ function Tags() {
         } catch (error) {
             console.error("Error creating payment:", error);
             setError(
-                "Error al registrar el pago. Por favor intente nuevamente."
+                "Error al registrar el pago. Por favor intente nuevamente.",
             );
         }
     };
@@ -486,7 +486,7 @@ function Tags() {
                                             <p className="text-xs text-slate-600">
                                                 {sale.sold_at
                                                     ? new Date(
-                                                          sale.sold_at
+                                                          sale.sold_at,
                                                       ).toLocaleDateString()
                                                     : "Sin fecha"}
                                             </p>
@@ -623,13 +623,13 @@ function Tags() {
                                                                 >
                                                                     {tag.codigo}
                                                                 </span>
-                                                            )
+                                                            ),
                                                         )}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {hasVecinoPaidThisMonth(
-                                                        vecino.id
+                                                        vecino.id,
                                                     ) ? (
                                                         <div className="flex items-center gap-2">
                                                             <CheckCircle2Icon />
@@ -651,7 +651,7 @@ function Tags() {
                                                             {
                                                                 month: "long",
                                                                 year: "numeric",
-                                                            }
+                                                            },
                                                         )}
                                                     </p>
                                                 </td>
@@ -687,14 +687,14 @@ function Tags() {
                                                                         )
                                                                     </span>
                                                                 </div>
-                                                            )
+                                                            ),
                                                         )}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="space-y-2">
                                                         {!hasVecinoPaidThisMonth(
-                                                            vecino.id
+                                                            vecino.id,
                                                         ) && (
                                                             <Link
                                                                 to={`/pagos?vecinoId=${vecino.id}`}
@@ -715,7 +715,7 @@ function Tags() {
                                                                         }
                                                                         onClick={() =>
                                                                             handleToggleTag(
-                                                                                tag.id
+                                                                                tag.id,
                                                                             )
                                                                         }
                                                                         className={`px-2 py-1 rounded text-xs font-semibold mr-1 mb-1 transition-all duration-200 ${
@@ -731,7 +731,7 @@ function Tags() {
                                                                             tag.codigo
                                                                         }
                                                                     </button>
-                                                                )
+                                                                ),
                                                             )}
                                                         </div>
                                                     </div>

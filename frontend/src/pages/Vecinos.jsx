@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import api from "../api";
+import api from "../lib/axios";
 
 // --- Custom SVG Icons ---
 const UserPlusIcon = ({ className }) => (

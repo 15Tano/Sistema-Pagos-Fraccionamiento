@@ -51,7 +51,14 @@ const MoneyIcon = () => (
 
 // --- COMPONENTE PRINCIPAL ---
 // OJO AQUÍ: Las llaves { } son obligatorias para sacar user y onLogout
-const ResidentDashboard = ({ user, onLogout }) => {
+import useAuthStore from "../store/authStore";
+
+const ResidentDashboard = () => {
+    const { user, logout } = useAuthStore();
+    const onLogout = () => {
+        logout();
+        window.location.href = "/login";
+    };
     // Datos simulados (Luego vendrán de la BD)
     const [status] = useState("ACTIVO");
     const [vencimiento] = useState("15/02/2026");
