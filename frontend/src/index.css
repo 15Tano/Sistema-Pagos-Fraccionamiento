@@ -10,7 +10,7 @@ button[class*="bg-gradient"],
 button[class*="bg-orange"],
 button[class*="bg-green"],
 button[class*="bg-red"],
-button[class*="bg-blue"],
+/*button[class*="bg-blue"],*/
 button[class*="bg-"] {
     /*background-color: revert !important;
     //*background-image: revert !important;

@@ -374,11 +374,11 @@ function Vecinos() {
                                         Número de Casa *
                                     </label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         name="numero_casa"
                                         value={form.numero_casa}
                                         onChange={handleChange}
-                                        placeholder="123"
+                                        placeholder="123-B"
                                         className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                                         required
                                         disabled={loading}

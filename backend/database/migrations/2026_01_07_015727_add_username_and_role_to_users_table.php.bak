@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+{
+    Schema::table('users', function (Blueprint $table) {
+        // 1. Campo para el Tag (Username). 
+        // Es 'unique' para que no haya dos vecinos con el mismo tag.
+        // Es 'nullable' para que el Admin pueda seguir existiendo sin tag.
+        $table->string('username')->unique()->nullable()->after('name');
+
+        // 2. Campo para el Rol ('admin' o 'residente').
+        // Por defecto será 'residente'.
+        $table->string('role')->default('residente')->after('password');
+
+        // 3. Hacemos que el email ya no sea obligatorio
+        // (Porque los vecinos entrarán con Tag, no con correo).
+        $table->string('email')->nullable()->change();
+    });
+}
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            //
+        });
+    }
+};

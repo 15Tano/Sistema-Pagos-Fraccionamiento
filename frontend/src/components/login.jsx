@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // --- Custom SVG Icons ---
 const UserIcon = ({ className }) => (
@@ -16,6 +16,21 @@ const UserIcon = ({ className }) => (
         />
     </svg>
 );
+const TagIcon = ({ className }) => (
+    <svg
+        className={className}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+        />
+    </svg>
+);
 const LockIcon = ({ className }) => (
     <svg
         className={className}
@@ -28,21 +43,6 @@ const LockIcon = ({ className }) => (
             strokeLinejoin="round"
             strokeWidth={2}
             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-        />
-    </svg>
-);
-const HomeIcon = ({ className }) => (
-    <svg
-        className={className}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
         />
     </svg>
 );
@@ -82,81 +82,180 @@ const EyeOffIcon = ({ className }) => (
         />
     </svg>
 );
-// Placeholder for your logo
+
+// Tu Logo Pequeño (para el formulario)
 const YourLogoIcon = ({ className }) => (
     <img
-        src="/arcos.png" // <-- Pon aquí la URL o la ruta a tu imagen
+        src="/arcos.png"
         alt="Logo de San Isidro"
-        className="max-w-[300px] lg:max-w-[1700]" // Ajusta el tamaño como necesites
+        className="max-w-[300px] lg:max-w-[1700]"
     />
 );
 
 function Login({ onLogin }) {
-    const [email, setEmail] = useState("");
+    const [loginType, setLoginType] = useState("admin"); // 'admin' o 'residente'
+    const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [csrfToken, setCsrfToken] = useState("");
 
-    const handleAdminLogin = (e) => {
+    useEffect(() => {
+        const token = document.querySelector('meta[name="csrf-token"]');
+        if (token) setCsrfToken(token.getAttribute("content"));
+    }, []);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setTimeout(() => {
-            if (email === "admin@fracc.com" && password === "admin123") {
-                onLogin({ role: "admin", name: "Administrador" });
-            } else {
-                alert("Credenciales incorrectas");
-            }
-            setIsLoading(false);
-        }, 800);
-    };
 
-    const handleGuestLogin = () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            onLogin({ role: "guest", name: "Invitado" });
-            setIsLoading(false);
-        }, 300);
+        try {
+            // PASO A: Pedimos la cookie de seguridad a Laravel ("El saludo")
+            // Esto establece la sesión antes de intentar entrar.
+            await fetch("http://127.0.0.1:8000/sanctum/csrf-cookie", {
+                method: "GET",
+                credentials: "include", // <--- OBLIGATORIO: Permite guardar la cookie
+            });
+
+            // PASO B: Ahora sí, intentamos el Login
+            const response = await fetch("http://127.0.0.1:8000/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    // Nota: Ya no enviamos X-CSRF-TOKEN manualmente,
+                    // Laravel lo leerá de la cookie gracias a credentials: 'include'
+                },
+                credentials: "include", // <--- OBLIGATORIO: Envía la cookie de vuelta
+                body: JSON.stringify({
+                    email: identifier,
+                    password: password,
+                }),
+            });
+
+            const data = await response.json();
+
+            // PASO C: Verificar respuesta
+            if (response.ok) {
+                // Login exitoso
+                if (data.role === "admin") {
+                    onLogin({ name: data.name, role: "admin" });
+                } else {
+                    onLogin({
+                        name: data.name,
+                        role: "residente",
+                        tag: data.tag_usado,
+                    });
+                }
+            } else {
+                // AQUÍ ESTABA EL PROBLEMA: Antes tenías un texto fijo.
+                // Ahora mostramos lo que dice el backend:
+                alert(data.message || "Error desconocido en el servidor");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error de conexión.");
+        }
+        setIsLoading(false);
     };
 
     return (
         <div className="min-h-screen bg-white flex">
-            {/* Left Column: Login Form */}
+            {/* Left Column: Formulario */}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8">
-                <div className="relative bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-full max-w-md border border-orange-100">
+                <div className="relative bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-orange-100/50">
+                    {/* Encabezado */}
                     <div className="text-center mb-8">
-                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <YourLogoIcon className="w-8 h-8 text-white" />
+                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-orange-50">
+                            <YourLogoIcon className="w-8 h-8" />
                         </div>
-                        <h2 className="text-3xl font-bold text-orange-600 mb-2">
-                            Sistema de Registros
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                            Bienvenido
                         </h2>
-                        <div className="w-16 h-1 bg-orange-300 mx-auto rounded-full"></div>
-                        <p className="text-slate-600 mt-3">
-                            Accede a tu cuenta de administrador
-                        </p>
                     </div>
 
-                    <form onSubmit={handleAdminLogin} className="space-y-6">
+                    {/* --- TABS / PESTAÑAS --- */}
+                    <div className="flex p-1 bg-gray-100 rounded-xl mb-8">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setLoginType("admin");
+                                setIdentifier("");
+                            }}
+                            className={`flex-1 flex items-center justify-center py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                loginType === "admin"
+                                    ? "bg-white text-orange-600 shadow-sm"
+                                    : "text-gray-500 hover:text-gray-700"
+                            }`}
+                        >
+                            <UserIcon className="w-4 h-4 mr-2" />
+                            Administración
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setLoginType("residente");
+                                setIdentifier("");
+                            }}
+                            className={`flex-1 flex items-center justify-center py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                loginType === "residente"
+                                    ? "bg-white text-green-600 shadow-sm"
+                                    : "text-gray-500 hover:text-gray-700"
+                            }`}
+                        >
+                            <TagIcon className="w-4 h-4 mr-2" />
+                            Residente
+                        </button>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* INPUT DINÁMICO */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Usuario
+                                {loginType === "admin"
+                                    ? "Correo Electrónico"
+                                    : "Número de Tag / Tarjeta"}
                             </label>
                             <div className="relative">
                                 <input
-                                    type="email"
-                                    className="w-full px-4 py-3 bg-white border-2 border-orange-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 pl-11"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Administrador"
-                                    disabled={isLoading}
+                                    type={
+                                        loginType === "admin" ? "email" : "text"
+                                    }
+                                    className={`w-full px-4 py-3 bg-white border-2 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 pl-11 
+                                        ${
+                                            loginType === "admin"
+                                                ? "border-orange-100 focus:ring-orange-500 focus:border-orange-500"
+                                                : "border-green-100 focus:ring-green-500 focus:border-green-500"
+                                        }`}
+                                    value={identifier}
+                                    onChange={(e) =>
+                                        setIdentifier(e.target.value)
+                                    }
+                                    placeholder={
+                                        loginType === "admin"
+                                            ? "admin@fracc.com"
+                                            : "Ej: 001452"
+                                    }
                                     required
+                                    disabled={isLoading}
                                 />
-                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400">
-                                    <UserIcon className="w-5 h-5" />
+                                <div
+                                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                                        loginType === "admin"
+                                            ? "text-orange-400"
+                                            : "text-green-500"
+                                    }`}
+                                >
+                                    {loginType === "admin" ? (
+                                        <UserIcon className="w-5 h-5" />
+                                    ) : (
+                                        <TagIcon className="w-5 h-5" />
+                                    )}
                                 </div>
                             </div>
                         </div>
 
+                        {/* CONTRASEÑA */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Contraseña
@@ -164,16 +263,27 @@ function Login({ onLogin }) {
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
-                                    className="w-full px-4 py-3 bg-white border-2 border-orange-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 pl-11 pr-11"
+                                    className={`w-full px-4 py-3 bg-white border-2 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 pl-11 pr-11
+                                        ${
+                                            loginType === "admin"
+                                                ? "border-orange-100 focus:ring-orange-500 focus:border-orange-500"
+                                                : "border-green-100 focus:ring-green-500 focus:border-green-500"
+                                        }`}
                                     value={password}
                                     onChange={(e) =>
                                         setPassword(e.target.value)
                                     }
                                     placeholder="********"
-                                    disabled={isLoading}
                                     required
+                                    disabled={isLoading}
                                 />
-                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400">
+                                <div
+                                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                                        loginType === "admin"
+                                            ? "text-orange-400"
+                                            : "text-green-500"
+                                    }`}
+                                >
                                     <LockIcon className="w-5 h-5" />
                                 </div>
                                 <button
@@ -181,8 +291,7 @@ function Login({ onLogin }) {
                                     onClick={() =>
                                         setShowPassword(!showPassword)
                                     }
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors p-1"
-                                    disabled={isLoading}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
                                 >
                                     {showPassword ? (
                                         <EyeOffIcon className="w-5 h-5" />
@@ -193,63 +302,42 @@ function Login({ onLogin }) {
                             </div>
                         </div>
 
+                        {/* BOTÓN SUBMIT */}
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full flex items-center justify-center px-4 py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200 transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg border-b-4 border-orange-500 active:border-b-0"
+                            className={`w-full flex items-center justify-center px-4 py-3 text-white font-semibold rounded-xl focus:outline-none focus:ring-4 transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg border-b-4 active:border-b-0 disabled:opacity-50 disabled:transform-none
+                                ${
+                                    loginType === "admin"
+                                        ? "bg-orange-500 hover:bg-orange-600 focus:ring-orange-200 border-orange-600"
+                                        : "bg-green-600 hover:bg-green-700 focus:ring-green-200 border-green-700"
+                                }`}
                         >
                             {isLoading ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                    Iniciando sesión...
-                                </>
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                            ) : loginType === "admin" ? (
+                                <UserIcon className="w-5 h-5 mr-2" />
                             ) : (
-                                <>
-                                    <UserIcon className="w-5 h-5 mr-2" />
-                                    Iniciar sesión
-                                </>
+                                <TagIcon className="w-5 h-5 mr-2" />
                             )}
+                            {isLoading
+                                ? "Entrando..."
+                                : loginType === "admin"
+                                ? "Iniciar sesión"
+                                : "Entrar con Tag"}
                         </button>
                     </form>
-
-                    <div className="mt-6 text-center">
-                        <div className="relative my-4">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-orange-200"></div>
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">
-                                    o
-                                </span>
-                            </div>
-                        </div>
-                        <button
-                            onClick={handleGuestLogin}
-                            disabled={isLoading}
-                            className="w-full flex items-center justify-center px-4 py-3 bg-white text-orange-700 font-medium rounded-xl border-2 border-orange-300 hover:bg-orange-50 hover:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-200 transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                        >
-                            {isLoading ? (
-                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600"></div>
-                            ) : (
-                                <>
-                                    <EyeIcon className="w-5 h-5 mr-2" />
-                                    Entrar como Invitado
-                                </>
-                            )}
-                        </button>
-                    </div>
+                    {/* Se eliminó la sección de Invitado aquí */}
                 </div>
             </div>
 
-            {/* Right Column: Logo/Image placeholder */}
-            <div className="hidden lg:flex w-1/2 bg-white items-center justify-center p-8">
-                {/* --- EJEMPLO CON TU LOGO --- */}
+            {/* Right Column: Imagen Grande (Fondo blanco limpio) */}
+            <div className="hidden lg:flex w-1/2 bg-white items-center justify-center p-8 relative">
                 <img
-                    src="/Logo Fraccionamiento Sol Verde Oro Elegante.png" // <-- Pon aquí la URL o la ruta a tu imagen
+                    src="/Logo Fraccionamiento Sol Verde Oro Elegante.png"
                     alt="Logo de San Isidro"
-                    className="max-w-[600px] lg:max-w-[600px]" // Ajusta el tamaño como necesites
+                    className="max-w-[600px] lg:max-w-[85%] relative z-10 drop-shadow-xl"
                 />
-                {/* --- FIN DEL EJEMPLO --- */}
             </div>
         </div>
     );
