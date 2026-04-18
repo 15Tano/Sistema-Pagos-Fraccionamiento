@@ -112,6 +112,36 @@ function Login({ onLogin }) {
         e.preventDefault();
         setIsLoading(true);
 
+        // --- 1. MOCK PARA VERCEL (SIMULADOR) ---
+        // Usamos un timeout de 800ms para que se vea la animación del botón cargando
+        setTimeout(() => {
+            const fakeToken = "token_de_prueba_123";
+            const fakeUser = {
+                id: 1,
+                name:
+                    loginType === "admin"
+                        ? "Admin (Prueba)"
+                        : "Residente (Prueba)",
+                role: loginType,
+                email:
+                    identifier ||
+                    (loginType === "admin" ? "admin@sanisidro.com" : "001452"),
+            };
+
+            // Guardamos la sesión falsa
+            setAuth(fakeToken, fakeUser);
+
+            // Redirigimos según el rol simulado
+            if (fakeUser.role === "admin") {
+                window.location.href = "/";
+            } else {
+                window.location.href = "/residente";
+            }
+            setIsLoading(false);
+        }, 800);
+
+        // --- 2. CÓDIGO REAL COMENTADO ---
+        /*
         try {
             const { token, user } = await login(identifier, password);
             setAuth(token, user);
@@ -122,12 +152,12 @@ function Login({ onLogin }) {
                 window.location.href = "/residente";
             }
         } catch (error) {
-            const message =
-                error.response?.data?.message || "Error de conexión.";
+            const message = error.response?.data?.message || "Error de conexión.";
             alert(message);
         } finally {
             setIsLoading(false);
         }
+        */
     };
 
     return (
