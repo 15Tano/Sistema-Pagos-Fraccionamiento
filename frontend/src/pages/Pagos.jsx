@@ -1,1004 +1,191 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import api from "../lib/axios";
 
-function Pagos() {
-    const [pagos, setPagos] = useState([]);
-    const [vecinos, setVecinos] = useState([]);
-    const [form, setForm] = useState({
-        vecino_id: "",
-        meses_pagados: "",
-        mes: "",
-        tipo: "ordinario",
-        fecha_de_cobro: "",
-    });
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [editingPagoId, setEditingPagoId] = useState(null);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [showVecinoDropdown, setShowVecinoDropdown] = useState(false);
-    const [selectedVecinoForSearch, setSelectedVecinoForSearch] =
-        useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [filterFechaCobro, setFilterFechaCobro] = useState("");
-    const itemsPerPage = 20;
+// ── ICONS ──
+const SearchIcon = () => (
+    <svg
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"
+        />
+    </svg>
+);
+const XIcon = () => (
+    <svg
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+        />
+    </svg>
+);
+const ChevronIcon = ({ open }) => (
+    <svg
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        style={{
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+        }}
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+        />
+    </svg>
+);
+const TagIcon = () => (
+    <svg
+        width="11"
+        height="11"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+        />
+    </svg>
+);
+const TrashIcon = () => (
+    <svg
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        />
+    </svg>
+);
+const EditIcon = () => (
+    <svg
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+        />
+    </svg>
+);
 
-    /**
-     * Formatea una cadena de fecha a un formato legible en español, evitando problemas de zona horaria.
-     * @param {string} dateString - La fecha en formato YYYY-MM, YYYY-MM-DD o ISO.
-     * @param {'day' | 'month'} formatType - 'day' para DD/MM/YYYY, 'month' para "Mes de Año".
-     * @returns {string} La fecha formateada.
-     */
-    const formatDisplayDate = (dateString, formatType = "day") => {
-        if (!dateString) {
-            return formatType === "day" ? "Sin fecha" : "-";
-        }
+// ── CUOTAS BASE ──
+const CUOTAS = [280, 300, 500];
+const RECARGO_EXTRA = 50;
 
-        // Añadir "-02" a las fechas que solo tienen mes (YYYY-MM) para evitar errores.
-        const safeDateString =
-            dateString.length === 7 ? `${dateString}-02` : dateString;
-
-        const date = new Date(safeDateString);
-
-        if (isNaN(date.getTime())) {
-            return "Fecha inválida";
-        }
-
-        // La clave es forzar la zona horaria a UTC tanto para días como para meses.
-        // Esto evita que la hora local del navegador cambie el día.
-        let options = {
-            timeZone: "UTC",
-        };
-
-        if (formatType === "day") {
-            options = {
-                ...options,
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-            };
-        } else if (formatType === "month") {
-            options = {
-                ...options,
-                year: "numeric",
-                month: "long",
-            };
-        }
-
-        return date.toLocaleDateString("es-ES", options);
-    };
+// ── FILA EXPANDIBLE ──
+function PagoExpandido({ vecinoUuid }) {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchInitialData();
-    }, []);
+        api.get(`/pagos/estado-meses/${vecinoUuid}`)
+            .then((r) => setData(r.data))
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, [vecinoUuid]);
 
-    const fetchInitialData = async () => {
-        setLoading(true);
-        try {
-            await Promise.all([fetchVecinos(), fetchPagos()]);
-        } catch (error) {
-            console.error("Error fetching initial data:", error);
-            setError("Error al cargar los datos iniciales");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchVecinos = async () => {
-        try {
-            const response = await api.get("/vecinos");
-            setVecinos(response.data);
-        } catch (error) {
-            console.error("Error fetching vecinos:", error);
-            throw error;
-        }
-    };
-
-    const fetchPagos = async () => {
-        try {
-            const response = await api.get("/pagos");
-            setPagos(response.data);
-        } catch (error) {
-            console.error("Error fetching pagos:", error);
-            throw error;
-        }
-    };
-
-    // Filter vecinos based on search query with multi-field support
-    const filteredVecinos = useMemo(() => {
-        if (!searchQuery.trim()) return vecinos;
-
-        const query = searchQuery.toLowerCase().trim();
-        const queryParts = query.split(/\s+/); // Split by whitespace
-
-        return vecinos.filter((vecino) => {
-            const searchableText =
-                `${vecino.nombre} ${vecino.calle} ${vecino.numero_casa}`.toLowerCase();
-
-            // All query parts must match somewhere in the combined text
-            return queryParts.every((part) => searchableText.includes(part));
-        });
-    }, [vecinos, searchQuery]);
-
-    // Filter and paginate pagos
-    const filteredAndPaginatedPagos = useMemo(() => {
-        let filtered = [...pagos];
-
-        // Filter by fecha_de_cobro if selected
-        if (filterFechaCobro) {
-            filtered = filtered.filter(
-                (pago) => pago.fecha_de_cobro === filterFechaCobro,
-            );
-        }
-
-        // Sort by ID descending (most recent first)
-        filtered.sort((a, b) => b.id - a.id);
-
-        // Calculate pagination
-        const totalPages = Math.ceil(filtered.length / itemsPerPage);
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const paginatedData = filtered.slice(startIndex, endIndex);
-
-        return {
-            data: paginatedData,
-            totalPages,
-            totalItems: filtered.length,
-        };
-    }, [pagos, filterFechaCobro, currentPage]);
-
-    // Get unique payment dates for filter
-    const uniqueFechasCobro = useMemo(() => {
-        const fechas = pagos
-            .map((p) => p.fecha_de_cobro)
-            .filter((f) => f)
-            .sort((a, b) => new Date(b) - new Date(a));
-        return [...new Set(fechas)];
-    }, [pagos]);
-
-    // Reset to page 1 when filter changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [filterFechaCobro]);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
-        setError("");
-    };
-
-    const handleSearchChange = (e) => {
-        const value = e.target.value;
-        setSearchQuery(value);
-        setShowVecinoDropdown(value.trim().length > 0);
-        setSelectedVecinoForSearch(null);
-    };
-
-    const handleVecinoSelect = (vecino) => {
-        setForm({ ...form, vecino_id: vecino.id });
-        setSelectedVecinoForSearch(vecino);
-        setSearchQuery(
-            `${vecino.nombre} - ${vecino.calle} #${vecino.numero_casa}`,
-        );
-        setShowVecinoDropdown(false);
-    };
-
-    const clearVecinoSelection = () => {
-        setForm({ ...form, vecino_id: "" });
-        setSelectedVecinoForSearch(null);
-        setSearchQuery("");
-        setShowVecinoDropdown(false);
-    };
-
-    const validateForm = () => {
-        if (!form.vecino_id) {
-            setError("Por favor seleccione un vecino");
-            return false;
-        }
-
-        if (
-            !form.meses_pagados ||
-            parseInt(form.meses_pagados) < 1 ||
-            parseInt(form.meses_pagados) > 12
-        ) {
-            setError("Por favor seleccione la cantidad de meses (1-12)");
-            return false;
-        }
-
-        if (!form.mes) {
-            setError("Por favor seleccione el mes de inicio");
-            return false;
-        }
-
-        return true;
-    };
-
-    const calculateTotalAmount = () => {
-        if (!form.meses_pagados) return 0;
-        return parseInt(form.meses_pagados) * 280;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!validateForm()) {
-            return;
-        }
-
-        setLoading(true);
-        setError("");
-
-        try {
-            const mesesPagados = parseInt(form.meses_pagados);
-            const cantidadTotal = mesesPagados * 280;
-
-            const submitData = {
-                vecino_id: form.vecino_id,
-                cantidad: cantidadTotal,
-                mes: form.mes,
-                tipo: form.tipo,
-                fecha_de_cobro: form.fecha_de_cobro,
-                meses_pagados: mesesPagados,
-            };
-
-            if (editingPagoId) {
-                await api.put(`/pagos/${editingPagoId}`, submitData);
-            } else {
-                await api.post("/pagos", submitData);
-            }
-
-            // Reset form
-            setForm({
-                vecino_id: "",
-                meses_pagados: "",
-                mes: "",
-                tipo: "ordinario",
-                fecha_de_cobro: "",
-            });
-            setEditingPagoId(null);
-            clearVecinoSelection();
-
-            await fetchPagos();
-            setCurrentPage(1); // Reset to first page after adding/editing
-        } catch (error) {
-            console.error("Error saving pago:", error);
-            if (error.response?.data?.message) {
-                setError(error.response.data.message);
-            } else {
-                setError(
-                    "Error al guardar el pago. Por favor intente nuevamente.",
-                );
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleEdit = (pago) => {
-        // Calculate months from cantidad (assuming 280 per month)
-        const mesesPagados = Math.round(pago.cantidad / 280);
-
-        setForm({
-            vecino_id: pago.vecino.id,
-            meses_pagados: mesesPagados.toString(),
-            mes: pago.mes,
-            tipo: pago.tipo,
-            fecha_de_cobro: pago.fecha_de_cobro || "",
-        });
-        setEditingPagoId(pago.id);
-        setSelectedVecinoForSearch(pago.vecino);
-        setSearchQuery(
-            `${pago.vecino.nombre} - ${pago.vecino.calle} #${pago.vecino.numero_casa}`,
-        );
-        setError("");
-    };
-
-    const handleCancelEdit = () => {
-        setForm({
-            vecino_id: "",
-            meses_pagados: "",
-            mes: "",
-            tipo: "ordinario",
-            fecha_de_cobro: "",
-        });
-        setEditingPagoId(null);
-        clearVecinoSelection();
-        setError("");
-    };
-
-    const handleDelete = async (id) => {
-        if (
-            !window.confirm("¿Estás seguro de que quieres eliminar este pago?")
-        ) {
-            return;
-        }
-
-        setLoading(true);
-        try {
-            await api.delete(`/pagos/${id}`);
-            await fetchPagos();
-        } catch (error) {
-            console.error("Error deleting pago:", error);
-            setError(
-                "Error al eliminar el pago. Por favor intente nuevamente.",
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading && pagos.length === 0 && vecinos.length === 0) {
+    if (loading)
         return (
-            <div className="max-w-7xl mx-auto p-6">
-                <div className="bg-white p-8 rounded-xl shadow-lg">
-                    <div className="flex justify-center items-center h-64">
-                        <div className="flex items-center space-x-3">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-                            <div className="text-lg text-gray-600">
-                                Cargando datos...
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="px-5 py-3 flex items-center gap-2 text-xs text-stone-400">
+                <div className="w-3 h-3 border border-orange-400 border-t-transparent rounded-full animate-spin" />
+                Cargando estado...
             </div>
         );
-    }
+
+    if (!data) return null;
 
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-6">
-            {/* Header */}
-            <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900">
-                    Gestión de Pagos
-                </h1>
-                <p className="text-gray-600 mt-2">
-                    Sistema de registro y seguimiento de cuotas vecinales
+        <div className="px-5 py-3 bg-white/20 border-t border-black/04 flex flex-col sm:flex-row gap-4">
+            {/* Últimos 3 meses */}
+            <div className="flex flex-col gap-1.5">
+                <p className="text-xs font-600 text-stone-500 uppercase tracking-wider mb-1">
+                    Últimos 3 meses
                 </p>
-            </div>
-
-            {/* Payment Form Card */}
-            <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-800">
-                        {editingPagoId ? "Editar Pago" : "Registrar Nuevo Pago"}
-                    </h2>
-                    {editingPagoId && (
-                        <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
-                            Modo Edición
-                        </span>
-                    )}
-                </div>
-
-                {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <div className="flex items-center">
-                            <div className="text-red-600 mr-3">⚠️</div>
-                            <div className="text-red-700 font-medium">
-                                {error}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Vecino Search Section */}
-                    <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                        <label className="block text-sm font-semibold text-gray-700 mb-3">
-                            Buscar Vecino *
-                        </label>
-
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                onFocus={() =>
-                                    setShowVecinoDropdown(
-                                        searchQuery.trim().length > 0,
-                                    )
-                                }
-                                placeholder="Busque por nombre, calle o número de casa..."
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-10 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
-                                disabled={loading}
-                            />
-
-                            {selectedVecinoForSearch && (
-                                <button
-                                    type="button"
-                                    onClick={clearVecinoSelection}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
-                                    disabled={loading}
-                                >
-                                    ✕
-                                </button>
-                            )}
-
-                            {!selectedVecinoForSearch && (
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                    🔍
-                                </div>
-                            )}
-
-                            {/* Dropdown */}
-                            {showVecinoDropdown && !selectedVecinoForSearch && (
-                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                    {filteredVecinos.length === 0 ? (
-                                        <div className="p-4 text-gray-500 text-center">
-                                            No se encontraron vecinos con "
-                                            {searchQuery}"
-                                        </div>
-                                    ) : (
-                                        filteredVecinos.map((vecino) => (
-                                            <button
-                                                key={vecino.id}
-                                                type="button"
-                                                onClick={() =>
-                                                    handleVecinoSelect(vecino)
-                                                }
-                                                className="w-full p-4 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition"
-                                                disabled={loading}
-                                            >
-                                                <div className="font-medium text-gray-900">
-                                                    {vecino.nombre}
-                                                </div>
-                                                <div className="text-sm text-gray-600">
-                                                    📍 {vecino.calle} #
-                                                    {vecino.numero_casa}
-                                                </div>
-                                            </button>
-                                        ))
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {selectedVecinoForSearch && (
-                            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                <div className="flex items-center text-green-800">
-                                    <span className="mr-2">✅</span>
-                                    <span className="font-medium">
-                                        Vecino seleccionado:
-                                    </span>
-                                </div>
-                                <div className="mt-1 text-green-700">
-                                    <strong>
-                                        {selectedVecinoForSearch.nombre}
-                                    </strong>{" "}
-                                    - {selectedVecinoForSearch.calle} #
-                                    {selectedVecinoForSearch.numero_casa}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Payment Details Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Cantidad de Meses *
-                            </label>
-                            <select
-                                name="meses_pagados"
-                                value={form.meses_pagados}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
-                                required
-                                disabled={loading}
-                            >
-                                <option value="">
-                                    Seleccionar cantidad de meses
-                                </option>
-                                <option value="1">1 mes - $280</option>
-                                <option value="2">2 meses - $560</option>
-                                <option value="3">3 meses - $840</option>
-                                <option value="4">4 meses - $1,120</option>
-                                <option value="5">5 meses - $1,400</option>
-                                <option value="6">6 meses - $1,680</option>
-                                <option value="7">7 meses - $1,960</option>
-                                <option value="8">8 meses - $2,240</option>
-                                <option value="9">9 meses - $2,520</option>
-                                <option value="10">10 meses - $2,800</option>
-                                <option value="11">11 meses - $3,080</option>
-                                <option value="12">12 meses - $3,360</option>
-                            </select>
-                            <div className="mt-1 text-xs text-gray-500">
-                                Cada mes equivale a $280
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Mes de Inicio *
-                            </label>
-                            <input
-                                type="month"
-                                name="mes"
-                                value={form.mes}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
-                                required
-                                disabled={loading}
-                            />
-                            <div className="mt-1 text-xs text-gray-500">
-                                Mes desde el cual se aplicará el pago
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Tipo de Pago
-                            </label>
-                            <select
-                                name="tipo"
-                                value={form.tipo}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
-                                disabled={loading}
-                            >
-                                <option value="ordinario">Ordinario</option>
-                                <option value="extraordinario">
-                                    Extraordinario
-                                </option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Fecha de Cobro
-                            </label>
-                            <input
-                                type="date"
-                                name="fecha_de_cobro"
-                                value={form.fecha_de_cobro}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
-                                disabled={loading}
-                            />
-                        </div>
-
-                        {/* Payment Summary */}
-                        {form.meses_pagados && form.vecino_id && form.mes && (
-                            <div className="md:col-span-2 bg-orange-50 border border-orange-200 rounded-lg p-4">
-                                <h4 className="font-medium text-orange-900 mb-3">
-                                    Resumen del Pago
-                                </h4>
-                                <div className="grid grid-cols-3 gap-4 text-sm">
-                                    <div>
-                                        <div className="text-orange-700">
-                                            Meses a pagar:
-                                        </div>
-                                        <div className="font-bold text-orange-900">
-                                            {form.meses_pagados} mes
-                                            {parseInt(form.meses_pagados) > 1
-                                                ? "es"
-                                                : ""}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="text-orange-700">
-                                            Total a pagar:
-                                        </div>
-                                        <div className="font-bold text-green-600">
-                                            $
-                                            {calculateTotalAmount().toLocaleString()}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="text-orange-700">
-                                            Desde mes:
-                                        </div>
-                                        <div className="font-bold text-orange-900">
-                                            {form.mes
-                                                ? formatDisplayDate(
-                                                      form.mes,
-                                                      "month",
-                                                  )
-                                                : "-"}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mt-3 p-2 bg-white rounded border border-orange-200">
-                                    <div className="text-xs text-orange-600 font-medium mb-1">
-                                        Detalle del pago:
-                                    </div>
-                                    <div className="text-sm text-orange-800">
-                                        {form.meses_pagados} × $280 = $
-                                        {calculateTotalAmount().toLocaleString()}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-4 pt-4 border-t border-gray-200">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transform hover:scale-105 active:scale-95 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                <div className="flex gap-2">
+                    {data.meses.map((m) => (
+                        <div
+                            key={m.mes}
+                            className="flex flex-col items-center gap-1"
                         >
-                            {loading ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                    {editingPagoId
-                                        ? "Actualizando..."
-                                        : "Registrando..."}
-                                </>
-                            ) : editingPagoId ? (
-                                "Actualizar Pago"
-                            ) : (
-                                "Registrar Pago"
-                            )}
-                        </button>
-
-                        {editingPagoId && (
-                            <button
-                                type="button"
-                                onClick={handleCancelEdit}
-                                disabled={loading}
-                                className="bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            <div
+                                className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-xs font-700
+                                ${
+                                    m.pagado
+                                        ? "bg-green-100 border-green-400 text-green-700"
+                                        : "bg-red-100 border-red-300 text-red-600"
+                                }`}
                             >
-                                Cancelar
-                            </button>
-                        )}
-                    </div>
-                </form>
+                                {m.pagado ? "✓" : "✗"}
+                            </div>
+                            <span
+                                className="text-xs text-stone-400 text-center leading-tight"
+                                style={{ maxWidth: 52 }}
+                            >
+                                {m.label.split(" ")[0]}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            {/* Payments History */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <h3 className="text-xl font-semibold text-gray-800">
-                            Historial de Pagos ({pagos.length})
-                        </h3>
+            {/* Divider */}
+            <div className="hidden sm:block w-px bg-black/08" />
 
-                        {/* Filter by Fecha de Cobro */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                Filtrar por fecha:
-                            </label>
-                            <select
-                                value={filterFechaCobro}
-                                onChange={(e) =>
-                                    setFilterFechaCobro(e.target.value)
-                                }
-                                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            {/* Tags */}
+            <div className="flex flex-col gap-1.5">
+                <p className="text-xs font-600 text-stone-500 uppercase tracking-wider mb-1">
+                    Tags asignados
+                </p>
+                {data.tags.length === 0 ? (
+                    <span className="text-xs text-stone-300 italic">
+                        Sin tags
+                    </span>
+                ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                        {data.tags.map((tag) => (
+                            <span
+                                key={tag.id}
+                                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-600 bg-orange-100 text-orange-700 border border-orange-200"
                             >
-                                <option value="">Todas las fechas</option>
-                                {uniqueFechasCobro.map((fecha) => (
-                                    <option key={fecha} value={fecha}>
-                                        {formatDisplayDate(fecha, "day")}
-                                    </option>
-                                ))}
-                            </select>
-                            {filterFechaCobro && (
-                                <button
-                                    onClick={() => setFilterFechaCobro("")}
-                                    className="text-orange-600 hover:text-orange-700 text-sm font-medium"
-                                >
-                                    Limpiar
-                                </button>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Results info */}
-                    {filterFechaCobro && (
-                        <div className="mt-2 text-sm text-gray-600">
-                            Mostrando {filteredAndPaginatedPagos.totalItems}{" "}
-                            pago
-                            {filteredAndPaginatedPagos.totalItems !== 1
-                                ? "s"
-                                : ""}{" "}
-                            del {formatDisplayDate(filterFechaCobro, "day")}
-                        </div>
-                    )}
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-orange-600 text-white">
-                            <tr>
-                                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
-                                    Vecino
-                                </th>
-                                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
-                                    Mes
-                                </th>
-                                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
-                                    Tipo
-                                </th>
-                                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
-                                    Cantidad
-                                </th>
-                                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
-                                    Estado
-                                </th>
-                                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
-                                    Fecha Cobro
-                                </th>
-                                <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">
-                                    Acciones
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredAndPaginatedPagos.data.length === 0 ? (
-                                <tr>
-                                    <td
-                                        colSpan="7"
-                                        className="px-6 py-12 text-center text-gray-500"
-                                    >
-                                        <div className="text-gray-400 text-6xl mb-4">
-                                            💳
-                                        </div>
-                                        <div className="text-lg font-medium">
-                                            {filterFechaCobro
-                                                ? "No hay pagos para esta fecha"
-                                                : "No hay pagos registrados"}
-                                        </div>
-                                        <div className="text-sm">
-                                            {filterFechaCobro
-                                                ? "Intenta con otra fecha de cobro"
-                                                : "Los pagos aparecerán aquí una vez que se registren"}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredAndPaginatedPagos.data.map((pago) => (
-                                    <tr
-                                        key={pago.id}
-                                        className="hover:bg-gray-50 transition"
-                                    >
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="font-medium text-gray-900">
-                                                {pago.vecino.nombre}
-                                            </div>
-                                            <div className="text-sm text-gray-500">
-                                                {pago.vecino.calle} #
-                                                {pago.vecino.numero_casa}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {formatDisplayDate(
-                                                pago.mes,
-                                                "month",
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span
-                                                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                                    pago.tipo ===
-                                                    "extraordinario"
-                                                        ? "bg-orange-100 text-orange-800"
-                                                        : "bg-orange-100 text-orange-800"
-                                                }`}
-                                            >
-                                                {pago.tipo
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    pago.tipo.slice(1)}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                            ${pago.cantidad.toLocaleString()}
-                                            <div className="text-xs text-gray-500">
-                                                {Math.round(
-                                                    pago.cantidad / 280,
-                                                )}{" "}
-                                                mes
-                                                {Math.round(
-                                                    pago.cantidad / 280,
-                                                ) > 1
-                                                    ? "es"
-                                                    : ""}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                <span className="mr-1">✅</span>
-                                                Pagado Completo
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {formatDisplayDate(
-                                                pago.fecha_de_cobro,
-                                                "day",
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                                            <div className="flex justify-center gap-2">
-                                                <button
-                                                    onClick={() =>
-                                                        handleEdit(pago)
-                                                    }
-                                                    disabled={loading}
-                                                    className="bg-orange-500 text-white px-3 py-1 rounded text-sm hover:bg-orange-600 transform hover:scale-105 active:scale-95 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                                >
-                                                    Editar
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(pago.id)
-                                                    }
-                                                    disabled={loading}
-                                                    className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transform hover:scale-105 active:scale-95 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                                >
-                                                    Eliminar
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Pagination Controls */}
-                {filteredAndPaginatedPagos.totalPages > 1 && (
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                            {/* Page info */}
-                            <div className="text-sm text-gray-700">
-                                Mostrando{" "}
-                                <span className="font-medium">
-                                    {(currentPage - 1) * itemsPerPage + 1}
-                                </span>{" "}
-                                -{" "}
-                                <span className="font-medium">
-                                    {Math.min(
-                                        currentPage * itemsPerPage,
-                                        filteredAndPaginatedPagos.totalItems,
-                                    )}
-                                </span>{" "}
-                                de{" "}
-                                <span className="font-medium">
-                                    {filteredAndPaginatedPagos.totalItems}
-                                </span>{" "}
-                                pagos
-                            </div>
-
-                            {/* Pagination buttons */}
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() =>
-                                        setCurrentPage((prev) =>
-                                            Math.max(1, prev - 1),
-                                        )
-                                    }
-                                    disabled={currentPage === 1}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition"
-                                >
-                                    ← Anterior
-                                </button>
-
-                                {/* Page numbers */}
-                                <div className="flex gap-1">
-                                    {(() => {
-                                        const totalPages =
-                                            filteredAndPaginatedPagos.totalPages;
-                                        const pages = [];
-                                        const maxVisible = 5;
-
-                                        let startPage = Math.max(
-                                            1,
-                                            currentPage -
-                                                Math.floor(maxVisible / 2),
-                                        );
-                                        let endPage = Math.min(
-                                            totalPages,
-                                            startPage + maxVisible - 1,
-                                        );
-
-                                        if (
-                                            endPage - startPage <
-                                            maxVisible - 1
-                                        ) {
-                                            startPage = Math.max(
-                                                1,
-                                                endPage - maxVisible + 1,
-                                            );
-                                        }
-
-                                        // First page
-                                        if (startPage > 1) {
-                                            pages.push(
-                                                <button
-                                                    key={1}
-                                                    onClick={() =>
-                                                        setCurrentPage(1)
-                                                    }
-                                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition"
-                                                >
-                                                    1
-                                                </button>,
-                                            );
-                                            if (startPage > 2) {
-                                                pages.push(
-                                                    <span
-                                                        key="ellipsis1"
-                                                        className="px-2 text-gray-500"
-                                                    >
-                                                        ...
-                                                    </span>,
-                                                );
-                                            }
-                                        }
-
-                                        // Visible pages
-                                        for (
-                                            let i = startPage;
-                                            i <= endPage;
-                                            i++
-                                        ) {
-                                            pages.push(
-                                                <button
-                                                    key={i}
-                                                    onClick={() =>
-                                                        setCurrentPage(i)
-                                                    }
-                                                    className={`px-3 py-2 border rounded-lg text-sm font-medium transition ${
-                                                        currentPage === i
-                                                            ? "bg-orange-600 text-white border-orange-600"
-                                                            : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                                                    }`}
-                                                >
-                                                    {i}
-                                                </button>,
-                                            );
-                                        }
-
-                                        // Last page
-                                        if (endPage < totalPages) {
-                                            if (endPage < totalPages - 1) {
-                                                pages.push(
-                                                    <span
-                                                        key="ellipsis2"
-                                                        className="px-2 text-gray-500"
-                                                    >
-                                                        ...
-                                                    </span>,
-                                                );
-                                            }
-                                            pages.push(
-                                                <button
-                                                    key={totalPages}
-                                                    onClick={() =>
-                                                        setCurrentPage(
-                                                            totalPages,
-                                                        )
-                                                    }
-                                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition"
-                                                >
-                                                    {totalPages}
-                                                </button>,
-                                            );
-                                        }
-
-                                        return pages;
-                                    })()}
-                                </div>
-
-                                <button
-                                    onClick={() =>
-                                        setCurrentPage((prev) =>
-                                            Math.min(
-                                                filteredAndPaginatedPagos.totalPages,
-                                                prev + 1,
-                                            ),
-                                        )
-                                    }
-                                    disabled={
-                                        currentPage ===
-                                        filteredAndPaginatedPagos.totalPages
-                                    }
-                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition"
-                                >
-                                    Siguiente →
-                                </button>
-                            </div>
-                        </div>
+                                <TagIcon />
+                                {tag.codigo}
+                            </span>
+                        ))}
                     </div>
                 )}
             </div>
@@ -1006,4 +193,850 @@ function Pagos() {
     );
 }
 
-export default Pagos;
+// ── FORMULARIO DE PAGO ──
+function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
+    const isEdit = !!editingPago;
+
+    const [vecinoSearch, setVecinoSearch] = useState("");
+    const [vecinoResults, setVecinoResults] = useState([]);
+    const [selectedVecino, setSelectedVecino] = useState(null);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [cuotaBase, setCuotaBase] = useState(280);
+    const [mesesPagados, setMesesPagados] = useState(1);
+    const [mes, setMes] = useState("");
+    const [tipo, setTipo] = useState("ordinario");
+    const [fechaCobro, setFechaCobro] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const searchTimeout = useRef(null);
+    const dropdownRef = useRef(null);
+
+    // Poblar form al editar
+    useEffect(() => {
+        if (editingPago) {
+            setSelectedVecino(editingPago.vecino);
+            setVecinoSearch(
+                `${editingPago.vecino.nombre} — ${editingPago.vecino.calle} #${editingPago.vecino.numero_casa}`,
+            );
+            // Inferir cuota base desde cantidad y meses
+            const porMes =
+                editingPago.meses_pagados > 0
+                    ? Math.round(
+                          editingPago.cantidad / editingPago.meses_pagados,
+                      )
+                    : editingPago.cantidad;
+            const recargo =
+                editingPago.tipo === "extraordinario" ? RECARGO_EXTRA : 0;
+            const base = porMes - recargo;
+            setCuotaBase(CUOTAS.includes(base) ? base : 280);
+            setMesesPagados(editingPago.meses_pagados || 1);
+            setMes(editingPago.mes || "");
+            setTipo(editingPago.tipo || "ordinario");
+            setFechaCobro(
+                editingPago.fecha_de_cobro
+                    ? editingPago.fecha_de_cobro.slice(0, 10)
+                    : "",
+            );
+        } else {
+            resetForm();
+        }
+    }, [editingPago]);
+
+    const resetForm = () => {
+        setSelectedVecino(null);
+        setVecinoSearch("");
+        setVecinoResults([]);
+        setCuotaBase(280);
+        setMesesPagados(1);
+        setMes("");
+        setTipo("ordinario");
+        setFechaCobro("");
+        setError("");
+    };
+
+    // Búsqueda de vecinos con debounce
+    const handleVecinoSearch = (val) => {
+        setVecinoSearch(val);
+        setSelectedVecino(null);
+        clearTimeout(searchTimeout.current);
+        if (!val.trim()) {
+            setVecinoResults([]);
+            setShowDropdown(false);
+            return;
+        }
+        searchTimeout.current = setTimeout(async () => {
+            try {
+                const res = await api.get("/vecinos", {
+                    params: { search: val, per_page: 8 },
+                });
+                setVecinoResults(res.data.data || []);
+                setShowDropdown(true);
+            } catch {
+                setVecinoResults([]);
+            }
+        }, 200);
+    };
+
+    const selectVecino = (v) => {
+        setSelectedVecino(v);
+        setVecinoSearch(`${v.nombre} — ${v.calle} #${v.numero_casa}`);
+        setShowDropdown(false);
+        setVecinoResults([]);
+    };
+
+    // Cálculo reactivo
+    const recargo = tipo === "extraordinario" ? RECARGO_EXTRA : 0;
+    const porMes = cuotaBase + recargo;
+    const totalCalc = porMes * mesesPagados;
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedVecino && !isEdit) {
+            setError("Selecciona un vecino.");
+            return;
+        }
+        if (!mes) {
+            setError("Selecciona el mes de inicio.");
+            return;
+        }
+        setLoading(true);
+        setError("");
+        try {
+            const payload = {
+                cuota_base: cuotaBase,
+                meses_pagados: mesesPagados,
+                mes,
+                tipo,
+                fecha_de_cobro: fechaCobro || null,
+            };
+            if (!isEdit) payload.vecino_uuid = selectedVecino.uuid;
+
+            if (isEdit) {
+                await api.put(`/pagos/${editingPago.uuid}`, payload);
+            } else {
+                await api.post("/pagos", payload);
+            }
+            resetForm();
+            onSaved();
+        } catch (err) {
+            setError(err.response?.data?.message || "Error al guardar.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="glass-card">
+            <div className="flex items-center justify-between mb-5">
+                <div>
+                    <h2 className="text-base font-700 text-stone-800">
+                        {isEdit ? "Editar Pago" : "Registrar Pago"}
+                    </h2>
+                    <p className="text-xs text-stone-400 mt-0.5">
+                        {isEdit
+                            ? "Modifica los datos del pago"
+                            : "Completa los datos para registrar"}
+                    </p>
+                </div>
+                {isEdit && (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-600 bg-orange-100 text-orange-700 border border-orange-200">
+                        Modo edición
+                    </span>
+                )}
+            </div>
+
+            {error && (
+                <div className="mb-4 px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs">
+                    {error}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                {/* Buscador de vecino */}
+                {!isEdit && (
+                    <div>
+                        <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                            Vecino *
+                        </label>
+                        <div className="relative" ref={dropdownRef}>
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
+                                <SearchIcon />
+                            </div>
+                            <input
+                                type="text"
+                                value={vecinoSearch}
+                                onChange={(e) =>
+                                    handleVecinoSearch(e.target.value)
+                                }
+                                onFocus={() =>
+                                    vecinoResults.length > 0 &&
+                                    setShowDropdown(true)
+                                }
+                                placeholder="Buscar por nombre, plaza o número..."
+                                className="vecino-input pl-9 pr-8"
+                                disabled={loading}
+                            />
+                            {vecinoSearch && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setVecinoSearch("");
+                                        setSelectedVecino(null);
+                                        setShowDropdown(false);
+                                    }}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                                >
+                                    <XIcon />
+                                </button>
+                            )}
+                            {showDropdown && vecinoResults.length > 0 && (
+                                <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white/95 backdrop-blur-md border border-black/08 rounded-xl shadow-lg overflow-hidden">
+                                    {vecinoResults.map((v) => (
+                                        <button
+                                            key={v.id}
+                                            type="button"
+                                            onClick={() => selectVecino(v)}
+                                            className="w-full px-4 py-2.5 text-left hover:bg-orange-50 border-b border-black/04 last:border-0 transition"
+                                        >
+                                            <p className="text-sm font-600 text-stone-800">
+                                                {v.nombre}
+                                            </p>
+                                            <p className="text-xs text-stone-400">
+                                                {v.calle} #{v.numero_casa}
+                                            </p>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        {selectedVecino && (
+                            <div className="mt-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-xs text-green-700 font-500">
+                                ✓ {selectedVecino.nombre} —{" "}
+                                {selectedVecino.calle} #
+                                {selectedVecino.numero_casa}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Grid de campos */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Cuota base */}
+                    <div>
+                        <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                            Cuota base *
+                        </label>
+                        <div className="flex gap-2">
+                            {CUOTAS.map((c) => (
+                                <button
+                                    key={c}
+                                    type="button"
+                                    onClick={() => setCuotaBase(c)}
+                                    className={`flex-1 py-2 rounded-xl text-sm font-700 border transition-all
+                                        ${
+                                            cuotaBase === c
+                                                ? "bg-orange-500 text-white border-orange-500 shadow-sm"
+                                                : "bg-white/60 text-stone-600 border-black/10 hover:border-orange-300"
+                                        }`}
+                                >
+                                    ${c}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Tipo */}
+                    <div>
+                        <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                            Tipo de pago *
+                        </label>
+                        <select
+                            value={tipo}
+                            onChange={(e) => setTipo(e.target.value)}
+                            className="vecino-input"
+                            disabled={loading}
+                        >
+                            <option value="ordinario">Ordinario</option>
+                            <option value="extraordinario">
+                                Extraordinario (+$50)
+                            </option>
+                        </select>
+                    </div>
+
+                    {/* Meses */}
+                    <div>
+                        <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                            Meses a pagar *
+                        </label>
+                        <select
+                            value={mesesPagados}
+                            onChange={(e) =>
+                                setMesesPagados(Number(e.target.value))
+                            }
+                            className="vecino-input"
+                            disabled={loading}
+                        >
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                                (n) => (
+                                    <option key={n} value={n}>
+                                        {n} mes{n > 1 ? "es" : ""}
+                                    </option>
+                                ),
+                            )}
+                        </select>
+                    </div>
+
+                    {/* Mes inicio */}
+                    <div>
+                        <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                            Mes de inicio *
+                        </label>
+                        <input
+                            type="month"
+                            value={mes}
+                            onChange={(e) => setMes(e.target.value)}
+                            className="vecino-input"
+                            disabled={loading}
+                        />
+                    </div>
+
+                    {/* Fecha de cobro */}
+                    <div>
+                        <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                            Fecha de cobro
+                        </label>
+                        <input
+                            type="date"
+                            value={fechaCobro}
+                            onChange={(e) => setFechaCobro(e.target.value)}
+                            className="vecino-input"
+                            disabled={loading}
+                        />
+                    </div>
+
+                    {/* Resumen reactivo */}
+                    <div className="flex flex-col justify-end">
+                        <div className="px-4 py-3 rounded-xl bg-orange-50 border border-orange-200">
+                            <p className="text-xs text-orange-600 font-600 mb-1">
+                                Resumen
+                            </p>
+                            <p className="text-xs text-stone-500">
+                                ${cuotaBase}
+                                {recargo > 0
+                                    ? ` + $${recargo} recargo`
+                                    : ""} × {mesesPagados} mes
+                                {mesesPagados > 1 ? "es" : ""}
+                            </p>
+                            <p className="text-xl font-800 text-orange-600 mt-0.5">
+                                ${totalCalc.toLocaleString("es-MX")}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Botones */}
+                <div className="flex gap-3 pt-1 border-t border-black/05">
+                    {isEdit && (
+                        <button
+                            type="button"
+                            onClick={() => {
+                                resetForm();
+                                onCancelEdit();
+                            }}
+                            className="px-5 py-2.5 rounded-xl border border-stone-200 bg-white/60 text-stone-600 text-sm font-600 hover:bg-white transition"
+                        >
+                            Cancelar
+                        </button>
+                    )}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="flex-1 sm:flex-none sm:px-8 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-600 hover:bg-orange-600 active:scale-95 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                        {loading && (
+                            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                        )}
+                        {loading
+                            ? "Guardando..."
+                            : isEdit
+                              ? "Guardar cambios"
+                              : "Registrar pago"}
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+}
+
+// ── COMPONENTE PRINCIPAL ──
+export default function Pagos() {
+    const [pagos, setPagos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [editingPago, setEditingPago] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [expandedId, setExpandedId] = useState(null);
+
+    // Paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const PER_PAGE = 20;
+
+    // Filtros
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebounced] = useState("");
+    const [filterFecha, setFilterFecha] = useState("");
+
+    useEffect(() => {
+        const t = setTimeout(() => {
+            setDebounced(search);
+            setCurrentPage(1);
+        }, 200);
+        return () => clearTimeout(t);
+    }, [search]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filterFecha]);
+
+    const fetchPagos = useCallback(
+        async (page = 1) => {
+            setLoading(true);
+            try {
+                const params = { page, per_page: PER_PAGE };
+                if (debouncedSearch) params.search = debouncedSearch;
+                if (filterFecha) params.fecha_cobro = filterFecha;
+                const res = await api.get("/pagos", { params });
+                const paginated = res.data;
+                setPagos(paginated.data || []);
+                setCurrentPage(paginated.current_page);
+                setLastPage(paginated.last_page);
+                setTotal(paginated.total);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [debouncedSearch, filterFecha],
+    );
+
+    useEffect(() => {
+        fetchPagos(currentPage);
+    }, [fetchPagos, currentPage]);
+
+    const handleDelete = async (uuid) => {
+        try {
+            await api.delete(`/pagos/${uuid}`);
+            setDeleteConfirm(null);
+            fetchPagos(currentPage);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getPageNumbers = () => {
+        if (lastPage <= 5)
+            return Array.from({ length: lastPage }, (_, i) => i + 1);
+        if (currentPage <= 3) return [1, 2, 3, 4, "...", lastPage];
+        if (currentPage >= lastPage - 2)
+            return [
+                1,
+                "...",
+                lastPage - 3,
+                lastPage - 2,
+                lastPage - 1,
+                lastPage,
+            ];
+        return [
+            1,
+            "...",
+            currentPage - 1,
+            currentPage,
+            currentPage + 1,
+            "...",
+            lastPage,
+        ];
+    };
+
+    const formatMes = (mes) => {
+        if (!mes) return "-";
+        const [y, m] = mes.split("-");
+        return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString(
+            "es-MX",
+            {
+                month: "long",
+                year: "numeric",
+            },
+        );
+    };
+
+    const formatDate = (d) => {
+        if (!d) return "-";
+        const [year, month, day] = d.slice(0, 10).split("-");
+        return new Date(year, month - 1, day).toLocaleDateString("es-MX", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        });
+    };
+
+    return (
+        <div className="flex flex-col gap-4">
+            {/* Header */}
+            <div>
+                <h1 className="text-lg font-700 text-stone-800">
+                    Gestión de Pagos
+                </h1>
+                <p className="text-xs text-stone-400 mt-0.5">
+                    {total} pagos registrados
+                </p>
+            </div>
+
+            {/* Formulario */}
+            <FormularioPago
+                onSaved={() => fetchPagos(currentPage)}
+                editingPago={editingPago}
+                onCancelEdit={() => setEditingPago(null)}
+            />
+
+            {/* Filtros tabla */}
+            <div className="glass-card !p-3 flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
+                        <SearchIcon />
+                    </div>
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Buscar vecino en pagos..."
+                        className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-white/70 border border-black/08 text-sm text-stone-700 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-400/40 transition"
+                    />
+                    {search && (
+                        <button
+                            onClick={() => setSearch("")}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                        >
+                            <XIcon />
+                        </button>
+                    )}
+                </div>
+                <div className="flex items-center gap-2">
+                    <label className="text-xs text-stone-500 whitespace-nowrap">
+                        Fecha cobro:
+                    </label>
+                    <input
+                        type="date"
+                        value={filterFecha}
+                        onChange={(e) => setFilterFecha(e.target.value)}
+                        className="py-2.5 px-3 rounded-xl bg-white/70 border border-black/08 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-orange-400/40 transition"
+                    />
+                    {filterFecha && (
+                        <button
+                            onClick={() => setFilterFecha("")}
+                            className="text-stone-400 hover:text-stone-600"
+                        >
+                            <XIcon />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Tabla */}
+            <div className="glass-card !p-0 overflow-hidden">
+                {loading ? (
+                    <div className="flex items-center justify-center h-48 gap-3">
+                        <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-sm text-stone-400">
+                            Cargando pagos...
+                        </span>
+                    </div>
+                ) : (
+                    <>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b border-black/06 bg-white/40">
+                                        <th className="w-8 px-3 py-3" />
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Vecino
+                                        </th>
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Mes
+                                        </th>
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Tipo
+                                        </th>
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Cantidad
+                                        </th>
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Fecha cobro
+                                        </th>
+                                        <th className="px-5 py-3 text-center text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Acciones
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pagos.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan="7"
+                                                className="px-5 py-12 text-center text-stone-400 text-sm"
+                                            >
+                                                {debouncedSearch
+                                                    ? `Sin resultados para "${debouncedSearch}"`
+                                                    : "No hay pagos registrados."}
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        pagos.map((pago) => (
+                                            <>
+                                                <tr
+                                                    key={pago.uuid}
+                                                    className={`border-b border-black/04 hover:bg-white/40 transition-colors ${expandedId === pago.uuid ? "bg-white/30" : ""}`}
+                                                >
+                                                    {/* Expandir */}
+                                                    <td className="px-3 py-3.5">
+                                                        <button
+                                                            onClick={() =>
+                                                                setExpandedId(
+                                                                    expandedId ===
+                                                                        pago.uuid
+                                                                        ? null
+                                                                        : pago.uuid,
+                                                                )
+                                                            }
+                                                            className="w-6 h-6 rounded-md flex items-center justify-center text-stone-400 hover:bg-black/05 transition"
+                                                        >
+                                                            <ChevronIcon
+                                                                open={
+                                                                    expandedId ===
+                                                                    pago.uuid
+                                                                }
+                                                            />
+                                                        </button>
+                                                    </td>
+                                                    {/* Vecino */}
+                                                    <td className="px-5 py-3.5">
+                                                        <p className="text-sm font-600 text-stone-800">
+                                                            {
+                                                                pago.vecino
+                                                                    ?.nombre
+                                                            }
+                                                        </p>
+                                                        <p className="text-xs text-stone-400">
+                                                            {pago.vecino?.calle}{" "}
+                                                            #
+                                                            {
+                                                                pago.vecino
+                                                                    ?.numero_casa
+                                                            }
+                                                        </p>
+                                                    </td>
+                                                    {/* Mes */}
+                                                    <td className="px-5 py-3.5 text-sm text-stone-600 capitalize">
+                                                        {formatMes(pago.mes)}
+                                                    </td>
+                                                    {/* Tipo */}
+                                                    <td className="px-5 py-3.5">
+                                                        <span
+                                                            className={`px-2.5 py-0.5 rounded-full text-xs font-600 border
+                                                        ${
+                                                            pago.tipo ===
+                                                            "extraordinario"
+                                                                ? "bg-purple-100 text-purple-700 border-purple-200"
+                                                                : "bg-blue-100 text-blue-700 border-blue-200"
+                                                        }`}
+                                                        >
+                                                            {pago.tipo
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                                pago.tipo.slice(
+                                                                    1,
+                                                                )}
+                                                        </span>
+                                                    </td>
+                                                    {/* Cantidad */}
+                                                    <td className="px-5 py-3.5">
+                                                        <span className="text-sm font-700 text-stone-800">
+                                                            $
+                                                            {parseFloat(
+                                                                pago.cantidad,
+                                                            ).toLocaleString(
+                                                                "es-MX",
+                                                            )}
+                                                        </span>
+                                                        {pago.meses_pagados >
+                                                            1 && (
+                                                            <span className="ml-1 text-xs text-stone-400">
+                                                                (
+                                                                {
+                                                                    pago.meses_pagados
+                                                                }{" "}
+                                                                meses)
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    {/* Fecha */}
+                                                    <td className="px-5 py-3.5 text-sm text-stone-500">
+                                                        {formatDate(
+                                                            pago.fecha_de_cobro,
+                                                        )}
+                                                    </td>
+                                                    {/* Acciones */}
+                                                    <td className="px-5 py-3.5">
+                                                        <div className="flex items-center justify-center gap-1">
+                                                            <button
+                                                                onClick={() =>
+                                                                    setEditingPago(
+                                                                        pago,
+                                                                    )
+                                                                }
+                                                                className="w-7 h-7 rounded-lg flex items-center justify-center text-amber-500 hover:bg-amber-50 transition"
+                                                            >
+                                                                <EditIcon />
+                                                            </button>
+                                                            <button
+                                                                onClick={() =>
+                                                                    setDeleteConfirm(
+                                                                        pago,
+                                                                    )
+                                                                }
+                                                                className="w-7 h-7 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-50 transition"
+                                                            >
+                                                                <TrashIcon />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                                {/* Fila expandida */}
+                                                {expandedId === pago.uuid && (
+                                                    <tr
+                                                        key={`exp-${pago.uuid}`}
+                                                    >
+                                                        <td
+                                                            colSpan="7"
+                                                            className="p-0"
+                                                        >
+                                                            <PagoExpandido
+                                                                vecinoUuid={
+                                                                    pago.vecino
+                                                                        ?.uuid
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Paginación */}
+                        {lastPage > 1 && (
+                            <div className="flex items-center justify-between px-5 py-3 border-t border-black/05 bg-white/30 flex-wrap gap-2">
+                                <span className="text-xs text-stone-400">
+                                    {(currentPage - 1) * PER_PAGE + 1}–
+                                    {Math.min(currentPage * PER_PAGE, total)} de{" "}
+                                    {total}
+                                </span>
+                                <div className="flex gap-1 items-center flex-wrap">
+                                    <button
+                                        onClick={() =>
+                                            setCurrentPage((p) =>
+                                                Math.max(1, p - 1),
+                                            )
+                                        }
+                                        disabled={currentPage === 1}
+                                        className="w-7 h-7 rounded-lg border border-black/10 bg-white/60 text-stone-600 text-xs font-semibold flex items-center justify-center hover:bg-white disabled:opacity-30 transition"
+                                    >
+                                        ‹
+                                    </button>
+                                    {getPageNumbers().map((p, i) =>
+                                        p === "..." ? (
+                                            <span
+                                                key={`e${i}`}
+                                                className="w-5 text-center text-xs text-stone-400"
+                                            >
+                                                …
+                                            </span>
+                                        ) : (
+                                            <button
+                                                key={p}
+                                                onClick={() =>
+                                                    setCurrentPage(p)
+                                                }
+                                                className={`w-7 h-7 rounded-lg text-xs font-semibold flex items-center justify-center transition
+                                                    ${currentPage === p ? "bg-orange-500 text-white border border-orange-500" : "border border-black/10 bg-white/60 text-stone-600 hover:bg-white"}`}
+                                            >
+                                                {p}
+                                            </button>
+                                        ),
+                                    )}
+                                    <button
+                                        onClick={() =>
+                                            setCurrentPage((p) =>
+                                                Math.min(lastPage, p + 1),
+                                            )
+                                        }
+                                        disabled={currentPage === lastPage}
+                                        className="w-7 h-7 rounded-lg border border-black/10 bg-white/60 text-stone-600 text-xs font-semibold flex items-center justify-center hover:bg-white disabled:opacity-30 transition"
+                                    >
+                                        ›
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+
+            {/* Confirm delete */}
+            {deleteConfirm && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    style={{
+                        background: "rgba(0,0,0,0.25)",
+                        backdropFilter: "blur(6px)",
+                    }}
+                    onClick={() => setDeleteConfirm(null)}
+                >
+                    <div
+                        className="glass-card w-full max-w-sm"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="text-base font-700 text-stone-800 mb-1">
+                            ¿Eliminar pago?
+                        </h3>
+                        <p className="text-sm text-stone-500 mb-5">
+                            Se eliminará el pago de{" "}
+                            <strong>{deleteConfirm.vecino?.nombre}</strong> del
+                            mes <strong>{formatMes(deleteConfirm.mes)}</strong>.
+                            Esta acción no se puede deshacer.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDeleteConfirm(null)}
+                                className="flex-1 py-2.5 rounded-xl border border-stone-200 bg-white/60 text-stone-600 text-sm font-600 hover:bg-white transition"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={() => handleDelete(deleteConfirm.uuid)}
+                                className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-600 hover:bg-red-600 active:scale-95 transition"
+                            >
+                                Sí, eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

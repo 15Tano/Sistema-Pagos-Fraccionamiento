@@ -34,7 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('tags', TagController::class);
 
     // Pagos — rutas específicas ANTES del resource
-    Route::get('pagos/historico', [PagoController::class, 'historico']);
+    // Pagos — rutas específicas ANTES del resource
+    Route::get('pagos/historico', [PagoController::class, 'getHistorico']);
+    Route::get('pagos/mis-pagos', [PagoController::class, 'misPagos']);
+    Route::get('pagos/estado-meses/{vecinoUuid}', [PagoController::class, 'estadoMeses']);
+    Route::resource('pagos', PagoController::class)->except(['show']);
+    Route::get('pagos/{pago}', [PagoController::class, 'show']);
     Route::resource('pagos', PagoController::class);
 
     // Tag Sales — ruta específica ANTES del resource
