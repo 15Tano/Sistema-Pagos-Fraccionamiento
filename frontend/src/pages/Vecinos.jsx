@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import api from "../lib/axios";
 
-// --- Custom SVG Icons ---
-const UserPlusIcon = ({ className }) => (
+// ── ICONS ──
+const PlusIcon = () => (
     <svg
-        className={className}
+        width="18"
+        height="18"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -13,13 +14,14 @@ const UserPlusIcon = ({ className }) => (
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+            d="M12 4v16m8-8H4"
         />
     </svg>
 );
-const EditIcon = ({ className }) => (
+const EditIcon = () => (
     <svg
-        className={className}
+        width="15"
+        height="15"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -32,9 +34,10 @@ const EditIcon = ({ className }) => (
         />
     </svg>
 );
-const TrashIcon = ({ className }) => (
+const TrashIcon = () => (
     <svg
-        className={className}
+        width="15"
+        height="15"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -47,9 +50,10 @@ const TrashIcon = ({ className }) => (
         />
     </svg>
 );
-const HomeIcon = ({ className }) => (
+const SearchIcon = () => (
     <svg
-        className={className}
+        width="16"
+        height="16"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -58,43 +62,14 @@ const HomeIcon = ({ className }) => (
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"
         />
     </svg>
 );
-const TagIcon = ({ className }) => (
+const XIcon = () => (
     <svg
-        className={className}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-        />
-    </svg>
-);
-const CheckIcon = ({ className }) => (
-    <svg
-        className={className}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-        />
-    </svg>
-);
-const XIcon = ({ className }) => (
-    <svg
-        className={className}
+        width="18"
+        height="18"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -107,9 +82,10 @@ const XIcon = ({ className }) => (
         />
     </svg>
 );
-const UsersIcon = () => (
+const TagIcon = () => (
     <svg
-        className="w-6 h-6"
+        width="11"
+        height="11"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -118,467 +94,830 @@ const UsersIcon = () => (
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197m0 0A5.995 5.995 0 0012 12a5.995 5.995 0 00-3-5.197M15 21a2 2 0 002-2v-1a2 2 0 00-2-2H9a2 2 0 00-2 2v1a2 2 0 002 2h6zm-6-9a2 2 0 00-2 2v1a2 2 0 002 2h6a2 2 0 002-2v-1a2 2 0 00-2-2H9z"
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
         />
     </svg>
 );
 
-function Vecinos() {
-    const [vecinos, setVecinos] = useState([]);
-    const [availableTags, setAvailableTags] = useState([]);
+// ── MODAL ──
+function VecinoModal({ open, onClose, onSaved, editingVecino, availableTags }) {
+    const isEdit = !!editingVecino;
     const [form, setForm] = useState({
         nombre: "",
         calle: "",
         numero_casa: "",
         selectedTags: [],
     });
-    const [editingId, setEditingId] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [visible, setVisible] = useState(false);
+    const [tagSearch, setTagSearch] = useState("");
 
-    const fetchVecinos = useCallback(async () => {
-        try {
-            const response = await api.get("/vecinos");
-            setVecinos(response.data || []);
-        } catch (error) {
-            console.error("Error fetching vecinos:", error);
-            setVecinos([]); // Ensure it's an array on error
-        }
-    }, []);
-
-    const fetchAvailableTags = useCallback(async (currentEditingId) => {
-        try {
-            const [tagsRes, salesRes, vecinosRes] = await Promise.all([
-                api.get("/tags"),
-                api.get("/tag_sales"),
-                api.get("/vecinos"),
-            ]);
-
-            const soldTagIds = new Set(
-                (salesRes.data || []).map((s) => s.tag_id)
-            );
-            const assignedTagIds = new Set();
-
-            (vecinosRes.data || []).forEach((vecino) => {
-                // Collect all assigned tags, EXCEPT from the one we are currently editing
-                if (vecino.id !== currentEditingId && vecino.tags) {
-                    vecino.tags.forEach((tag) => assignedTagIds.add(tag.id));
-                }
-            });
-
-            const available = (tagsRes.data || []).filter(
-                (t) => soldTagIds.has(t.id) && !assignedTagIds.has(t.id)
-            );
-
-            setAvailableTags(available);
-        } catch (error) {
-            console.error("Error fetching available tags:", error);
-            setAvailableTags([]); // Ensure it's an array on error
-        }
-    }, []);
-
+    // Animación de entrada
     useEffect(() => {
-        const loadInitialData = async () => {
-            setLoading(true);
-            await Promise.all([fetchVecinos(), fetchAvailableTags(null)]);
-            setLoading(false);
-        };
-        loadInitialData();
-    }, [fetchVecinos, fetchAvailableTags]);
+        if (open) {
+            setTimeout(() => setVisible(true), 10);
+        } else {
+            setVisible(false);
+        }
+    }, [open]);
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    // Poblar form al editar
+    useEffect(() => {
+        if (editingVecino) {
+            setForm({
+                nombre: editingVecino.nombre || "",
+                calle: editingVecino.calle || "",
+                numero_casa: editingVecino.numero_casa || "",
+                selectedTags: editingVecino.tags?.map((t) => t.id) || [],
+            });
+        } else {
+            setForm({
+                nombre: "",
+                calle: "",
+                numero_casa: "",
+                selectedTags: [],
+            });
+        }
+        setError("");
+        setTagSearch("");
+    }, [editingVecino, open]);
 
     const toggleTag = (tagId) => {
-        setForm((prevForm) => ({
-            ...prevForm,
-            selectedTags: prevForm.selectedTags.includes(tagId)
-                ? prevForm.selectedTags.filter((id) => id !== tagId)
-                : [...prevForm.selectedTags, tagId],
+        setForm((f) => ({
+            ...f,
+            selectedTags: f.selectedTags.includes(tagId)
+                ? f.selectedTags.filter((id) => id !== tagId)
+                : [...f.selectedTags, tagId],
         }));
     };
 
-    const resetForm = useCallback(() => {
-        setForm({ nombre: "", calle: "", numero_casa: "", selectedTags: [] });
-        setEditingId(null);
-    }, []);
+    const handleClose = () => {
+        setVisible(false);
+        setTimeout(onClose, 250);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!form.nombre.trim()) {
+            setError("El nombre es obligatorio.");
+            return;
+        }
+        if (!form.calle.trim()) {
+            setError("La plaza es obligatoria.");
+            return;
+        }
+        if (!form.numero_casa.trim()) {
+            setError("El número de casa es obligatorio.");
+            return;
+        }
+
         setLoading(true);
-        const dataToSend = { ...form, tag_ids: form.selectedTags };
-        delete dataToSend.selectedTags;
+        setError("");
         try {
-            if (editingId) {
-                await api.put(`/vecinos/${editingId}`, dataToSend);
+            const payload = {
+                nombre: form.nombre.trim(),
+                calle: form.calle.trim(),
+                numero_casa: form.numero_casa.trim(),
+                tags: form.selectedTags,
+            };
+            if (isEdit) {
+                await api.put(`/vecinos/${editingVecino.id}`, payload);
             } else {
-                await api.post("/vecinos", dataToSend);
+                await api.post("/vecinos", payload);
             }
-            resetForm();
-            await Promise.all([fetchVecinos(), fetchAvailableTags(null)]);
-        } catch (error) {
-            console.error("Error saving vecino:", error);
-            alert(
-                "Error al guardar vecino: " +
-                    (error.response?.data?.message || error.message)
+            onSaved();
+            handleClose();
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                    "Error al guardar. Intenta de nuevo.",
             );
         } finally {
             setLoading(false);
         }
     };
 
-    const handleEdit = useCallback(
-        (vecino) => {
-            setForm({
-                nombre: vecino.nombre,
-                calle: vecino.calle,
-                numero_casa: vecino.numero_casa,
-                selectedTags: vecino.tags ? vecino.tags.map((t) => t.id) : [],
-            });
-            setEditingId(vecino.id);
-            fetchAvailableTags(vecino.id); // Refresh tags, passing the ID of the user being edited
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        },
-        [fetchAvailableTags]
+    const filteredTags = availableTags.filter((tag) =>
+        tag.codigo.toLowerCase().includes(tagSearch.toLowerCase()),
     );
 
-    const handleCancelEdit = useCallback(() => {
-        resetForm();
-        fetchAvailableTags(null);
-    }, [resetForm, fetchAvailableTags]);
-
-    const handleDelete = useCallback(
-        async (id) => {
-            if (
-                window.confirm(
-                    "¿Estás seguro de eliminar este vecino? Esta acción es permanente."
-                )
-            ) {
-                setLoading(true);
-                try {
-                    await api.delete(`/vecinos/${id}`);
-                    await Promise.all([
-                        fetchVecinos(),
-                        fetchAvailableTags(null),
-                    ]);
-                } catch (error) {
-                    console.error("Error deleting vecino:", error);
-                    alert("Error al eliminar el vecino.");
-                } finally {
-                    setLoading(false);
-                }
-            }
-        },
-        [fetchVecinos, fetchAvailableTags]
-    );
-
-    // Create the definitive list of tags to show in the form
-    const tagsForSelection = [...availableTags];
-    if (editingId) {
-        const currentVecino = vecinos.find((v) => v.id === editingId);
-        if (currentVecino && currentVecino.tags) {
-            currentVecino.tags.forEach((tag) => {
-                // If the neighbor's tag isn't in the available list, add it
-                if (!tagsForSelection.find((t) => t.id === tag.id)) {
-                    tagsForSelection.push(tag);
-                }
-            });
-        }
-    }
-
-    if (loading && !editingId) {
-        // Show full-page loader only on initial load
-        return (
-            <div className="min-h-screen bg-white-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
-                    <p className="mt-4 text-slate-600 font-medium">
-                        Cargando datos...
-                    </p>
-                </div>
-            </div>
-        );
-    }
+    if (!open && !editingVecino) return null;
 
     return (
-        <div className="min-h-screen bg-whire-50 p-4 md:p-6">
-            <div className="max-w-7xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="text-center">
-                    <h1 className="text-4xl font-bold bg-orange-600 bg-clip-text text-transparent mb-2">
-                        Gestión de Vecinos
-                    </h1>
-                    <p className="text-slate-600">
-                        Administra la información de los vecinos y asignación de
-                        tags
-                    </p>
-                </div>
-
-                {/* Form Card */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
-                    <div className="bg-orange-500 px-6 py-4">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-orange-500 rounded-lg">
-                                <UserPlusIcon className="w-6 h-6 text-white" />
-                            </div>
-                            <h3 className="text-xl font-semibold text-white">
-                                {editingId
-                                    ? "Editar Vecino"
-                                    : "Agregar Nuevo Vecino"}
-                            </h3>
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{
+                background: `rgba(0,0,0,${visible ? 0.25 : 0})`,
+                backdropFilter: `blur(${visible ? 6 : 0}px)`,
+                transition: "background 0.25s ease, backdrop-filter 0.25s ease",
+            }}
+            onClick={handleClose}
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                    opacity: visible ? 1 : 0,
+                    transform: visible
+                        ? "scale(1) translateY(0)"
+                        : "scale(0.92) translateY(24px)",
+                    transition:
+                        "opacity 0.28s cubic-bezier(0.34,1.56,0.64,1), transform 0.28s cubic-bezier(0.34,1.56,0.64,1)",
+                }}
+                className="w-full max-w-md"
+            >
+                <div className="glass-card">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-5">
+                        <div>
+                            <h2 className="text-base font-700 text-stone-800">
+                                {isEdit ? "Editar Vecino" : "Nuevo Vecino"}
+                            </h2>
+                            <p className="text-xs text-stone-400 mt-0.5">
+                                {isEdit
+                                    ? "Modifica los datos del vecino"
+                                    : "Completa los datos para registrar"}
+                            </p>
                         </div>
+                        <button
+                            onClick={handleClose}
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-600 hover:bg-black/5 transition"
+                        >
+                            <XIcon />
+                        </button>
                     </div>
 
-                    <div className="p-6 bg-white">
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Basic Info Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Nombre Completo *
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            name="nombre"
-                                            value={form.nombre}
-                                            onChange={handleChange}
-                                            placeholder="Ej: Juan Pérez"
-                                            className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 pl-10"
-                                            required
-                                            disabled={loading}
-                                        />
-                                        <UserPlusIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Calle *
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            name="calle"
-                                            value={form.calle}
-                                            onChange={handleChange}
-                                            placeholder="Ej: Av. Principal"
-                                            className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 pl-10"
-                                            required
-                                            disabled={loading}
-                                        />
-                                        <HomeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Número de Casa *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="numero_casa"
-                                        value={form.numero_casa}
-                                        onChange={handleChange}
-                                        placeholder="123-B"
-                                        className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
-                                        required
-                                        disabled={loading}
-                                    />
-                                </div>
-                            </div>
+                    {error && (
+                        <div className="mb-4 px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs">
+                            {error}
+                        </div>
+                    )}
 
-                            {/* Tag Selection */}
+                    <form
+                        onSubmit={handleSubmit}
+                        className="flex flex-col gap-4"
+                    >
+                        {/* Nombre */}
+                        <div>
+                            <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                                Nombre completo *
+                            </label>
+                            <input
+                                type="text"
+                                value={form.nombre}
+                                onChange={(e) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        nombre: e.target.value,
+                                    }))
+                                }
+                                placeholder="Ej. Juan Pérez García"
+                                className="vecino-input"
+                                disabled={loading}
+                            />
+                        </div>
+
+                        {/* Plaza + Número */}
+                        <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <div className="flex items-center gap-2 mb-3">
-                                    <TagIcon className="w-5 h-5 text-gray-600" />
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Asignar Tags
-                                    </label>
-                                </div>
-                                {tagsForSelection.length === 0 ? (
-                                    <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-center">
-                                        <p className="text-amber-800 text-sm font-medium">
-                                            No hay tags vendidos disponibles
-                                            para asignar.
+                                <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                                    Plaza *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={form.calle}
+                                    onChange={(e) =>
+                                        setForm((f) => ({
+                                            ...f,
+                                            calle: e.target.value,
+                                        }))
+                                    }
+                                    placeholder="Ej. Plaza Roble"
+                                    className="vecino-input"
+                                    disabled={loading}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                                    Número de casa *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={form.numero_casa}
+                                    onChange={(e) =>
+                                        setForm((f) => ({
+                                            ...f,
+                                            numero_casa: e.target.value,
+                                        }))
+                                    }
+                                    placeholder="Ej. 14-A"
+                                    className="vecino-input"
+                                    disabled={loading}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Tags disponibles */}
+                        <div className="flex flex-col">
+                            <div className="flex items-center justify-between mb-1.5 gap-2">
+                                <label className="text-xs font-600 text-stone-600">
+                                    Tags disponibles
+                                    <span className="ml-1 font-400 text-stone-400">
+                                        (opcional)
+                                    </span>
+                                </label>
+                                {/* Buscador pequeñito */}
+                                {availableTags.length > 0 && (
+                                    <div className="relative w-32">
+                                        <div className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-400 scale-75">
+                                            <SearchIcon />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={tagSearch}
+                                            onChange={(e) =>
+                                                setTagSearch(e.target.value)
+                                            }
+                                            placeholder="Buscar tag..."
+                                            className="w-full pl-7 pr-2 py-1 text-[11px] rounded-md bg-stone-100 border border-stone-200 text-stone-700 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-orange-400 transition"
+                                            disabled={loading}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {availableTags.length === 0 ? (
+                                <p className="text-xs text-stone-400 italic py-2">
+                                    No hay tags disponibles para asignar.
+                                </p>
+                            ) : (
+                                <div className="max-h-40 overflow-y-auto p-3 rounded-xl bg-white/50 border border-black/05 custom-scrollbar">
+                                    {filteredTags.length === 0 ? (
+                                        <p className="text-xs text-stone-400 text-center py-4">
+                                            No se encontró el tag "{tagSearch}"
                                         </p>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-wrap gap-3">
-                                        {tagsForSelection.map((tag) => {
-                                            const isSelected =
-                                                form.selectedTags.includes(
-                                                    tag.id
-                                                );
-                                            return (
-                                                <button
-                                                    key={tag.id}
-                                                    type="button"
-                                                    onClick={() =>
-                                                        toggleTag(tag.id)
-                                                    }
-                                                    disabled={loading}
-                                                    className={`relative px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 transform border-2 disabled:opacity-50 ${
-                                                        isSelected
-                                                            ? "bg-orange-500 text-white border-transparent shadow-lg scale-105"
-                                                            : "bg-white text-gray-700 border-gray-300 hover:border-orange-400 hover:scale-105"
-                                                    }`}
-                                                >
-                                                    <span className="font-mono">
+                                    ) : (
+                                        <div className="flex flex-wrap gap-2">
+                                            {filteredTags.map((tag) => {
+                                                const selected =
+                                                    form.selectedTags.includes(
+                                                        tag.id,
+                                                    );
+                                                return (
+                                                    <button
+                                                        key={tag.id}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            toggleTag(tag.id)
+                                                        }
+                                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-600 border transition-all duration-150
+                                                            ${
+                                                                selected
+                                                                    ? "bg-orange-500 text-white border-orange-500 shadow-sm scale-105"
+                                                                    : "bg-white text-stone-600 border-stone-200 hover:border-orange-300 hover:text-orange-600"
+                                                            }`}
+                                                    >
+                                                        <TagIcon />
                                                         {tag.codigo}
-                                                    </span>
-                                                    {isSelected && (
-                                                        <CheckIcon className="absolute -top-1 -right-1 w-4 h-4 text-white bg-green-500 rounded-full p-0.5" />
-                                                    )}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-4 pt-6 border-t border-gray-200">
-                                <button
-                                    type="submit"
-                                    disabled={loading || !form.nombre}
-                                    className="flex items-center justify-center px-6 py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200 transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:bg-gray-400 disabled:scale-100 disabled:cursor-not-allowed shadow-lg"
-                                >
-                                    {loading
-                                        ? "Guardando..."
-                                        : editingId
-                                        ? "Actualizar Vecino"
-                                        : "Agregar Vecino"}
-                                </button>
-                                {editingId && (
-                                    <button
-                                        type="button"
-                                        onClick={handleCancelEdit}
-                                        disabled={loading}
-                                        className="flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300 transform hover:scale-105 active:scale-95 border-2 border-gray-300 shadow-md"
-                                    >
-                                        Cancelar
-                                    </button>
-                                )}
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                {/* Table Card */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
-                    <div className="bg-orange-500 px-6 py-4">
-                        <h3 className="text-xl font-semibold text-white flex items-center gap-2">
-                            <UsersIcon className="w-6 h-6" />
-                            Lista de Vecinos ({vecinos.length})
-                        </h3>
-                    </div>
-                    <div className="overflow-x-auto bg-white">
-                        <table className="w-full">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                        Nombre
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                        Dirección
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                        Tags Asignados
-                                    </th>
-                                    <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                        Acciones
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {vecinos.length === 0 ? (
-                                    <tr>
-                                        <td
-                                            colSpan="4"
-                                            className="px-6 py-12 text-center text-gray-500"
-                                        >
-                                            No hay vecinos registrados.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    vecinos.map((vecino) => (
-                                        <tr
-                                            key={vecino.id}
-                                            className="hover:bg-gray-50/50 transition-colors"
-                                        >
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-orange-300 rounded-full flex-shrink-0 flex items-center justify-center">
-                                                        <span className="text-white font-semibold text-lg">
-                                                            {vecino.nombre
-                                                                .charAt(0)
-                                                                .toUpperCase()}
-                                                        </span>
-                                                    </div>
-                                                    <div className="font-medium text-gray-900">
-                                                        {vecino.nombre}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-700">
-                                                {vecino.calle} #
-                                                {vecino.numero_casa}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {vecino.tags &&
-                                                vecino.tags.length > 0 ? (
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {vecino.tags.map(
-                                                            (tag) => (
-                                                                <span
-                                                                    key={tag.id}
-                                                                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-bold bg-orange-100 text-orange-800"
-                                                                >
-                                                                    <TagIcon className="w-3 h-3 mr-1.5" />
-                                                                    {tag.codigo}
-                                                                </span>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-400 italic text-sm">
-                                                        Sin tags
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="flex justify-center gap-2">
-                                                    <button
-                                                        onClick={() =>
-                                                            handleEdit(vecino)
-                                                        }
-                                                        disabled={loading}
-                                                        className="p-2 text-amber-600 hover:bg-amber-100 rounded-full transition-colors"
-                                                    >
-                                                        <EditIcon className="w-5 h-5" />
                                                     </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                vecino.id
-                                                            )
-                                                        }
-                                                        disabled={loading}
-                                                        className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-                                                    >
-                                                        <TrashIcon className="w-5 h-5" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            {form.selectedTags.length > 0 && (
+                                <p className="text-xs text-orange-600 mt-1.5 font-500">
+                                    {form.selectedTags.length} tag
+                                    {form.selectedTags.length > 1
+                                        ? "s"
+                                        : ""}{" "}
+                                    seleccionado
+                                    {form.selectedTags.length > 1 ? "s" : ""}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Botones */}
+                        <div className="flex gap-3 pt-1">
+                            <button
+                                type="button"
+                                onClick={handleClose}
+                                disabled={loading}
+                                className="flex-1 py-2.5 rounded-xl border border-stone-200 bg-white/60 text-stone-600 text-sm font-600 hover:bg-white transition disabled:opacity-50"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="flex-1 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-600 hover:bg-orange-600 active:scale-95 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                {loading && (
+                                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                                 )}
-                            </tbody>
-                        </table>
-                    </div>
+                                {loading
+                                    ? "Guardando..."
+                                    : isEdit
+                                      ? "Guardar cambios"
+                                      : "Registrar vecino"}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     );
 }
 
-export default Vecinos;
+// ── COMPONENTE PRINCIPAL ──
+export default function Vecinos() {
+    const [vecinos, setVecinos] = useState([]);
+    const [availableTags, setAvailableTags] = useState([]);
+    const [allTags, setAllTags] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editingVecino, setEditingVecino] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+    // Filtros
+    const [search, setSearch] = useState("");
+    const [filterPlaza, setFilterPlaza] = useState("");
+    const [plazas, setPlazas] = useState([]);
+
+    // Paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const PER_PAGE = 20;
+
+    // Debounce del search
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    useEffect(() => {
+        const t = setTimeout(() => setDebouncedSearch(search), 350);
+        return () => clearTimeout(t);
+    }, [search]);
+
+    // Reset página cuando cambian filtros
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearch, filterPlaza]);
+
+    // Fetch principal
+    const fetchVecinos = useCallback(
+        async (page = 1) => {
+            setLoading(true);
+            try {
+                const params = { page, per_page: PER_PAGE };
+                if (debouncedSearch) params.search = debouncedSearch;
+                if (filterPlaza) params.calle = filterPlaza;
+
+                const res = await api.get("/vecinos", { params });
+                const paginated = res.data;
+
+                setVecinos(paginated.data || []);
+                setCurrentPage(paginated.current_page);
+                setLastPage(paginated.last_page);
+                setTotal(paginated.total);
+            } catch (err) {
+                console.error("Error cargando vecinos:", err);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [debouncedSearch, filterPlaza],
+    );
+
+    // Fetch tags y plazas (solo una vez al montar)
+    const fetchTagsAndPlazas = useCallback(async () => {
+        try {
+            const [tagsRes, salesRes, plazasRes] = await Promise.all([
+                api.get("/tags"),
+                api.get("/tag_sales"),
+                api.get("/vecinos/plazas"),
+            ]);
+
+            const soldTagIds = new Set(
+                (salesRes.data || []).map((s) => s.tag_id),
+            );
+
+            // Tags disponibles = vendidos sin vecino asignado aún
+            // Lo calculamos después de cargar vecinos
+            setAllTags(tagsRes.data || []);
+            setPlazas(plazasRes.data || []);
+        } catch (err) {
+            console.error("Error cargando tags/plazas:", err);
+        }
+    }, []);
+
+    // Calcular tags disponibles cuando cambian vecinos o allTags
+    useEffect(() => {
+        const fetchSalesAndCompute = async () => {
+            try {
+                const [salesRes, vecinosAllRes] = await Promise.all([
+                    api.get("/tag_sales"),
+                    api.get("/vecinos", { params: { per_page: 9999 } }),
+                ]);
+                const soldTagIds = new Set(
+                    (salesRes.data || []).map((s) => s.tag_id),
+                );
+                const assignedTagIds = new Set();
+                (vecinosAllRes.data?.data || []).forEach((v) => {
+                    (v.tags || []).forEach((t) => assignedTagIds.add(t.id));
+                });
+                setAvailableTags(
+                    allTags.filter(
+                        (t) =>
+                            soldTagIds.has(t.id) && !assignedTagIds.has(t.id),
+                    ),
+                );
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        if (allTags.length > 0) fetchSalesAndCompute();
+    }, [allTags, vecinos]);
+
+    useEffect(() => {
+        fetchTagsAndPlazas();
+    }, [fetchTagsAndPlazas]);
+    useEffect(() => {
+        fetchVecinos(currentPage);
+    }, [fetchVecinos, currentPage]);
+
+    const handleSaved = () => {
+        fetchVecinos(currentPage);
+        fetchTagsAndPlazas();
+    };
+
+    const tagsForModal = useMemo(() => {
+        if (!editingVecino) return availableTags;
+        const editingIds = new Set((editingVecino.tags || []).map((t) => t.id));
+        const extra = (editingVecino.tags || []).filter(
+            (t) => !availableTags.find((a) => a.id === t.id),
+        );
+        return [
+            ...availableTags.filter((t) => !editingIds.has(t.id)),
+            ...extra,
+        ];
+    }, [availableTags, editingVecino]);
+
+    const handleOpenNew = () => {
+        setEditingVecino(null);
+        setModalOpen(true);
+    };
+    const handleOpenEdit = (vecino) => {
+        setEditingVecino(vecino);
+        setModalOpen(true);
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await api.delete(`/vecinos/${id}`);
+            setDeleteConfirm(null);
+            fetchVecinos(currentPage);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // Páginas con ellipsis
+    const getPageNumbers = () => {
+        if (lastPage <= 5)
+            return Array.from({ length: lastPage }, (_, i) => i + 1);
+        if (currentPage <= 3) return [1, 2, 3, 4, "...", lastPage];
+        if (currentPage >= lastPage - 2)
+            return [
+                1,
+                "...",
+                lastPage - 3,
+                lastPage - 2,
+                lastPage - 1,
+                lastPage,
+            ];
+        return [
+            1,
+            "...",
+            currentPage - 1,
+            currentPage,
+            currentPage + 1,
+            "...",
+            lastPage,
+        ];
+    };
+
+    return (
+        <div className="flex flex-col gap-4">
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                    <h1 className="text-lg font-700 text-stone-800">
+                        Gestión de Vecinos
+                    </h1>
+                    <p className="text-xs text-stone-400 mt-0.5">
+                        {total} vecinos registrados
+                    </p>
+                </div>
+                <button
+                    onClick={handleOpenNew}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-600 hover:bg-orange-600 active:scale-95 transition shadow-sm"
+                >
+                    <PlusIcon />
+                    Nuevo Vecino
+                </button>
+            </div>
+
+            {/* Filtros */}
+            <div className="glass-card !p-3 flex flex-col sm:flex-row gap-3">
+                {/* Search */}
+                <div className="relative flex-1">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
+                        <SearchIcon />
+                    </div>
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Buscar por nombre, plaza o número..."
+                        className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-white/70 border border-black/08 text-sm text-stone-700 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-400/40 focus:border-orange-300 transition"
+                    />
+                    {search && (
+                        <button
+                            onClick={() => setSearch("")}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                        >
+                            <XIcon />
+                        </button>
+                    )}
+                </div>
+
+                {/* Filtro Plaza */}
+                <select
+                    value={filterPlaza}
+                    onChange={(e) => setFilterPlaza(e.target.value)}
+                    className="py-2.5 px-3 rounded-xl bg-white/70 border border-black/08 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-orange-400/40 focus:border-orange-300 transition min-w-[160px]"
+                >
+                    <option value="">Todas las plazas</option>
+                    {plazas.map((p) => (
+                        <option key={p} value={p}>
+                            {p}
+                        </option>
+                    ))}
+                </select>
+
+                {/* Limpiar filtros */}
+                {(search || filterPlaza) && (
+                    <button
+                        onClick={() => {
+                            setSearch("");
+                            setFilterPlaza("");
+                        }}
+                        className="px-3 py-2.5 rounded-xl border border-stone-200 bg-white/60 text-stone-500 text-sm hover:bg-white transition whitespace-nowrap"
+                    >
+                        Limpiar
+                    </button>
+                )}
+            </div>
+
+            {/* Tabla */}
+            <div className="glass-card !p-0 overflow-hidden">
+                {loading ? (
+                    <div className="flex items-center justify-center h-48 gap-3">
+                        <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-sm text-stone-400">
+                            Cargando vecinos...
+                        </span>
+                    </div>
+                ) : (
+                    <>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b border-black/06 bg-white/40">
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Vecino
+                                        </th>
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Plaza
+                                        </th>
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Casa
+                                        </th>
+                                        <th className="px-5 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Tags
+                                        </th>
+                                        <th className="px-5 py-3 text-center text-xs font-600 text-stone-500 uppercase tracking-wider">
+                                            Acciones
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-black/04">
+                                    {vecinos.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan="5"
+                                                className="px-5 py-12 text-center text-stone-400 text-sm"
+                                            >
+                                                {search || filterPlaza
+                                                    ? "No hay resultados para los filtros aplicados."
+                                                    : "No hay vecinos registrados."}
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        vecinos.map((vecino) => (
+                                            <tr
+                                                key={vecino.id}
+                                                className="hover:bg-white/40 transition-colors"
+                                            >
+                                                <td className="px-5 py-3.5">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center flex-shrink-0">
+                                                            <span className="text-orange-600 font-700 text-xs">
+                                                                {vecino.nombre
+                                                                    .charAt(0)
+                                                                    .toUpperCase()}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-sm font-600 text-stone-800">
+                                                            {vecino.nombre}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-5 py-3.5 text-sm text-stone-600">
+                                                    {vecino.calle}
+                                                </td>
+                                                <td className="px-5 py-3.5 text-sm text-stone-600">
+                                                    #{vecino.numero_casa}
+                                                </td>
+                                                <td className="px-5 py-3.5">
+                                                    {vecino.tags?.length > 0 ? (
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {vecino.tags.map(
+                                                                (tag) => (
+                                                                    <span
+                                                                        key={
+                                                                            tag.id
+                                                                        }
+                                                                        className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-600 bg-orange-100 text-orange-700 border border-orange-200"
+                                                                    >
+                                                                        <TagIcon />
+                                                                        {
+                                                                            tag.codigo
+                                                                        }
+                                                                    </span>
+                                                                ),
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-xs text-stone-300 italic">
+                                                            Sin asignar
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="px-5 py-3.5">
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <button
+                                                            onClick={() =>
+                                                                handleOpenEdit(
+                                                                    vecino,
+                                                                )
+                                                            }
+                                                            className="w-7 h-7 rounded-lg flex items-center justify-center text-amber-500 hover:bg-amber-50 transition"
+                                                        >
+                                                            <EditIcon />
+                                                        </button>
+                                                        <button
+                                                            onClick={() =>
+                                                                setDeleteConfirm(
+                                                                    vecino,
+                                                                )
+                                                            }
+                                                            className="w-7 h-7 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-50 transition"
+                                                        >
+                                                            <TrashIcon />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Paginación */}
+                        {lastPage > 1 && (
+                            <div className="flex items-center justify-between px-5 py-3 border-t border-black/05 bg-white/30 flex-wrap gap-2">
+                                <span className="text-xs text-stone-400">
+                                    {(currentPage - 1) * PER_PAGE + 1}–
+                                    {Math.min(currentPage * PER_PAGE, total)} de{" "}
+                                    {total} vecinos
+                                </span>
+                                <div className="flex gap-1 items-center flex-wrap">
+                                    <button
+                                        onClick={() =>
+                                            setCurrentPage((p) =>
+                                                Math.max(1, p - 1),
+                                            )
+                                        }
+                                        disabled={currentPage === 1}
+                                        className="w-7 h-7 rounded-lg border border-black/10 bg-white/60 text-stone-600 text-xs font-semibold flex items-center justify-center hover:bg-white disabled:opacity-30 transition"
+                                    >
+                                        ‹
+                                    </button>
+                                    {getPageNumbers().map((p, i) =>
+                                        p === "..." ? (
+                                            <span
+                                                key={`e${i}`}
+                                                className="w-6 text-center text-xs text-stone-400"
+                                            >
+                                                …
+                                            </span>
+                                        ) : (
+                                            <button
+                                                key={p}
+                                                onClick={() =>
+                                                    setCurrentPage(p)
+                                                }
+                                                className={`w-7 h-7 rounded-lg text-xs font-semibold flex items-center justify-center transition
+                                                    ${
+                                                        currentPage === p
+                                                            ? "bg-orange-500 text-white border border-orange-500"
+                                                            : "border border-black/10 bg-white/60 text-stone-600 hover:bg-white"
+                                                    }`}
+                                            >
+                                                {p}
+                                            </button>
+                                        ),
+                                    )}
+                                    <button
+                                        onClick={() =>
+                                            setCurrentPage((p) =>
+                                                Math.min(lastPage, p + 1),
+                                            )
+                                        }
+                                        disabled={currentPage === lastPage}
+                                        className="w-7 h-7 rounded-lg border border-black/10 bg-white/60 text-stone-600 text-xs font-semibold flex items-center justify-center hover:bg-white disabled:opacity-30 transition"
+                                    >
+                                        ›
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+
+            {/* Modales */}
+            <VecinoModal
+                open={modalOpen}
+                onClose={() => {
+                    setModalOpen(false);
+                    setEditingVecino(null); // ¡Esto mata al fantasma!
+                }}
+                onSaved={handleSaved}
+                editingVecino={editingVecino}
+                availableTags={tagsForModal}
+            />
+
+            {deleteConfirm && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    style={{
+                        background: "rgba(0,0,0,0.25)",
+                        backdropFilter: "blur(6px)",
+                    }}
+                    onClick={() => setDeleteConfirm(null)}
+                >
+                    <div
+                        className="glass-card w-full max-w-sm"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="text-base font-700 text-stone-800 mb-1">
+                            ¿Eliminar vecino?
+                        </h3>
+                        <p className="text-sm text-stone-500 mb-5">
+                            Se eliminará a{" "}
+                            <strong>{deleteConfirm.nombre}</strong>{" "}
+                            permanentemente.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDeleteConfirm(null)}
+                                className="flex-1 py-2.5 rounded-xl border border-stone-200 bg-white/60 text-stone-600 text-sm font-600 hover:bg-white transition"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={() => handleDelete(deleteConfirm.id)}
+                                className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-600 hover:bg-red-600 active:scale-95 transition"
+                            >
+                                Sí, eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

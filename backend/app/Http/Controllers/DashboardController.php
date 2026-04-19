@@ -14,12 +14,12 @@ class DashboardController extends Controller
 
         // ── Total recaudado este mes ──
         $totalRecaudado = DB::table('pagos')
-            ->whereRaw("strftime('%Y-%m', mes) = ?", [$mesActual])
+            ->whereRaw("DATE_FORMAT(mes, '%Y-%m') = ?", [$mesActual])
             ->sum('cantidad');
 
         // ── IDs de vecinos que pagaron este mes ──
         $vecinosPagaron = DB::table('pagos')
-            ->whereRaw("strftime('%Y-%m', mes) = ?", [$mesActual])
+            ->whereRaw("DATE_FORMAT(mes, '%Y-%m') = ?", [$mesActual])
             ->distinct()
             ->pluck('vecino_id');
 

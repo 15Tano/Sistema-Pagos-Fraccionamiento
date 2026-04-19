@@ -13,6 +13,29 @@ function PaginatedPanel({ items, renderItem, emptyText }) {
 
     useEffect(() => setPage(1), [items.length]);
 
+    // Genera array de páginas visibles con ellipsis
+    const getPageNumbers = () => {
+        if (totalPages <= 5) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+        const pages = [];
+        if (page <= 3) {
+            pages.push(1, 2, 3, 4, "...", totalPages);
+        } else if (page >= totalPages - 2) {
+            pages.push(
+                1,
+                "...",
+                totalPages - 3,
+                totalPages - 2,
+                totalPages - 1,
+                totalPages,
+            );
+        } else {
+            pages.push(1, "...", page - 1, page, page + 1, "...", totalPages);
+        }
+        return pages;
+    };
+
     return (
         <div className="flex flex-col flex-1 min-h-0">
             <div className="flex flex-col gap-1.5 flex-1">
@@ -26,13 +49,13 @@ function PaginatedPanel({ items, renderItem, emptyText }) {
             </div>
 
             {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/20">
+                <div className="flex items-center justify-between pt-2 mt-2 border-t border-black/06">
                     <span className="text-xs text-stone-400">
                         {(page - 1) * ITEMS_PER_PAGE + 1}–
                         {Math.min(page * ITEMS_PER_PAGE, items.length)} de{" "}
                         {items.length}
                     </span>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 items-center">
                         <button
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
                             disabled={page === 1}
@@ -40,20 +63,31 @@ function PaginatedPanel({ items, renderItem, emptyText }) {
                         >
                             ‹
                         </button>
-                        {Array.from({ length: totalPages }, (_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setPage(i + 1)}
-                                className={`w-6 h-6 rounded-md text-xs font-semibold flex items-center justify-center transition
-                                    ${
-                                        page === i + 1
-                                            ? "bg-orange-500 text-white border border-orange-500"
-                                            : "border border-black/10 bg-white/60 text-stone-600 hover:bg-white"
-                                    }`}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
+
+                        {getPageNumbers().map((p, i) =>
+                            p === "..." ? (
+                                <span
+                                    key={`ellipsis-${i}`}
+                                    className="w-6 text-center text-xs text-stone-400"
+                                >
+                                    …
+                                </span>
+                            ) : (
+                                <button
+                                    key={p}
+                                    onClick={() => setPage(p)}
+                                    className={`w-6 h-6 rounded-md text-xs font-semibold flex items-center justify-center transition
+                                        ${
+                                            page === p
+                                                ? "bg-orange-500 text-white border border-orange-500"
+                                                : "border border-black/10 bg-white/60 text-stone-600 hover:bg-white"
+                                        }`}
+                                >
+                                    {p}
+                                </button>
+                            ),
+                        )}
+
                         <button
                             onClick={() =>
                                 setPage((p) => Math.min(totalPages, p + 1))

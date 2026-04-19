@@ -9,115 +9,103 @@ use Carbon\Carbon;
 
 class VecinoController extends Controller
 {
-    /**
-     * Listar todos los vecinos con sus tags y pagos.
-     * Calcula el estado de cada tag para el mes actual.
-     */
-    public function index()
-    {
-        $vecinos = Vecino::with('tags', 'pagos')->get();
-        $currentMonth = Carbon::now()->format('Y-m');
+   public function index(Request $request)
+{
+    $perPage = $request->get('per_page', 20);
+    $search  = $request->get('search', '');
 
-        $vecinos->each(function ($vecino) use ($currentMonth) {
-            $hasCompletePago = $vecino->pagos->contains(function ($pago) use ($currentMonth) {
-                return $pago->mes === $currentMonth && $pago->restante == 0;
-            });
+    $query = Vecino::with(['tags']);
 
-            $vecino->tags->each(function ($tag) use ($hasCompletePago) {
-                $tag->is_active_for_month = $tag->activo && $hasCompletePago;
-            });
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            // Búsqueda simultánea en nombre, calle y numero_casa
+            $terms = explode(' ', trim($search));
+            foreach ($terms as $term) {
+                $q->where(function ($inner) use ($term) {
+                    $inner->where('nombre', 'like', "%{$term}%")
+                          ->orWhere('calle', 'like', "%{$term}%")
+                          ->orWhere('numero_casa', 'like', "%{$term}%");
+                });
+            }
         });
-
-        return response()->json($vecinos);
     }
 
-    /**
-     * Guardar un nuevo vecino.
-     */
+    $vecinos = $query->orderBy('nombre')->paginate($perPage);
+    return response()->json($vecinos);
+}
+
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'calle' => 'required|string|max:255',
+            'nombre'      => 'required|string|max:255',
+            'calle'       => 'required|string|max:255',
             'numero_casa' => 'required|string|max:255',
-            'tag_ids' => 'required|array',
-            'tag_ids.*' => 'exists:tags,id',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'exists:tags,id',
         ]);
 
-        // Verificar que los tags han sido vendidos
-        $soldTagIds = Tag::whereIn('id', $request->tag_ids)
-            ->whereHas('tagSale')
-            ->pluck('id')
-            ->toArray();
+        $vecino = Vecino::create($request->only(['nombre', 'calle', 'numero_casa']));
 
-        if (count($soldTagIds) !== count($request->tag_ids)) {
-            return response()->json(['error' => 'One or more tags have not been sold.'], 422);
+        if (!empty($request->tags)) {
+            $soldTagIds = Tag::whereIn('id', $request->tags)
+                ->whereHas('tagSale')
+                ->pluck('id')
+                ->toArray();
+            $vecino->tags()->sync($soldTagIds);
         }
 
-        $vecino = Vecino::create($request->only(['nombre', 'calle', 'numero_casa']));
-        $vecino->tags()->sync($soldTagIds);
-
-        return response()->json(['message' => 'Vecino registrado correctamente.', 'vecino' => $vecino], 201);
+        return response()->json([
+            'message' => 'Vecino registrado correctamente.',
+            'vecino'  => $vecino->load('tags'),
+        ], 201);
     }
 
-    /**
-     * Mostrar un vecino específico con sus tags y pagos.
-     */
     public function show($id)
     {
         $vecino = Vecino::with('tags', 'pagos')->findOrFail($id);
         return response()->json($vecino);
     }
 
-    /**
-     * Actualizar un vecino.
-     */
     public function update(Request $request, $id)
     {
         $vecino = Vecino::findOrFail($id);
 
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'calle' => 'required|string|max:255',
+            'nombre'      => 'required|string|max:255',
+            'calle'       => 'required|string|max:255',
             'numero_casa' => 'required|string|max:255',
-            'tag_ids' => 'required|array',
-            'tag_ids.*' => 'exists:tags,id',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'exists:tags,id',
         ]);
 
-        $soldTagIds = Tag::whereIn('id', $request->tag_ids)
-            ->whereHas('tagSale')
-            ->pluck('id')
-            ->toArray();
-
-        if (count($soldTagIds) !== count($request->tag_ids)) {
-            return response()->json(['error' => 'One or more tags have not been sold.'], 422);
-        }
-
         $vecino->update($request->only(['nombre', 'calle', 'numero_casa']));
-        $vecino->tags()->sync($soldTagIds);
 
-        return response()->json(['message' => 'Vecino actualizado.', 'vecino' => $vecino]);
+        $tagIds = [];
+        if (!empty($request->tags)) {
+            $tagIds = Tag::whereIn('id', $request->tags)
+                ->whereHas('tagSale')
+                ->pluck('id')
+                ->toArray();
+        }
+        $vecino->tags()->sync($tagIds);
+
+        return response()->json([
+            'message' => 'Vecino actualizado.',
+            'vecino'  => $vecino->load('tags'),
+        ]);
     }
 
-    /**
-     * Eliminar un vecino.
-     */
     public function destroy($id)
     {
-        $vecino = Vecino::findOrFail($id);
-        $vecino->delete();
-
+        Vecino::findOrFail($id)->delete();
         return response()->json(['message' => 'Vecino eliminado.']);
     }
 
-    /**
-     * Obtener historial de pagos por número de tag.
-     */
     public function historial($numero_tag)
     {
-        $vecino = Vecino::whereHas('tags', function ($query) use ($numero_tag) {
-            $query->where('codigo', $numero_tag);
-        })->with('pagos')->first();
+        $vecino = Vecino::whereHas('tags', fn($q) => $q->where('codigo', $numero_tag))
+            ->with('pagos')
+            ->first();
 
         if (!$vecino) {
             return response()->json(['message' => 'Vecino no encontrado'], 404);
@@ -125,4 +113,14 @@ class VecinoController extends Controller
 
         return response()->json($vecino->pagos);
     }
+
+    public function plazas()
+{
+    $plazas = Vecino::select('calle')
+        ->distinct()
+        ->orderBy('calle')
+        ->pluck('calle');
+
+    return response()->json($plazas);
+}
 }

@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::get('vecinos/plazas', [VecinoController::class, 'plazas']);
 
     // Vecinos
     Route::resource('vecinos', VecinoController::class);
