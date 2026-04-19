@@ -114,7 +114,7 @@ function Login({ onLogin }) {
 
         // --- 1. MOCK PARA VERCEL (SIMULADOR) ---
         // Usamos un timeout de 800ms para que se vea la animación del botón cargando
-        
+
         setTimeout(() => {
             const fakeToken = "token_de_prueba_123";
             const fakeUser = {
@@ -140,7 +140,6 @@ function Login({ onLogin }) {
             }
             setIsLoading(false);
         }, 800);
-        
 
         // --- 2. CÓDIGO REAL COMENTADO ---
         /*
@@ -159,9 +158,9 @@ function Login({ onLogin }) {
             alert(message);
         } finally {
             setIsLoading(false);
-        }
+        }*/
     };
-    */
+
     return (
         <div className="min-h-screen bg-white flex">
             {/* Left Column: Formulario */}
