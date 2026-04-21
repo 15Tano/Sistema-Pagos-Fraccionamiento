@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\Tag;
 use App\Models\Vecino;
 
 class AuthController extends Controller
@@ -13,136 +12,74 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required',
+            'email'    => 'required', // Este campo recibirá email o username
             'password' => 'required',
         ]);
 
         $input    = trim($request->input('email'));
         $password = $request->input('password');
 
-        // --- CASO 1: ADMIN (es un email) ---
-        if (filter_var($input, FILTER_VALIDATE_EMAIL)) {
-            $user = User::where('email', $input)->first();
+        // 1. Intentamos buscar por Email (Admin) o Username (Residente)
+        $user = User::where('email', $input)
+                    ->orWhere('username', $input)
+                    ->first();
 
-            if (!$user || !Hash::check($password, $user->password)) {
-                return response()->json([
-                    'message' => 'Credenciales incorrectas.'
-                ], 401);
-            }
-
-            if ($user->role !== 'admin') {
-                return response()->json([
-                    'message' => 'No tienes permisos de administrador.'
-                ], 403);
-            }
-
-            $token = $user->createToken('auth-token')->plainTextToken;
-
-            return response()->json([
-                'token' => $token,
-                'user'  => [
-                    'id'   => $user->id,
-                    'name' => $user->name,
-                    'role' => $user->role,
-                ],
-            ]);
-        }
-
-        // --- CASO 2: RESIDENTE por username ---
-        $userByUsername = User::where('username', $input)
-            ->where('role', 'residente')
-            ->first();
-
-        if ($userByUsername && Hash::check($password, $userByUsername->password)) {
-            $vecino = Vecino::where('user_id', $userByUsername->id)->first();
-
-            if (!$vecino) {
-                return response()->json([
-                    'message' => 'No hay vecino vinculado a este usuario.'
-                ], 401);
-            }
-
-            $token = $userByUsername->createToken('auth-token')->plainTextToken;
-
-            return response()->json([
-                'token' => $token,
-                'user'  => [
-                    'id'          => $userByUsername->id,
-                    'name'        => $userByUsername->name,
-                    'role'        => $userByUsername->role,
-                    'tag_usado'   => null,
-                    'vecino_id'   => $vecino->id,
-                    'vecino_uuid' => $vecino->uuid,
-                    'tags'        => $vecino->tags->map(fn($t) => [
-                        'id'     => $t->id,
-                        'codigo' => $t->codigo,
-                        'activo' => $t->activo,
-                    ]),
-                ],
-            ]);
-        }
-
-        // --- CASO 3: RESIDENTE por código de tag ---
-        $tag = Tag::where('codigo', $input)->first();
-
-        if (!$tag) {
-            return response()->json([
-                'message' => 'Usuario, tag o credenciales incorrectos.'
-            ], 401);
-        }
-
-        if (!$tag->activo) {
-            return response()->json([
-                'message' => 'Este tag está desactivado.'
-            ], 403);
-        }
-
-        // Buscar vecino via pivot tag_vecino
-        $vecino = $tag->vecinos()->first();
-
-        if (!$vecino || !$vecino->user_id) {
-            return response()->json([
-                'message' => 'No hay un usuario vinculado a este tag.'
-            ], 401);
-        }
-
-        $user = User::find($vecino->user_id);
-
+        // 2. Validación de existencia y contraseña
         if (!$user || !Hash::check($password, $user->password)) {
             return response()->json([
                 'message' => 'Credenciales incorrectas.'
             ], 401);
         }
 
+        // 3. Lógica según el Rol
+        $responseData = [
+            'id'   => $user->id,
+            'name' => $user->name,
+            'role' => $user->role,
+        ];
+
+        if ($user->role === 'residente') {
+            // Buscamos al vecino vinculado
+            $vecino = Vecino::where('user_id', $user->id)->first();
+
+            if (!$vecino) {
+                return response()->json([
+                    'message' => 'Usuario residente sin vecino vinculado.'
+                ], 401);
+            }
+
+            // Agregamos datos del vecino y sus tags al response
+            $responseData['vecino_id']   = $vecino->id;
+            $responseData['vecino_uuid'] = $vecino->uuid;
+            $responseData['tags']        = $vecino->tags->map(fn($t) => [
+                'id'     => $t->id,
+                'codigo' => $t->codigo,
+                'activo' => $t->activo,
+            ]);
+        }
+
+        // 4. Generar Token y responder
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
             'token' => $token,
-            'user'  => [
-                'id'          => $user->id,
-                'name'        => $user->name,
-                'role'        => $user->role,
-                'tag_usado'   => $input,
-                'vecino_id'   => $vecino->id,
-                'vecino_uuid' => $vecino->uuid,
-                'tags'        => $vecino->tags->map(fn($t) => [
-                    'id'     => $t->id,
-                    'codigo' => $t->codigo,
-                    'activo' => $t->activo,
-                ]),
-            ],
+            'user'  => $responseData,
         ]);
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-
         return response()->json(['message' => 'Sesión cerrada correctamente.']);
     }
 
     public function me(Request $request)
     {
-        return response()->json($request->user());
+        // Cargamos la relación del vecino si es residente para que el frontend tenga todo
+        $user = $request->user();
+        if($user->role === 'residente') {
+            $user->load('vecino.tags');
+        }
+        return response()->json($user);
     }
 }
