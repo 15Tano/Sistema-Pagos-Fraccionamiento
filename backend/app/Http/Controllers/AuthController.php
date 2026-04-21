@@ -22,7 +22,7 @@ class AuthController extends Controller
 
         // --- CASO 1: ADMIN (es un email) ---
         if (filter_var($input, FILTER_VALIDATE_EMAIL)) {
-            $user = User::where('username', $input)->first();
+            $user = User::where('email', $input)->first();
 
             if (!$user || !Hash::check($password, $user->password)) {
                 return response()->json([
@@ -48,12 +48,46 @@ class AuthController extends Controller
             ]);
         }
 
-        // --- CASO 2: RESIDENTE (es un código de tag) ---
+        // --- CASO 2: RESIDENTE por username ---
+        $userByUsername = User::where('username', $input)
+            ->where('role', 'residente')
+            ->first();
+
+        if ($userByUsername && Hash::check($password, $userByUsername->password)) {
+            $vecino = Vecino::where('user_id', $userByUsername->id)->first();
+
+            if (!$vecino) {
+                return response()->json([
+                    'message' => 'No hay vecino vinculado a este usuario.'
+                ], 401);
+            }
+
+            $token = $userByUsername->createToken('auth-token')->plainTextToken;
+
+            return response()->json([
+                'token' => $token,
+                'user'  => [
+                    'id'          => $userByUsername->id,
+                    'name'        => $userByUsername->name,
+                    'role'        => $userByUsername->role,
+                    'tag_usado'   => null,
+                    'vecino_id'   => $vecino->id,
+                    'vecino_uuid' => $vecino->uuid,
+                    'tags'        => $vecino->tags->map(fn($t) => [
+                        'id'     => $t->id,
+                        'codigo' => $t->codigo,
+                        'activo' => $t->activo,
+                    ]),
+                ],
+            ]);
+        }
+
+        // --- CASO 3: RESIDENTE por código de tag ---
         $tag = Tag::where('codigo', $input)->first();
 
         if (!$tag) {
             return response()->json([
-                'message' => 'Tag no encontrado.'
+                'message' => 'Usuario, tag o credenciales incorrectos.'
             ], 401);
         }
 
@@ -63,7 +97,8 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $vecino = Vecino::find($tag->vecino_id);
+        // Buscar vecino via pivot tag_vecino
+        $vecino = $tag->vecinos()->first();
 
         if (!$vecino || !$vecino->user_id) {
             return response()->json([
@@ -84,10 +119,17 @@ class AuthController extends Controller
         return response()->json([
             'token' => $token,
             'user'  => [
-                'id'        => $user->id,
-                'name'      => $user->name,
-                'role'      => $user->role,
-                'tag_usado' => $input,
+                'id'          => $user->id,
+                'name'        => $user->name,
+                'role'        => $user->role,
+                'tag_usado'   => $input,
+                'vecino_id'   => $vecino->id,
+                'vecino_uuid' => $vecino->uuid,
+                'tags'        => $vecino->tags->map(fn($t) => [
+                    'id'     => $t->id,
+                    'codigo' => $t->codigo,
+                    'activo' => $t->activo,
+                ]),
             ],
         ]);
     }

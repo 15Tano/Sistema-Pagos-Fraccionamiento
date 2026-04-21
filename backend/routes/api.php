@@ -9,6 +9,7 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\TagSaleController;
 use App\Http\Controllers\Api\ZkApiController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AvisosController;
 
 
 // ─── AUTH (públicas) ──────────────────────────────────────────────
@@ -59,3 +60,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // ─── ZKTeco (acceso desde script Python — token separado) ─────────
 Route::get('/vencimientos', [ZkApiController::class, 'index']);
+
+//Rutas de aviso
+Route::resource('avisos', AvisosController::class);
