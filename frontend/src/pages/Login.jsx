@@ -114,7 +114,7 @@ function Login({ onLogin }) {
 
         // --- 1. MOCK PARA VERCEL (SIMULADOR) ---
         // Usamos un timeout de 800ms para que se vea la animación del botón cargando
-
+        /*
         setTimeout(() => {
             const fakeToken = "token_de_prueba_123";
             const fakeUser = {
@@ -139,10 +139,10 @@ function Login({ onLogin }) {
                 window.location.href = "/residente";
             }
             setIsLoading(false);
-        }, 800);
+        }, 800);*/
 
         // --- 2. CÓDIGO REAL COMENTADO ---
-        /*
+
         try {
             const { token, user } = await login(identifier, password);
             setAuth(token, user);
@@ -158,7 +158,7 @@ function Login({ onLogin }) {
             alert(message);
         } finally {
             setIsLoading(false);
-        }*/
+        }
     };
 
     return (
