@@ -1,271 +1,477 @@
-import React, { useState } from "react";
-
-// --- ICONOS (SVG) ---
-const LogoutIcon = () => (
-    <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-        />
-    </svg>
-);
-
-const BellIcon = () => (
-    <svg
-        className="w-5 h-5 text-orange-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-        />
-    </svg>
-);
-
-const MoneyIcon = () => (
-    <svg
-        className="w-5 h-5 text-green-600"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-    </svg>
-);
-
-// --- COMPONENTE PRINCIPAL ---
-// OJO AQUÍ: Las llaves { } son obligatorias para sacar user y onLogout
+import { useState, useEffect, useMemo, useCallback } from "react";
+import api from "../lib/axios";
 import useAuthStore from "../store/authStore";
+import { getAvisos } from "../api/avisos";
+import { logout as apiLogout } from "../api/auth";
 
-const ResidentDashboard = () => {
-    const { user, logout } = useAuthStore();
-    const onLogout = () => {
-        logout();
-        window.location.href = "/login";
+console.log("VERSION 2.0 - CARGADA");
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function currentMonthKey() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function formatMonth(mes) {
+    if (!mes) return "-";
+    const [year, month] = mes.split("-");
+    return new Date(year, month - 1).toLocaleDateString("es-MX", {
+        month: "long",
+        year: "numeric",
+    });
+}
+
+function formatDate(dateString) {
+    if (!dateString) return "-";
+    const part = dateString.split("T")[0];
+    const [y, m, d] = part.split("-");
+    return `${d}/${m}/${y}`;
+}
+
+// ─── Config de tipos de aviso ─────────────────────────────────────────────────
+
+const TIPO_CONFIG = {
+    urgente: {
+        label: "Urgente",
+        bg: "bg-red-100",
+        text: "text-red-700",
+        border: "border-red-200",
+        dot: "bg-red-500",
+    },
+    informativo: {
+        label: "Informativo",
+        bg: "bg-blue-100",
+        text: "text-blue-700",
+        border: "border-blue-200",
+        dot: "bg-blue-500",
+    },
+    aviso: {
+        label: "Aviso",
+        bg: "bg-yellow-100",
+        text: "text-yellow-700",
+        border: "border-yellow-200",
+        dot: "bg-yellow-500",
+    },
+    positivo: {
+        label: "Positivo",
+        bg: "bg-green-100",
+        text: "text-green-700",
+        border: "border-green-200",
+        dot: "bg-green-500",
+    },
+};
+
+// ─── Semáforo de estado ───────────────────────────────────────────────────────
+
+function calcularEstado(pagos) {
+    const mesActual = currentMonthKey();
+    const pagosDelMes = pagos.filter((p) => p.mes === mesActual);
+
+    if (pagosDelMes.length === 0) {
+        return {
+            color: "rojo",
+            titulo: "Acceso Restringido",
+            subtitulo: "Pendiente de Pago",
+            descripcion: `No se detecta pago para ${formatMonth(mesActual)}.`,
+        };
+    }
+
+    const tieneExtraordinario = pagosDelMes.some(
+        (p) => p.tipo === "extraordinario",
+    );
+
+    if (tieneExtraordinario) {
+        return {
+            color: "amarillo",
+            titulo: "Acceso Activo",
+            subtitulo: "Pago Extraordinario",
+            descripcion: `Pago registrado con recargo para ${formatMonth(mesActual)}.`,
+        };
+    }
+
+    return {
+        color: "verde",
+        titulo: "Acceso Activo",
+        subtitulo: "Pago Puntual",
+        descripcion: `Pago ordinario registrado para ${formatMonth(mesActual)}.`,
     };
-    // Datos simulados (Luego vendrán de la BD)
-    const [status] = useState("ACTIVO");
-    const [vencimiento] = useState("15/02/2026");
+}
 
-    const avisos = [
-        {
-            id: 1,
-            titulo: "Mantenimiento Portón",
-            msg: "Cerrado jueves de 10am a 2pm.",
-            tipo: "alerta",
-            fecha: "Hoy",
-        },
-        {
-            id: 2,
-            titulo: "Recolección Basura",
-            msg: "El camión pasará ahora los martes.",
-            tipo: "info",
-            fecha: "Ayer",
-        },
-    ];
+const SEMAFORO_STYLES = {
+    verde: {
+        ring: "ring-green-400/60",
+        glow: "shadow-green-400/40",
+        bg: "bg-green-500/20",
+        icon: "text-green-500",
+        titulo: "text-green-700",
+        pulse: "bg-green-400",
+    },
+    amarillo: {
+        ring: "ring-yellow-400/60",
+        glow: "shadow-yellow-400/40",
+        bg: "bg-yellow-500/20",
+        icon: "text-yellow-500",
+        titulo: "text-yellow-700",
+        pulse: "bg-yellow-400",
+    },
+    rojo: {
+        ring: "ring-red-400/60",
+        glow: "shadow-red-400/40",
+        bg: "bg-red-500/20",
+        icon: "text-red-500",
+        titulo: "text-red-700",
+        pulse: "bg-red-400",
+    },
+};
 
-    const pagos = [
-        {
-            id: 1,
-            mes: "Enero 2026",
-            monto: 500,
-            fecha: "02/01/26",
-            estado: "Pagado",
-        },
-        {
-            id: 2,
-            mes: "Dic 2025",
-            monto: 500,
-            fecha: "05/12/25",
-            estado: "Pagado",
-        },
-        {
-            id: 3,
-            mes: "Nov 2025",
-            monto: 500,
-            fecha: "03/11/25",
-            estado: "Pagado",
-        },
-    ];
+// ─── Componente Semáforo ──────────────────────────────────────────────────────
+
+function Semaforo({ estado }) {
+    const s = SEMAFORO_STYLES[estado.color];
+
+    const Icon =
+        estado.color === "verde" ? (
+            <svg
+                className="w-16 h-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+            </svg>
+        ) : estado.color === "amarillo" ? (
+            <svg
+                className="w-16 h-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+            </svg>
+        ) : (
+            <svg
+                className="w-16 h-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+            </svg>
+        );
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-10 font-sans">
-            {/* --- NAVBAR --- */}
-            <nav className="bg-white shadow-sm sticky top-0 z-50">
-                <div className="max-w-2xl mx-auto px-4 h-16 flex justify-between items-center">
-                    <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                            SI
-                        </div>
-                        <span className="font-bold text-gray-700 tracking-tight">
-                            San Isidro
-                        </span>
-                    </div>
+        <div className="glass-card relative overflow-hidden flex flex-col items-center py-10 px-6">
+            <div className="glass-card-shine" />
 
-                    {/* BOTÓN DE LOGOUT CORREGIDO */}
-                    <button
-                        onClick={onLogout}
-                        className="text-sm text-gray-500 hover:text-red-500 font-medium transition flex items-center gap-1"
-                    >
-                        Salir
-                        <LogoutIcon />
-                    </button>
-                </div>
-            </nav>
-
-            {/* --- CONTENIDO PRINCIPAL --- */}
-            <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-                {/* SALUDO (Usando datos reales del login) */}
-                <div>
-                    <p className="text-gray-500 text-sm">Bienvenido a casa,</p>
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        {user.name}
-                    </h1>
-                    <p className="text-xs text-gray-400 font-mono mt-1">
-                        Tag ID: {user.tag || user.username}
-                    </p>
-                </div>
-
-                {/* 1. EL SEMÁFORO (HÉROE) */}
-                <div
-                    className={`relative overflow-hidden rounded-2xl shadow-xl p-6 text-center text-white transition-all duration-500 transform hover:scale-[1.02]
-          ${
-              status === "ACTIVO"
-                  ? "bg-gradient-to-br from-green-500 to-green-700 shadow-green-200"
-                  : "bg-gradient-to-br from-red-500 to-red-700 shadow-red-200"
-          }`}
-                >
-                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
-
-                    <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-3">
-                        Estado del Acceso
-                    </p>
-
-                    <div className="flex justify-center items-center gap-3 mb-5">
-                        <div
-                            className={`w-3 h-3 rounded-full animate-pulse ${
-                                status === "ACTIVO"
-                                    ? "bg-green-300 shadow-[0_0_15px_rgba(134,239,172,1)]"
-                                    : "bg-red-300"
-                            }`}
-                        ></div>
-                        <span className="text-4xl font-black tracking-tight drop-shadow-sm">
-                            {status === "ACTIVO" ? "AUTORIZADO" : "SUSPENDIDO"}
-                        </span>
-                    </div>
-
-                    <div className="bg-white/20 rounded-lg p-2 px-4 inline-block backdrop-blur-sm border border-white/10">
-                        <p className="text-sm">
-                            Vence el:{" "}
-                            <span className="font-bold">{vencimiento}</span>
-                        </p>
-                    </div>
-                </div>
-
-                {/* 2. AVISOS */}
-                <div>
-                    <h2 className="font-bold text-gray-700 mb-3 flex items-center gap-2 text-lg">
-                        <BellIcon />
-                        Avisos Recientes
-                    </h2>
-                    <div className="space-y-3">
-                        {avisos.map((aviso) => (
-                            <div
-                                key={aviso.id}
-                                className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow"
-                            >
-                                <div
-                                    className={`absolute left-0 top-0 bottom-0 w-1 ${
-                                        aviso.tipo === "alerta"
-                                            ? "bg-red-500"
-                                            : "bg-blue-500"
-                                    }`}
-                                ></div>
-                                <div className="flex justify-between items-start mb-1">
-                                    <h3 className="font-bold text-gray-800 text-sm group-hover:text-orange-600 transition-colors">
-                                        {aviso.titulo}
-                                    </h3>
-                                    <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                                        {aviso.fecha}
-                                    </span>
-                                </div>
-                                <p className="text-xs text-gray-500 leading-relaxed">
-                                    {aviso.msg}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* 3. HISTORIAL DE PAGOS */}
-                <div>
-                    <h2 className="font-bold text-gray-700 mb-3 flex items-center gap-2 text-lg">
-                        <MoneyIcon />
-                        Últimos Pagos
-                    </h2>
-                    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                        <table className="w-full text-sm">
-                            <thead className="bg-gray-50 text-gray-500 border-b border-gray-100">
-                                <tr>
-                                    <th className="p-3 text-left font-medium text-xs uppercase tracking-wider">
-                                        Concepto
-                                    </th>
-                                    <th className="p-3 text-right font-medium text-xs uppercase tracking-wider">
-                                        Monto
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {pagos.map((pago) => (
-                                    <tr
-                                        key={pago.id}
-                                        className="hover:bg-gray-50 transition-colors"
-                                    >
-                                        <td className="p-3">
-                                            <p className="font-bold text-gray-800 text-sm">
-                                                {pago.mes}
-                                            </p>
-                                            <p className="text-[11px] text-gray-400">
-                                                {pago.fecha}
-                                            </p>
-                                        </td>
-                                        <td className="p-3 text-right">
-                                            <span className="block font-bold text-gray-700">
-                                                ${pago.monto}
-                                            </span>
-                                            <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded-full font-bold mt-1">
-                                                {pago.estado}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            {/* Círculo principal */}
+            <div
+                className={`relative flex items-center justify-center w-36 h-36 rounded-full ring-4 ${s.ring} ${s.bg} shadow-2xl ${s.glow} mb-6`}
+            >
+                {/* Pulso animado */}
+                <span
+                    className={`absolute inline-flex w-full h-full rounded-full opacity-20 animate-ping ${s.pulse}`}
+                />
+                <span className={s.icon}>{Icon}</span>
             </div>
 
-            <div className="text-center mt-8 text-gray-300 text-[10px]">
-                San Isidro App v2.0
+            <p className={`text-2xl font-bold ${s.titulo}`}>{estado.titulo}</p>
+            <p className="text-lg text-stone-600 font-medium mt-1">
+                {estado.subtitulo}
+            </p>
+            <p className="text-sm text-stone-400 mt-2 text-center max-w-xs">
+                {estado.descripcion}
+            </p>
+        </div>
+    );
+}
+
+// ─── Tablón de avisos (vista residente) ───────────────────────────────────────
+
+function TablonavisoResidente({ avisos }) {
+    if (avisos.length === 0) return null;
+
+    return (
+        <div className="glass-card">
+            <div className="glass-card-shine" />
+            <div className="flex items-center gap-2 mb-4">
+                <svg
+                    className="w-4 h-4 text-orange-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+                    />
+                </svg>
+                <h3 className="text-sm font-700 text-stone-800">
+                    Tablón de Avisos
+                </h3>
+            </div>
+
+            <div className="space-y-3">
+                {avisos.map((aviso) => {
+                    const cfg =
+                        TIPO_CONFIG[aviso.tipo] || TIPO_CONFIG.informativo;
+                    return (
+                        <div
+                            key={aviso.id}
+                            className={`rounded-xl border p-4 ${cfg.bg} ${cfg.border}`}
+                        >
+                            <div className="flex items-start gap-3">
+                                <span
+                                    className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${cfg.dot}`}
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                        <p
+                                            className={`text-sm font-700 ${cfg.text}`}
+                                        >
+                                            {aviso.titulo}
+                                        </p>
+                                        <span
+                                            className={`px-2 py-0.5 rounded-full text-xs font-600 ${cfg.bg} ${cfg.text} border ${cfg.border}`}
+                                        >
+                                            {cfg.label}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-stone-600">
+                                        {aviso.descripcion}
+                                    </p>
+                                    <p className="text-xs text-stone-400 mt-1">
+                                        {new Date(
+                                            aviso.created_at,
+                                        ).toLocaleDateString("es-MX", {
+                                            day: "2-digit",
+                                            month: "short",
+                                            year: "numeric",
+                                        })}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
-};
+}
 
-export default ResidentDashboard;
+// ─── Historial de pagos ───────────────────────────────────────────────────────
+
+function HistorialPagos({ pagos, loading }) {
+    return (
+        <div className="glass-card">
+            <div className="glass-card-shine" />
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <svg
+                        className="w-4 h-4 text-orange-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                        />
+                    </svg>
+                    <h3 className="text-sm font-700 text-stone-800">
+                        Historial de Pagos
+                    </h3>
+                </div>
+                <span className="text-xs text-stone-400">
+                    {pagos.length} registros
+                </span>
+            </div>
+
+            {loading ? (
+                <div className="flex items-center justify-center py-8">
+                    <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+            ) : pagos.length === 0 ? (
+                <p className="text-sm text-stone-400 text-center py-8">
+                    Sin pagos registrados
+                </p>
+            ) : (
+                <div className="divide-y divide-black/05">
+                    {pagos.map((pago) => (
+                        <div key={pago.id} className="panel-item">
+                            <div>
+                                <p className="item-name">
+                                    {formatMonth(pago.mes)}
+                                </p>
+                                <p className="item-sub">
+                                    {pago.tipo === "extraordinario"
+                                        ? "Extraordinario"
+                                        : "Ordinario"}
+                                    {pago.fecha_de_cobro
+                                        ? ` · ${formatDate(pago.fecha_de_cobro)}`
+                                        : ""}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-700 text-stone-800">
+                                    $
+                                    {parseFloat(pago.cantidad).toLocaleString(
+                                        "es-MX",
+                                    )}
+                                </span>
+                                {parseFloat(pago.restante) === 0 ? (
+                                    <span className="badge badge-sold">
+                                        Completo
+                                    </span>
+                                ) : (
+                                    <span className="badge badge-due">
+                                        Resta $
+                                        {parseFloat(pago.restante).toFixed(0)}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Componente principal ─────────────────────────────────────────────────────
+
+export default function ResidentDashboard() {
+    const { user, logout: storeLogout } = useAuthStore();
+    const [pagos, setPagos] = useState([]);
+    const [avisos, setAvisos] = useState([]);
+    const [loadingPagos, setLoadingPagos] = useState(true);
+    const [lastSync, setLastSync] = useState(null);
+
+    const fetchData = useCallback(async () => {
+        setLoadingPagos(true);
+        try {
+            const [pagosRes, avisosRes] = await Promise.all([
+                api.get("/pagos/mis-pagos"),
+                getAvisos(),
+            ]);
+            setPagos(pagosRes.data.data || pagosRes.data || []);
+            setAvisos(avisosRes.data || []);
+            setLastSync(new Date());
+        } catch (e) {
+            console.error("Error cargando datos del residente:", e);
+        } finally {
+            setLoadingPagos(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    const estado = useMemo(() => calcularEstado(pagos), [pagos]);
+
+    const handleLogout = useCallback(async () => {
+        try {
+            await apiLogout();
+        } catch {}
+        storeLogout();
+        window.location.href = "/login";
+    }, [storeLogout]);
+
+    const tags = user?.tags || [];
+
+    return (
+        <div className="min-h-screen p-4 md:p-6">
+            <div className="max-w-2xl mx-auto flex flex-col gap-4">
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-stone-800">
+                            Bienvenido, {user?.name || "Residente"}
+                        </h1>
+                        {tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-1.5">
+                                {tags.map((t) => (
+                                    <span
+                                        key={t.id}
+                                        className={`px-2 py-0.5 rounded-full text-xs font-600 font-mono ${
+                                            t.activo
+                                                ? "bg-green-100 text-green-700 border border-green-200"
+                                                : "bg-red-100 text-red-600 border border-red-200"
+                                        }`}
+                                    >
+                                        {t.codigo}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-600 text-stone-500 bg-white/60 border border-black/08 hover:bg-white transition"
+                    >
+                        <svg
+                            className="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                            />
+                        </svg>
+                        Salir
+                    </button>
+                </div>
+
+                {/* Semáforo */}
+                <Semaforo estado={estado} />
+
+                {/* Tablón de avisos */}
+                <TablonavisoResidente avisos={avisos} />
+
+                {/* Historial */}
+                <HistorialPagos pagos={pagos} loading={loadingPagos} />
+
+                {/* Pie: última sincronización */}
+                {lastSync && (
+                    <p className="text-center text-xs text-stone-400 pb-2">
+                        Última actualización:{" "}
+                        {lastSync.toLocaleTimeString("es-MX", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })}{" "}
+                        ·{" "}
+                        {lastSync.toLocaleDateString("es-MX", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                        })}
+                    </p>
+                )}
+            </div>
+        </div>
+    );
+}

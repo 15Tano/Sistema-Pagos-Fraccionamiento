@@ -1,5 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { getDashboardStats } from "../api/dashboard";
+import {
+    getAvisos,
+    createAviso,
+    updateAviso,
+    deleteAviso,
+} from "../api/avisos";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -101,6 +107,298 @@ function PaginatedPanel({ items, renderItem, emptyText }) {
                 </div>
             )}
         </div>
+    );
+}
+
+const TIPO_CONFIG_ADMIN = {
+    urgente: { label: "Urgente", dot: "bg-red-500", ring: "ring-red-400" },
+    informativo: {
+        label: "Informativo",
+        dot: "bg-blue-500",
+        ring: "ring-blue-400",
+    },
+    aviso: { label: "Aviso", dot: "bg-yellow-500", ring: "ring-yellow-400" },
+    positivo: {
+        label: "Positivo",
+        dot: "bg-green-500",
+        ring: "ring-green-400",
+    },
+};
+
+const TIPOS = ["urgente", "informativo", "aviso", "positivo"];
+
+function AvisosAdmin() {
+    const [avisos, setAvisos] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [editing, setEditing] = useState(null); // aviso a editar o null para crear
+    const [form, setForm] = useState({
+        titulo: "",
+        descripcion: "",
+        tipo: "informativo",
+    });
+    const [saving, setSaving] = useState(false);
+
+    const fetchAvisos = useCallback(async () => {
+        try {
+            const res = await getAvisos();
+            setAvisos(res.data || []);
+        } catch {}
+    }, []);
+
+    useEffect(() => {
+        fetchAvisos();
+    }, [fetchAvisos]);
+
+    const openCreate = () => {
+        setEditing(null);
+        setForm({ titulo: "", descripcion: "", tipo: "informativo" });
+        setShowModal(true);
+    };
+
+    const openEdit = (aviso) => {
+        setEditing(aviso);
+        setForm({
+            titulo: aviso.titulo,
+            descripcion: aviso.descripcion,
+            tipo: aviso.tipo,
+        });
+        setShowModal(true);
+    };
+
+    const handleSave = async () => {
+        if (!form.titulo.trim() || !form.descripcion.trim()) return;
+        setSaving(true);
+        try {
+            if (editing) {
+                await updateAviso(editing.id, form);
+            } else {
+                await createAviso(form);
+            }
+            setShowModal(false);
+            fetchAvisos();
+        } catch {
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("¿Eliminar este aviso?")) return;
+        try {
+            await deleteAviso(id);
+            fetchAvisos();
+        } catch {}
+    };
+
+    return (
+        <>
+            {/* ── Feed de avisos ── */}
+            <div className="glass-card flex flex-col min-h-0">
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-700 text-stone-800">
+                        Tablón de Avisos
+                    </h3>
+                    <button
+                        onClick={openCreate}
+                        className="flex items-center gap-1 px-2.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-600 rounded-lg transition"
+                    >
+                        <svg
+                            className="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 4v16m8-8H4"
+                            />
+                        </svg>
+                        Nuevo
+                    </button>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                    {avisos.length === 0 ? (
+                        <div className="flex items-center justify-center h-16 text-sm text-stone-400">
+                            Sin avisos publicados
+                        </div>
+                    ) : (
+                        avisos.map((aviso) => {
+                            const cfg =
+                                TIPO_CONFIG_ADMIN[aviso.tipo] ||
+                                TIPO_CONFIG_ADMIN.informativo;
+                            return (
+                                <div key={aviso.id} className="panel-item">
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                        <span
+                                            className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`}
+                                        />
+                                        <p className="item-name truncate">
+                                            {aviso.titulo}
+                                        </p>
+                                        <span
+                                            className={`px-1.5 py-0.5 rounded-full text-xs font-600 ring-1 ${cfg.ring} text-stone-600 shrink-0`}
+                                        >
+                                            {cfg.label}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        {/* Editar */}
+                                        <button
+                                            onClick={() => openEdit(aviso)}
+                                            className="p-1.5 text-stone-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition"
+                                        >
+                                            <svg
+                                                className="w-3.5 h-3.5"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                                />
+                                            </svg>
+                                        </button>
+                                        {/* Borrar */}
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(aviso.id)
+                                            }
+                                            className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                        >
+                                            <svg
+                                                className="w-3.5 h-3.5"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+
+            {/* ── Modal crear/editar ── */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    {/* Backdrop */}
+                    <div
+                        className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+                        onClick={() => setShowModal(false)}
+                    />
+
+                    {/* Modal */}
+                    <div className="relative w-full max-w-md bg-white/80 backdrop-blur-xl border border-white/70 rounded-2xl shadow-2xl p-6 z-10">
+                        <h3 className="text-base font-700 text-stone-800 mb-4">
+                            {editing ? "Editar aviso" : "Nuevo aviso"}
+                        </h3>
+
+                        <div className="space-y-3">
+                            {/* Título */}
+                            <input
+                                type="text"
+                                placeholder="Título"
+                                value={form.titulo}
+                                onChange={(e) =>
+                                    setForm({ ...form, titulo: e.target.value })
+                                }
+                                className="vecino-input w-full"
+                            />
+
+                            {/* Descripción */}
+                            <textarea
+                                rows={3}
+                                placeholder="Descripción del aviso..."
+                                value={form.descripcion}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        descripcion: e.target.value,
+                                    })
+                                }
+                                className="vecino-input w-full resize-none"
+                            />
+
+                            {/* Selector de tipo con círculos de color */}
+                            <div>
+                                <p className="text-xs text-stone-500 mb-2">
+                                    Prioridad
+                                </p>
+                                <div className="flex gap-3">
+                                    {TIPOS.map((tipo) => {
+                                        const cfg = TIPO_CONFIG_ADMIN[tipo];
+                                        const selected = form.tipo === tipo;
+                                        return (
+                                            <button
+                                                key={tipo}
+                                                onClick={() =>
+                                                    setForm({ ...form, tipo })
+                                                }
+                                                className="flex flex-col items-center gap-1"
+                                                title={cfg.label}
+                                            >
+                                                <span
+                                                    className={`w-7 h-7 rounded-full ${cfg.dot} transition-all ${
+                                                        selected
+                                                            ? `ring-2 ring-offset-2 ${cfg.ring} scale-110`
+                                                            : "opacity-40 hover:opacity-70"
+                                                    }`}
+                                                />
+                                                <span
+                                                    className={`text-xs ${selected ? "text-stone-700 font-600" : "text-stone-400"}`}
+                                                >
+                                                    {cfg.label}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Acciones */}
+                        <div className="flex gap-2 mt-5">
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="flex-1 py-2 rounded-xl text-sm font-600 text-stone-600 bg-white/60 border border-black/08 hover:bg-white transition"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                disabled={
+                                    saving ||
+                                    !form.titulo.trim() ||
+                                    !form.descripcion.trim()
+                                }
+                                className="flex-1 py-2 rounded-xl text-sm font-700 text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-50 transition"
+                            >
+                                {saving
+                                    ? "Guardando..."
+                                    : editing
+                                      ? "Guardar cambios"
+                                      : "Publicar"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }
 
@@ -307,6 +605,10 @@ export default function Dashboard() {
                             </div>
                         )}
                     />
+                </div>
+                {/* 📍 Panel de Avisos (Cambio solicitado) */}
+                <div className="md:col-span-2 lg:col-span-1">
+                    <AvisosAdmin />
                 </div>
             </div>
         </div>
