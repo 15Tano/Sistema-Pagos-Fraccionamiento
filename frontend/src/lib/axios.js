@@ -1,5 +1,7 @@
 import axios from "axios";
 
+console.log("DEBUG - La URL de la API es:", import.meta.env.VITE_API_URL);
+
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     headers: {
