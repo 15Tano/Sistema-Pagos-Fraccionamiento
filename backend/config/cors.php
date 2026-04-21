@@ -8,7 +8,9 @@ return [
 
     'allowed_origins' => [
         'http://localhost:5173',    // Vite dev
-        'http://127.0.0.1:5173',   // Vite dev alternativo
+        'http://127.0.0.1:5173',
+        'https://sanisidro.info',
+        'https://www.sanisidro.info',   // Vite dev alternativo
         // 'https://tu-app.vercel.app' <- descomentar al hacer deploy
     ],
 

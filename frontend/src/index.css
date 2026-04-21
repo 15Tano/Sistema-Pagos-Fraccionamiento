@@ -520,3 +520,27 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* Limpiar inputs de fecha y mes nativos */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+    background-color: #f1f5f9; /* Gris sutil */
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 8px;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="month"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    background-color: #e2e8f0;
+    transform: scale(1.05);
+}
+
+/* Quitar la "X" fea por defecto que ponen algunos navegadores */
+input[type="date"]::-webkit-clear-button,
+input[type="month"]::-webkit-clear-button {
+    display: none;
+}

@@ -203,9 +203,11 @@ function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
     const [showDropdown, setShowDropdown] = useState(false);
     const [cuotaBase, setCuotaBase] = useState(280);
     const [mesesPagados, setMesesPagados] = useState(1);
-    const [mes, setMes] = useState("");
+    const [mes, setMes] = useState(() => new Date().toISOString().slice(0, 7));
     const [tipo, setTipo] = useState("ordinario");
-    const [fechaCobro, setFechaCobro] = useState("");
+    const [fechaCobro, setFechaCobro] = useState(() =>
+        new Date().toISOString().slice(0, 10),
+    );
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const searchTimeout = useRef(null);
@@ -248,9 +250,9 @@ function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
         setVecinoResults([]);
         setCuotaBase(280);
         setMesesPagados(1);
-        setMes("");
+        setMes(() => new Date().toISOString().slice(0, 7));
         setTipo("ordinario");
-        setFechaCobro("");
+        setFechaCobro(() => new Date().toISOString().slice(0, 10));
         setError("");
     };
 
@@ -359,9 +361,11 @@ function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                             Vecino *
                         </label>
                         <div className="relative" ref={dropdownRef}>
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
-                                <SearchIcon />
-                            </div>
+                            {!vecinoSearch && (
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
+                                    <SearchIcon />
+                                </div>
+                            )}
                             <input
                                 type="text"
                                 value={vecinoSearch}

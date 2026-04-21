@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { getDashboardStats } from "../api/dashboard";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 function PaginatedPanel({ items, renderItem, emptyText }) {
     const [page, setPage] = useState(1);

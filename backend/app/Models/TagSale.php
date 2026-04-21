@@ -10,6 +10,9 @@ class TagSale extends Model
     use HasFactory;
 
     protected $fillable = ['tag_id', 'sold_at', 'price'];
+    protected $casts = [
+    'sold_at' => 'datetime',
+];
 
     public function tag()
     {

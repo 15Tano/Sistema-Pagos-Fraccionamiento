@@ -7,14 +7,13 @@ use App\Models\Vecino;
 use App\Services\ZkAccessService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class PagoController extends Controller
 {
-    private const MENSUALIDAD = 280;
+    const RECARGO_EXTRA = 50;
 
     // ─────────────────────────────────────────
-    // INDEX — con paginación y filtros
+    // INDEX
     // ─────────────────────────────────────────
     public function index(Request $request)
     {
@@ -23,7 +22,6 @@ class PagoController extends Controller
             'vecino:id,uuid,nombre,calle,numero_casa'
         ])->latest();
 
-        // Filtro por búsqueda de vecino (nombre, calle, número)
         if ($request->filled('search')) {
             $query->whereHas('vecino', function ($q) use ($request) {
                 $terms = explode(' ', trim($request->search));
@@ -37,7 +35,6 @@ class PagoController extends Controller
             });
         }
 
-        // Filtros originales preservados
         if ($request->filled('month') && $request->filled('year')) {
             $query->whereYear('fecha_de_cobro', $request->year)
                   ->whereMonth('fecha_de_cobro', $request->month);
@@ -46,9 +43,7 @@ class PagoController extends Controller
         }
 
         if ($request->filled('calle')) {
-            $query->whereHas('vecino', fn($q) =>
-                $q->where('calle', $request->calle)
-            );
+            $query->whereHas('vecino', fn($q) => $q->where('calle', $request->calle));
         }
 
         if ($request->filled('tipo')) {
@@ -63,7 +58,7 @@ class PagoController extends Controller
     }
 
     // ─────────────────────────────────────────
-    // STORE — acepta vecino_uuid
+    // STORE (La lógica corregida)
     // ─────────────────────────────────────────
     public function store(Request $request)
     {
@@ -76,100 +71,80 @@ class PagoController extends Controller
             'fecha_de_cobro' => 'nullable|date',
         ]);
 
-        $vecino      = Vecino::where('uuid', $request->vecino_uuid)->firstOrFail();
-        $cuota       = (int) $request->cuota_base;
-        $recargo     = $request->tipo === 'extraordinario' ? 50 : 0;
-        $porMes      = $cuota + $recargo;
-        $cantidadTotal = $porMes * (int) $request->meses_pagados;
+        $vecino     = Vecino::where('uuid', $request->vecino_uuid)->firstOrFail();
+        
+        $cuota      = (int) $request->cuota_base;
+        $recargo    = $request->tipo === 'extraordinario' ? self::RECARGO_EXTRA : 0;
+        $porMes     = $cuota + $recargo;
+        
+        $fechaCobro = $request->fecha_de_cobro ?: Carbon::now()->toDateString();
+        $mesActual  = Carbon::parse($request->mes)->startOfMonth();
+        
+        $mesesRegistrados = 0;
+        $maxIteraciones   = 36; // Límite de seguridad
+        $iteracion        = 0;
 
-        $mesInicial      = Carbon::parse($request->mes)->startOfMonth();
-        $remainingAmount = $cantidadTotal;
-        $currentMonth    = $mesInicial->copy();
+        while ($mesesRegistrados < (int) $request->meses_pagados && $iteracion < $maxIteraciones) {
+            $iteracion++;
+            $mesString = $mesActual->format('Y-m');
 
-        while ($remainingAmount > 0) {
-            $mesString = $currentMonth->format('Y-m');
-
-            $totalPagadoMes = Pago::where('vecino_id', $vecino->id)
+            // LA CLAVE: Si existe el mes para este vecino, lo saltamos sin importar la cantidad.
+            $yaPagado = Pago::where('vecino_id', $vecino->id)
                 ->where('mes', $mesString)
-                ->sum('cantidad');
+                ->exists();
 
-            $neededForMonth = max(0, $porMes - $totalPagadoMes);
-
-            if ($neededForMonth <= 0) {
-                $currentMonth->addMonth();
-                continue;
+            if ($yaPagado) {
+                $mesActual->addMonth();
+                continue; 
             }
 
-            $amountForThisMonth = min($remainingAmount, $neededForMonth);
+            // Si llegamos aquí, el mes está libre.
+            Pago::create([
+                'vecino_id'      => $vecino->id,
+                'cantidad'       => $porMes,
+                'mes'            => $mesString,
+                'tipo'           => $request->tipo,
+                'fecha_de_cobro' => $fechaCobro,
+                'meses_pagados'  => 1, // Esto arregla el error de tu captura (cada fila es 1 mes)
+            ]);
 
-            if ($amountForThisMonth > 0) {
-                $existingPago = Pago::where('vecino_id', $vecino->id)
-                    ->where('mes', $mesString)
-                    ->where('tipo', $request->tipo)
-                    ->first();
-
-                if ($existingPago) {
-                    $existingPago->cantidad += $amountForThisMonth;
-                    $existingPago->save();
-                } else {
-                    $restante = max(0, $porMes - $totalPagadoMes - $amountForThisMonth);
-                    Pago::create([
-                        'vecino_id'      => $vecino->id,
-                        'cantidad'       => $amountForThisMonth,
-                        'mes'            => $mesString,
-                        'tipo'           => $request->tipo,
-                        'restante'       => $restante,
-                        'fecha_de_cobro' => $request->fecha_de_cobro
-                            ?: Carbon::now()->toDateString(),
-                        'meses_pagados'  => (int) $request->meses_pagados,
-                    ]);
-                }
-                $remainingAmount -= $amountForThisMonth;
-            }
-
-            $currentMonth->addMonth();
+            $mesesRegistrados++;
+            $mesActual->addMonth();
         }
 
-        // Sincronizar ZKTeco
         $this->syncVecinoTagStatusForMonth($vecino->id, null);
 
         return response()->json([
-            'message' => 'Pago registrado correctamente.',
+            'message'           => 'Pago registrado correctamente.',
+            'meses_registrados' => $mesesRegistrados,
         ], 201);
     }
 
     // ─────────────────────────────────────────
-    // UPDATE — por UUID del pago
+    // UPDATE
     // ─────────────────────────────────────────
     public function update(Request $request, Pago $pago)
     {
         $request->validate([
             'cuota_base'     => 'required|in:280,300,500',
-            'meses_pagados'  => 'required|integer|min:1|max:12',
             'mes'            => 'required|string',
             'tipo'           => 'required|in:ordinario,extraordinario',
             'fecha_de_cobro' => 'nullable|date',
         ]);
 
         $cuota    = (int) $request->cuota_base;
-        $recargo  = $request->tipo === 'extraordinario' ? 50 : 0;
-        $cantidad = ($cuota + $recargo) * (int) $request->meses_pagados;
+        $recargo  = $request->tipo === 'extraordinario' ? self::RECARGO_EXTRA : 0;
+        $porMes   = $cuota + $recargo;
 
-        $oldMes      = $pago->mes;
         $oldVecinoId = $pago->vecino_id;
 
         $pago->update([
-            'cantidad'       => $cantidad,
+            'cantidad'       => $porMes,
             'mes'            => $request->mes,
             'tipo'           => $request->tipo,
             'fecha_de_cobro' => $request->fecha_de_cobro,
-            'meses_pagados'  => (int) $request->meses_pagados,
+            'meses_pagados'  => 1, 
         ]);
-
-        $this->recalculateRestanteForMonth($pago->mes, $pago->vecino_id);
-        if ($oldMes !== $pago->mes || $oldVecinoId !== $pago->vecino_id) {
-            $this->recalculateRestanteForMonth($oldMes, $oldVecinoId);
-        }
 
         $this->syncVecinoTagStatusForMonth($pago->vecino_id, null);
         if ($oldVecinoId !== $pago->vecino_id) {
@@ -183,22 +158,20 @@ class PagoController extends Controller
     }
 
     // ─────────────────────────────────────────
-    // DESTROY — por UUID del pago
+    // DESTROY
     // ─────────────────────────────────────────
     public function destroy(Pago $pago)
     {
-        $mes       = $pago->mes;
         $vecino_id = $pago->vecino_id;
         $pago->delete();
 
-        $this->recalculateRestanteForMonth($mes, $vecino_id);
         $this->syncVecinoTagStatusForMonth($vecino_id, null);
 
         return response()->json(['message' => 'Pago eliminado.']);
     }
 
     // ─────────────────────────────────────────
-    // HISTÓRICO — filtros completos preservados
+    // HISTÓRICO
     // ─────────────────────────────────────────
     public function getHistorico(Request $request)
     {
@@ -212,7 +185,6 @@ class PagoController extends Controller
             $vecino = Vecino::where('uuid', $request->vecino_uuid)->firstOrFail();
             $query->where('vecino_id', $vecino->id);
         } elseif ($request->filled('vecino_id')) {
-            // Compatibilidad con el código viejo
             $query->where('vecino_id', $request->vecino_id);
         }
 
@@ -221,9 +193,7 @@ class PagoController extends Controller
         }
 
         if ($request->filled('calle')) {
-            $query->whereHas('vecino', fn($q) =>
-                $q->where('calle', $request->calle)
-            );
+            $query->whereHas('vecino', fn($q) => $q->where('calle', $request->calle));
         }
 
         if ($request->filled('tipo')) {
@@ -247,7 +217,7 @@ class PagoController extends Controller
     }
 
     // ─────────────────────────────────────────
-    // ESTADO MESES — para fila expandible
+    // ESTADO MESES
     // ─────────────────────────────────────────
     public function estadoMeses(string $vecinoUuid)
     {
@@ -267,7 +237,7 @@ class PagoController extends Controller
             $meses[] = [
                 'mes'    => $mesKey,
                 'label'  => ucfirst($fecha->locale('es')->isoFormat('MMMM YYYY')),
-                'pagado' => $totalPagado >= self::MENSUALIDAD,
+                'pagado' => $totalPagado > 0, // Si tiene más de $0, está pagado. Simple.
                 'monto'  => (float) $totalPagado,
             ];
         }
@@ -279,7 +249,7 @@ class PagoController extends Controller
     }
 
     // ─────────────────────────────────────────
-    // MIS PAGOS — solo para residentes
+    // MIS PAGOS
     // ─────────────────────────────────────────
     public function misPagos(Request $request)
     {
@@ -292,41 +262,19 @@ class PagoController extends Controller
         );
     }
 
-    // ─────────────────────────────────────────
-    // SHOW
-    // ─────────────────────────────────────────
     public function show($id)
     {
-        return response()->json(
-            Pago::with('vecino')->findOrFail($id)
-        );
+        return response()->json(Pago::with('vecino')->findOrFail($id));
     }
 
     // ─────────────────────────────────────────
-    // HELPERS PRIVADOS — sin cambios
+    // ZKTECO LÓGICA (Simplificada)
     // ─────────────────────────────────────────
-    private function recalculateRestanteForMonth($mes, $vecino_id): void
-    {
-        $pagos = Pago::where('vecino_id', $vecino_id)
-            ->where('mes', $mes)
-            ->orderBy('fecha_de_cobro')
-            ->orderBy('id')
-            ->get();
-
-        $cumulative = 0;
-        foreach ($pagos as $p) {
-            $cumulative += $p->cantidad;
-            $p->restante = max(0, self::MENSUALIDAD - $cumulative);
-            $p->save();
-        }
-    }
-
     private function calculateExpirationDate($vecino_id): Carbon
     {
+        // Traemos los meses que este vecino tiene registrados
         $pagosCompletos = Pago::where('vecino_id', $vecino_id)
-            ->selectRaw('mes, SUM(cantidad) as total')
-            ->groupBy('mes')
-            ->having('total', '>=', self::MENSUALIDAD)
+            ->distinct()
             ->pluck('mes')
             ->toArray();
 

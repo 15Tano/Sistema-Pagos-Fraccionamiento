@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import api from "../lib/axios";
+import { getTagSales } from "../api/tags";
 
 const MONTHLY_FEE = 280;
 const CURRENT_MONTH_ISO = new Date().toISOString().slice(0, 7);
@@ -20,6 +21,7 @@ function Historico() {
         useState(CURRENT_MONTH_ISO);
     const [searchTipo, setSearchTipo] = useState("");
     const [showOnlyDue, setShowOnlyDue] = useState(false);
+    const [tagSales, setTagSales] = useState([]);
 
     useEffect(() => {
         fetchInitialData();
@@ -42,7 +44,12 @@ function Historico() {
     const fetchInitialData = async () => {
         setLoading(true);
         try {
-            await Promise.all([fetchVecinos(), fetchPagos()]);
+            const [, , tagSalesRes] = await Promise.all([
+                fetchVecinos(),
+                fetchPagos(),
+                getTagSales(),
+            ]);
+            setTagSales(tagSalesRes.data || []);
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -52,8 +59,8 @@ function Historico() {
 
     const fetchVecinos = async () => {
         try {
-            const response = await api.get("/vecinos");
-            setVecinos(response.data);
+            const response = await api.get("/vecinos?per_page=500");
+            setVecinos(response.data.data || response.data || []);
         } catch (error) {
             console.error("Error fetching vecinos:", error);
         }
@@ -85,8 +92,11 @@ function Historico() {
                 params.tipo = searchTipo;
             }
 
-            const response = await api.get("/pagos/historico", { params });
-            setPagos(response.data);
+            const response = await api.get("/pagos/historico", {
+                params: { ...params, per_page: 9999 },
+            });
+
+            setPagos(response.data.data || response.data || []);
         } catch (error) {
             console.error("Error fetching pagos:", error);
         } finally {
@@ -169,6 +179,44 @@ function Historico() {
         return { ordinarioTotal, extraordinarioTotal };
     }, [pagos]);
 
+    const resumenFinanciero = useMemo(() => {
+        const currentMonthPayments = pagos.filter(
+            (p) => p.mes === CURRENT_MONTH_ISO,
+        );
+
+        // Pagos ordinarios a $280 (cuota base)
+        const ordinario = currentMonthPayments
+            .filter(
+                (p) => p.tipo === "ordinario" && parseFloat(p.cantidad) === 280,
+            )
+            .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
+
+        // Multas extraordinarias (tipo extraordinario)
+        const extraordinario = currentMonthPayments
+            .filter((p) => p.tipo === "extraordinario")
+            .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
+
+        // Pagos especiales: ordinarios pero con cantidad distinta a 280 ($300, $500, etc.)
+        const especiales = currentMonthPayments
+            .filter(
+                (p) => p.tipo === "ordinario" && parseFloat(p.cantidad) !== 280,
+            )
+            .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
+
+        // Ventas de tags del mes actual
+        const ventasTags = tagSales
+            .filter(
+                (s) =>
+                    (s.sold_at || s.created_at || "").slice(0, 7) ===
+                    CURRENT_MONTH_ISO,
+            )
+            .reduce((sum, s) => sum + parseFloat(s.price || 150), 0);
+
+        const total = ordinario + extraordinario + especiales + ventasTags;
+
+        return { ordinario, extraordinario, especiales, ventasTags, total };
+    }, [pagos, tagSales]);
+
     const formatMonth = (monthString) => {
         if (!monthString) return "-";
         const [year, month] = monthString.split("-");
@@ -222,17 +270,19 @@ function Historico() {
     const TabButton = ({ id, label, count }) => (
         <button
             onClick={() => setActiveTab(id)}
-            className={`px-4 py-2 font-medium text-sm rounded-lg transition ${
+            className={`px-4 py-2 font-medium text-sm rounded-xl transition-all duration-200 ${
                 activeTab === id
-                    ? "bg-orange-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-orange-500 text-white shadow-md"
+                    : "bg-white/60 backdrop-blur-sm border border-black/08 text-stone-600 hover:bg-white"
             }`}
         >
             {label}
             {count !== undefined && (
                 <span
-                    className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                        activeTab === id ? "bg-orange-500" : "bg-gray-300"
+                    className={`ml-2 px-1.5 py-0.5 text-xs rounded-full font-700 ${
+                        activeTab === id
+                            ? "bg-orange-400 text-white"
+                            : "bg-stone-200 text-stone-600"
                     }`}
                 >
                     {count}
@@ -243,31 +293,30 @@ function Historico() {
 
     if (loading) {
         return (
-            <div className="max-w-7xl mx-auto p-6">
-                <div className="bg-white p-8 rounded-xl shadow-lg">
-                    <div className="flex justify-center items-center h-32">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                        <span className="ml-3 text-gray-600">
-                            Cargando historial...
-                        </span>
-                    </div>
+            <div className="flex items-center justify-center h-64">
+                <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-stone-500 text-sm">
+                        Cargando historial...
+                    </span>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-6">
-            <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900">
+        <div className="flex flex-col gap-4 h-full">
+            <div className="mb-2">
+                <h1 className="text-3xl font-bold text-stone-800 mb-1">
                     Histórico de Pagos
                 </h1>
-                <p className="text-gray-600 mt-2">
-                    Sistema completo de seguimiento de pagos vecinales
+                <p className="text-sm text-stone-500">
+                    Seguimiento completo de pagos vecinales
                 </p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <div className="glass-card">
+                <div className="glass-card-shine" />{" "}
                 <div className="flex flex-wrap gap-2 mb-6">
                     <TabButton
                         id="resumen"
@@ -287,8 +336,8 @@ function Historico() {
                         }
                     />
                 </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-white/40 p-4 rounded-xl border border-black/05">
+                    {" "}
                     <div className="flex flex-wrap gap-4 items-center">
                         <div className="flex-1 min-w-48">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -301,7 +350,7 @@ function Historico() {
                                     if (activeTab === "individual")
                                         setSelectedVecino("");
                                 }}
-                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                className="vecino-input w-full"
                             >
                                 <option value="">Todas las calles</option>
                                 {uniqueCalles.map((calle) => (
@@ -322,7 +371,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedVecino(e.target.value)
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                    className="vecino-input w-full"
                                 >
                                     <option value="">Seleccionar vecino</option>
                                     {filteredVecinos.map((v) => (
@@ -346,7 +395,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedMonth(e.target.value)
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                    className="vecino-input w-full"
                                 />
                             </div>
                         )}
@@ -364,7 +413,7 @@ function Historico() {
                                             e.target.value,
                                         )
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                    className="vecino-input w-full"
                                 />
                             </div>
                         )}
@@ -380,7 +429,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedDate(e.target.value)
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                    className="vecino-input w-full"
                                 />
                             </div>
                         )}
@@ -395,7 +444,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSearchTipo(e.target.value)
                                     }
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                    className="vecino-input w-full"
                                 >
                                     <option value="">Todos los tipos</option>
                                     <option value="ordinario">Ordinario</option>
@@ -446,11 +495,12 @@ function Historico() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <div className="glass-card overflow-hidden">
+                <div className="glass-card-shine" />
                 {activeTab === "resumen" && (
                     <div>
-                        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200">
-                            <h3 className="text-xl font-semibold text-orange-900">
+                        <div className="px-6 py-4 border-b border-black/06">
+                            <h3 className="text-sm font-700 text-stone-800">
                                 Resumen del Mes Actual (
                                 {formatMonth(CURRENT_MONTH_ISO)})
                             </h3>
@@ -460,24 +510,24 @@ function Historico() {
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-black/03">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                             Vecino
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                             Dirección
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                             Estado
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                             Pagado
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                             Restante
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                             Tag
                                         </th>
                                     </tr>
@@ -487,12 +537,12 @@ function Historico() {
                                         (vecino) => (
                                             <tr
                                                 key={vecino.id}
-                                                className="hover:bg-gray-50"
+                                                className="hover:bg-orange-50/40 transition-colors"
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="font-medium text-gray-900">
+                                                    <p className="item-name">
                                                         {vecino.nombre}
-                                                    </div>
+                                                    </p>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {vecino.calle} #
@@ -537,74 +587,150 @@ function Historico() {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                            <div className="grid grid-cols-3 gap-6">
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-green-600">
+                        <div className="border-t border-black/06">
+                            {/* Fila 1: contadores de estado */}
+                            <div className="grid grid-cols-3 gap-0 divide-x divide-black/06 border-b border-black/06">
+                                <div className="px-6 py-4 text-center">
+                                    <p className="text-2xl font-bold text-green-600">
                                         {
                                             filteredCurrentMonthSummary.filter(
                                                 (v) => v.isComplete,
                                             ).length
                                         }
-                                    </div>
-                                    <div className="text-sm text-gray-600">
-                                        Pagos Completos
-                                    </div>
+                                    </p>
+                                    <p className="text-xs text-stone-500 mt-0.5">
+                                        Pagos completos
+                                    </p>
                                 </div>
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-orange-600">
+                                <div className="px-6 py-4 text-center">
+                                    <p className="text-2xl font-bold text-orange-500">
                                         {
                                             filteredCurrentMonthSummary.filter(
                                                 (v) =>
                                                     v.hasPaid && !v.isComplete,
                                             ).length
                                         }
-                                    </div>
-                                    <div className="text-sm text-gray-600">
-                                        Pagos Parciales
-                                    </div>
+                                    </p>
+                                    <p className="text-xs text-stone-500 mt-0.5">
+                                        Pagos parciales
+                                    </p>
                                 </div>
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-red-600">
+                                <div className="px-6 py-4 text-center">
+                                    <p className="text-2xl font-bold text-red-500">
                                         {
                                             filteredCurrentMonthSummary.filter(
                                                 (v) => !v.hasPaid,
                                             ).length
                                         }
-                                    </div>
-                                    <div className="text-sm text-gray-600">
-                                        Sin Pagar
-                                    </div>
+                                    </p>
+                                    <p className="text-xs text-stone-500 mt-0.5">
+                                        Sin pagar
+                                    </p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-6 mt-4 pt-4 border-t border-gray-200">
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-orange-600">
-                                        $
-                                        {paymentTypeSummary.ordinarioTotal.toFixed(
-                                            2,
-                                        )}
+
+                            {/* Fila 2: desglose financiero */}
+                            <div className="px-6 py-4">
+                                <p className="text-xs font-700 text-stone-500 uppercase tracking-wide mb-3">
+                                    Desglose financiero —{" "}
+                                    {new Date().toLocaleDateString("es-MX", {
+                                        month: "long",
+                                        year: "numeric",
+                                    })}
+                                </p>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                                    {/* Ordinarios $280 */}
+                                    <div className="bg-white/60 border border-black/06 rounded-xl px-4 py-3">
+                                        <p className="text-xs text-stone-400 mb-1">
+                                            Cuotas ordinarias
+                                        </p>
+                                        <p className="text-lg font-bold text-stone-800">
+                                            $
+                                            {resumenFinanciero.ordinario.toLocaleString(
+                                                "es-MX",
+                                            )}
+                                        </p>
+                                        <p className="text-xs text-stone-400">
+                                            a $280 c/u
+                                        </p>
                                     </div>
-                                    <div className="text-sm text-gray-600">
-                                        Recaudado Ordinario (Mes Actual)
+
+                                    {/* Extraordinarios */}
+                                    <div className="bg-white/60 border border-black/06 rounded-xl px-4 py-3">
+                                        <p className="text-xs text-stone-400 mb-1">
+                                            Multas extraordinarias
+                                        </p>
+                                        <p className="text-lg font-bold text-stone-800">
+                                            $
+                                            {resumenFinanciero.extraordinario.toLocaleString(
+                                                "es-MX",
+                                            )}
+                                        </p>
+                                        <p className="text-xs text-stone-400">
+                                            tipo extraordinario
+                                        </p>
+                                    </div>
+
+                                    {/* Especiales $300/$500 */}
+                                    <div className="bg-white/60 border border-black/06 rounded-xl px-4 py-3">
+                                        <p className="text-xs text-stone-400 mb-1">
+                                            Pagos especiales
+                                        </p>
+                                        <p className="text-lg font-bold text-stone-800">
+                                            $
+                                            {resumenFinanciero.especiales.toLocaleString(
+                                                "es-MX",
+                                            )}
+                                        </p>
+                                        <p className="text-xs text-stone-400">
+                                            $300, $500, etc.
+                                        </p>
+                                    </div>
+
+                                    {/* Ventas de tags */}
+                                    <div className="bg-white/60 border border-black/06 rounded-xl px-4 py-3">
+                                        <p className="text-xs text-stone-400 mb-1">
+                                            Ventas de tags
+                                        </p>
+                                        <p className="text-lg font-bold text-stone-800">
+                                            $
+                                            {resumenFinanciero.ventasTags.toLocaleString(
+                                                "es-MX",
+                                            )}
+                                        </p>
+                                        <p className="text-xs text-stone-400">
+                                            {
+                                                tagSales.filter(
+                                                    (s) =>
+                                                        (
+                                                            s.sold_at ||
+                                                            s.created_at ||
+                                                            ""
+                                                        ).slice(0, 7) ===
+                                                        CURRENT_MONTH_ISO,
+                                                ).length
+                                            }{" "}
+                                            tags · $150 c/u
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-orange-600">
+
+                                {/* Total general */}
+                                <div className="flex items-center justify-between bg-orange-50/80 border border-orange-200/60 rounded-xl px-5 py-3">
+                                    <p className="text-sm font-700 text-stone-700">
+                                        Total ingresado este mes
+                                    </p>
+                                    <p className="text-2xl font-bold text-orange-600">
                                         $
-                                        {paymentTypeSummary.extraordinarioTotal.toFixed(
-                                            2,
+                                        {resumenFinanciero.total.toLocaleString(
+                                            "es-MX",
                                         )}
-                                    </div>
-                                    <div className="text-sm text-gray-600">
-                                        Recaudado Extraordinario (Mes Actual)
-                                    </div>
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
-
                 {[
                     "individual",
                     "mensual",
@@ -613,22 +739,16 @@ function Historico() {
                     "adelantados",
                 ].includes(activeTab) && (
                     <div>
-                        <div className="px-6 py-4 bg-green-50 border-b border-green-200">
-                            <h3 className="text-xl font-semibold text-green-900">
+                        <div className="px-6 py-4 border-b border-black/06">
+                            <h3 className="text-sm font-700 text-stone-800">
                                 {activeTab === "individual" &&
                                     `Historial Individual`}
                                 {activeTab === "mensual" &&
-                                    `Pagos del Mes: ${formatMonth(
-                                        selectedMonth,
-                                    )}`}
+                                    `Pagos del Mes: ${formatMonth(selectedMonth)}`}
                                 {activeTab === "mes_cobro" &&
-                                    `Pagos Cobrados en: ${formatMonth(
-                                        selectedCollectionMonth,
-                                    )}`}
+                                    `Pagos Cobrados en: ${formatMonth(selectedCollectionMonth)}`}
                                 {activeTab === "por_dia" &&
-                                    `Pagos del Día: ${formatDate(
-                                        selectedDate,
-                                    )}`}
+                                    `Pagos del Día: ${formatDate(selectedDate)}`}
                                 {activeTab === "adelantados" &&
                                     `Pagos Adelantados`}
                             </h3>
@@ -648,27 +768,27 @@ function Historico() {
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full">
-                                    <thead className="bg-green-600 text-white">
+                                    <thead className="bg-black/03">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                                 Vecino
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                                 Dirección
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                                 Mes Pagado
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                                 Tipo
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                                 Cantidad
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                                 Estado
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
                                                 Fecha Cobro
                                             </th>
                                         </tr>
@@ -687,31 +807,29 @@ function Historico() {
                                             pagos.map((pago) => (
                                                 <tr
                                                     key={pago.id}
-                                                    className="hover:bg-gray-50"
+                                                    className="hover:bg-orange-50/40 transition-colors"
                                                 >
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="font-medium text-gray-900">
+                                                        <p className="item-name">
                                                             {pago.vecino.nombre}
-                                                        </div>
+                                                        </p>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {pago.vecino.calle} #
-                                                        {
-                                                            pago.vecino
-                                                                .numero_casa
-                                                        }
+                                                        <p className="item-sub">
+                                                            {pago.vecino.calle}{" "}
+                                                            #
+                                                            {
+                                                                pago.vecino
+                                                                    .numero_casa
+                                                            }
+                                                        </p>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                         {formatMonth(pago.mes)}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span
-                                                            className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                                                pago.tipo ===
-                                                                "extraordinario"
-                                                                    ? "bg-orange-100 text-orange-800"
-                                                                    : "bg-blue-100 text-blue-800"
-                                                            }`}
+                                                            className={`px-2 py-1 text-xs font-medium rounded-full ${pago.tipo === "extraordinario" ? "bg-orange-100 text-orange-800" : "bg-blue-100 text-blue-800"}`}
                                                         >
                                                             {pago.tipo
                                                                 .charAt(0)
@@ -757,12 +875,11 @@ function Historico() {
                         )}
                     </div>
                 )}
-
                 {activeTab !== "resumen" && pagos.length > 0 && (
-                    <div className="px-6 py-4 bg-gray-50 border-t">
+                    <div className="px-6 py-4 border-t border-black/06">
                         <div className="grid grid-cols-2 gap-6">
                             <div className="text-center">
-                                <div className="text-xl font-bold text-orange-500">
+                                <p className="text-xl font-bold text-orange-500">
                                     $
                                     {pagos
                                         .reduce(
@@ -771,13 +888,13 @@ function Historico() {
                                             0,
                                         )
                                         .toFixed(2)}
-                                </div>
-                                <div className="text-sm text-gray-600">
+                                </p>
+                                <p className="text-xs text-stone-500 mt-0.5">
                                     Total Recaudado
-                                </div>
+                                </p>
                             </div>
                             <div className="text-center">
-                                <div className="text-xl font-bold text-gray-900">
+                                <p className="text-xl font-bold text-gray-900">
                                     $
                                     {pagos
                                         .reduce(
@@ -786,10 +903,10 @@ function Historico() {
                                             0,
                                         )
                                         .toFixed(2)}
-                                </div>
-                                <div className="text-sm text-gray-600">
+                                </p>
+                                <p className="text-xs text-stone-500 mt-0.5">
                                     Total Restante
-                                </div>
+                                </p>
                             </div>
                         </div>
                     </div>
