@@ -366,21 +366,24 @@ export default function ResidentDashboard() {
     const [loadingPagos, setLoadingPagos] = useState(true);
     const [lastSync, setLastSync] = useState(null);
 
+    // REEMPLAZA fetchData completo:
     const fetchData = useCallback(async () => {
         setLoadingPagos(true);
         try {
-            const [pagosRes, avisosRes] = await Promise.all([
-                api.get("/pagos/mis-pagos"),
-                getAvisos(),
-            ]);
+            const pagosRes = await api.get("/pagos/mis-pagos");
             setPagos(pagosRes.data.data || pagosRes.data || []);
-            setAvisos(avisosRes.data || []);
             setLastSync(new Date());
         } catch (e) {
-            console.error("Error cargando datos del residente:", e);
+            console.error("Error cargando pagos:", e);
         } finally {
             setLoadingPagos(false);
         }
+
+        // Avisos por separado — no bloquea si falla
+        try {
+            const avisosRes = await getAvisos();
+            setAvisos(avisosRes.data || []);
+        } catch {}
     }, []);
 
     useEffect(() => {

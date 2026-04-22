@@ -62,4 +62,10 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/vencimientos', [ZkApiController::class, 'index']);
 
 //Rutas de aviso
-Route::resource('avisos', AvisosController::class);
+use App\Http\Controllers\AvisoController;
+
+// Dentro del grupo auth:sanctum:
+Route::get('/avisos', [AvisosController::class, 'index']);
+Route::post('/avisos', [AvisosController::class, 'store']);
+Route::put('/avisos/{id}', [AvisosController::class, 'update']);
+Route::delete('/avisos/{id}', [AvisosController::class, 'destroy']);
