@@ -20,7 +20,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {
 };
 
 const AdminRoute = ({ children }) => (
-    <PrivateRoute allowedRoles={["admin"]}>
+    <PrivateRoute allowedRoles={["admin", "capturista"]}>
         <Layout>{children}</Layout>
     </PrivateRoute>
 );
