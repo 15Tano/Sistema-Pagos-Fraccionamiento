@@ -90,7 +90,7 @@ const YourLogoIcon = ({ className }) => (
     <img
         src="/arcos.png"
         alt="Logo de San Isidro"
-        className="max-w-[300px] lg:max-w-[1700]"
+        className="max-w-[320px] lg:max-w-[1300]"
     />
 );
 
@@ -112,37 +112,6 @@ function Login({ onLogin }) {
         e.preventDefault();
         setIsLoading(true);
 
-        // --- 1. MOCK PARA VERCEL (SIMULADOR) ---
-        // Usamos un timeout de 800ms para que se vea la animación del botón cargando
-        /*
-        setTimeout(() => {
-            const fakeToken = "token_de_prueba_123";
-            const fakeUser = {
-                id: 1,
-                name:
-                    loginType === "admin"
-                        ? "Admin (Prueba)"
-                        : "Residente (Prueba)",
-                role: loginType,
-                email:
-                    identifier ||
-                    (loginType === "admin" ? "admin@sanisidro.com" : "001452"),
-            };
-
-            // Guardamos la sesión falsa
-            setAuth(fakeToken, fakeUser);
-
-            // Redirigimos según el rol simulado
-            if (fakeUser.role === "admin") {
-                window.location.href = "/";
-            } else {
-                window.location.href = "/residente";
-            }
-            setIsLoading(false);
-        }, 800);*/
-
-        // --- 2. CÓDIGO REAL COMENTADO ---
-
         try {
             const { token, user } = await login(identifier, password);
             setAuth(token, user);
@@ -162,32 +131,43 @@ function Login({ onLogin }) {
     };
 
     return (
-        <div className="min-h-screen bg-white flex">
+        // Global background: Piedra muy claro con refracciones de color detrás del cristal
+        <div className="min-h-screen bg-stone-100 flex relative overflow-hidden">
+            {/* Orbes desenfocados para dar refracción al Liquid Glass */}
+            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-300/30 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-stone-300/50 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-white/40 rounded-full blur-[80px] pointer-events-none" />
+
             {/* Left Column: Formulario */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8">
-                <div className="relative bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-orange-100/50">
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative z-10">
+                {/* Placa de Liquid Glass Principal */}
+                <div className="relative bg-white/40 backdrop-blur-2xl p-8 rounded-[2.5rem] shadow-[0_8px_32px_rgba(0,0,0,0.06)] w-full max-w-md border-t border-l border-white/80 border-r border-b border-white/30">
+                    {/* Brillo curvo superior */}
+                    <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
                     {/* Encabezado */}
                     <div className="text-center mb-8">
-                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-orange-50">
+                        {/* Contenedor del Logo con glass */}
+                        <div className="w-16 h-16 bg-white/60 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-[inset_0_2px_4px_rgba(255,255,255,1),0_4px_10px_rgba(0,0,0,0.03)] border border-white/80">
                             <YourLogoIcon className="w-8 h-8" />
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                        <h2 className="text-2xl font-bold text-stone-800 mb-2 drop-shadow-sm">
                             Bienvenido
                         </h2>
                     </div>
 
-                    {/* --- TABS / PESTAÑAS --- */}
-                    <div className="flex p-1 bg-gray-100 rounded-xl mb-8">
+                    {/* --- TABS / PESTAÑAS LÍQUIDAS --- */}
+                    <div className="flex p-1.5 bg-black/5 backdrop-blur-sm rounded-2xl mb-8 shadow-[inset_0_2px_6px_rgba(0,0,0,0.04)] border border-white/20">
                         <button
                             type="button"
                             onClick={() => {
                                 setLoginType("admin");
                                 setIdentifier("");
                             }}
-                            className={`flex-1 flex items-center justify-center py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`flex-1 flex items-center justify-center py-2 text-sm font-bold rounded-xl transition-all duration-300 ${
                                 loginType === "admin"
-                                    ? "bg-white text-orange-600 shadow-sm"
-                                    : "text-gray-500 hover:text-gray-700"
+                                    ? "bg-white/80 text-orange-600 shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-white transform scale-[1.02]"
+                                    : "text-stone-500 hover:text-stone-700 hover:bg-white/20"
                             }`}
                         >
                             <UserIcon className="w-4 h-4 mr-2" />
@@ -199,10 +179,10 @@ function Login({ onLogin }) {
                                 setLoginType("residente");
                                 setIdentifier("");
                             }}
-                            className={`flex-1 flex items-center justify-center py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`flex-1 flex items-center justify-center py-2 text-sm font-bold rounded-xl transition-all duration-300 ${
                                 loginType === "residente"
-                                    ? "bg-white text-green-600 shadow-sm"
-                                    : "text-gray-500 hover:text-gray-700"
+                                    ? "bg-white/80 text-green-600 shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-white transform scale-[1.02]"
+                                    : "text-stone-500 hover:text-stone-700 hover:bg-white/20"
                             }`}
                         >
                             <TagIcon className="w-4 h-4 mr-2" />
@@ -210,24 +190,27 @@ function Login({ onLogin }) {
                         </button>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form
+                        onSubmit={handleSubmit}
+                        className="space-y-6 relative z-10"
+                    >
                         {/* INPUT DINÁMICO */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-bold text-stone-700 mb-2 ml-1">
                                 {loginType === "admin"
                                     ? "Correo Electrónico"
-                                    : "Número de Tag / Tarjeta"}
+                                    : "Nombre de Usuario"}
                             </label>
-                            <div className="relative">
+                            <div className="relative group">
                                 <input
                                     type={
                                         loginType === "admin" ? "email" : "text"
                                     }
-                                    className={`w-full px-4 py-3 bg-white border-2 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 pl-11 
+                                    className={`w-full px-4 py-3 bg-white/40 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_2px_6px_rgba(0,0,0,0.02)] focus:outline-none focus:bg-white/60 transition-all duration-300 pl-11 
                                         ${
                                             loginType === "admin"
-                                                ? "border-orange-100 focus:ring-orange-500 focus:border-orange-500"
-                                                : "border-green-100 focus:ring-green-500 focus:border-green-500"
+                                                ? "focus:ring-4 focus:ring-orange-500/20 focus:border-orange-400"
+                                                : "focus:ring-4 focus:ring-green-500/20 focus:border-green-400"
                                         }`}
                                     value={identifier}
                                     onChange={(e) =>
@@ -236,16 +219,16 @@ function Login({ onLogin }) {
                                     placeholder={
                                         loginType === "admin"
                                             ? "admin@fracc.com"
-                                            : "Ej: 001452"
+                                            : "Ej: Humberto Taboada"
                                     }
                                     required
                                     disabled={isLoading}
                                 />
                                 <div
-                                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                                         loginType === "admin"
-                                            ? "text-orange-400"
-                                            : "text-green-500"
+                                            ? "text-orange-400 group-focus-within:text-orange-600"
+                                            : "text-green-500 group-focus-within:text-green-700"
                                     }`}
                                 >
                                     {loginType === "admin" ? (
@@ -259,17 +242,17 @@ function Login({ onLogin }) {
 
                         {/* CONTRASEÑA */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-bold text-stone-700 mb-2 ml-1">
                                 Contraseña
                             </label>
-                            <div className="relative">
+                            <div className="relative group">
                                 <input
                                     type={showPassword ? "text" : "password"}
-                                    className={`w-full px-4 py-3 bg-white border-2 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 pl-11 pr-11
+                                    className={`w-full px-4 py-3 bg-white/40 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_2px_6px_rgba(0,0,0,0.02)] focus:outline-none focus:bg-white/60 transition-all duration-300 pl-11 pr-11
                                         ${
                                             loginType === "admin"
-                                                ? "border-orange-100 focus:ring-orange-500 focus:border-orange-500"
-                                                : "border-green-100 focus:ring-green-500 focus:border-green-500"
+                                                ? "focus:ring-4 focus:ring-orange-500/20 focus:border-orange-400"
+                                                : "focus:ring-4 focus:ring-green-500/20 focus:border-green-400"
                                         }`}
                                     value={password}
                                     onChange={(e) =>
@@ -280,10 +263,10 @@ function Login({ onLogin }) {
                                     disabled={isLoading}
                                 />
                                 <div
-                                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                                         loginType === "admin"
-                                            ? "text-orange-400"
-                                            : "text-green-500"
+                                            ? "text-orange-400 group-focus-within:text-orange-600"
+                                            : "text-green-500 group-focus-within:text-green-700"
                                     }`}
                                 >
                                     <LockIcon className="w-5 h-5" />
@@ -293,7 +276,7 @@ function Login({ onLogin }) {
                                     onClick={() =>
                                         setShowPassword(!showPassword)
                                     }
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors p-1"
                                 >
                                     {showPassword ? (
                                         <EyeOffIcon className="w-5 h-5" />
@@ -304,41 +287,44 @@ function Login({ onLogin }) {
                             </div>
                         </div>
 
-                        {/* BOTÓN SUBMIT */}
+                        {/* BOTÓN SUBMIT LIQUID PLOP */}
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`w-full flex items-center justify-center px-4 py-3 text-white font-semibold rounded-xl focus:outline-none focus:ring-4 transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg border-b-4 active:border-b-0 disabled:opacity-50 disabled:transform-none
+                            className={`w-full flex items-center justify-center px-4 py-3.5 mt-2 text-white font-bold rounded-xl focus:outline-none transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-[0_8px_20px_rgba(0,0,0,0.1),inset_0_2px_4px_rgba(255,255,255,0.4)] border border-white/40 disabled:opacity-50 disabled:transform-none disabled:shadow-none
                                 ${
                                     loginType === "admin"
-                                        ? "bg-orange-500 hover:bg-orange-600 focus:ring-orange-200 border-orange-600"
-                                        : "bg-green-600 hover:bg-green-700 focus:ring-green-200 border-green-700"
+                                        ? "bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-400 hover:to-orange-500 shadow-[0_8px_20px_rgba(249,115,22,0.3),inset_0_2px_4px_rgba(255,255,255,0.4)]"
+                                        : "bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 shadow-[0_8px_20px_rgba(22,163,74,0.3),inset_0_2px_4px_rgba(255,255,255,0.4)]"
                                 }`}
                         >
                             {isLoading ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                             ) : loginType === "admin" ? (
-                                <UserIcon className="w-5 h-5 mr-2" />
+                                <UserIcon className="w-5 h-5 mr-2 drop-shadow-sm" />
                             ) : (
-                                <TagIcon className="w-5 h-5 mr-2" />
+                                <TagIcon className="w-5 h-5 mr-2 drop-shadow-sm" />
                             )}
-                            {isLoading
-                                ? "Entrando..."
-                                : loginType === "admin"
-                                  ? "Iniciar sesión"
-                                  : "Entrar con Tag"}
+                            <span className="drop-shadow-sm tracking-wide">
+                                {isLoading
+                                    ? "Entrando..."
+                                    : loginType === "admin"
+                                      ? "Iniciar sesión"
+                                      : "Entrar con Tag"}
+                            </span>
                         </button>
                     </form>
-                    {/* Se eliminó la sección de Invitado aquí */}
                 </div>
             </div>
 
-            {/* Right Column: Imagen Grande (Fondo blanco limpio) */}
-            <div className="hidden lg:flex w-1/2 bg-white items-center justify-center p-8 relative">
+            {/* Right Column: Imagen Grande */}
+            <div className="hidden lg:flex w-1/2 items-center justify-center p-8 relative z-10 pointer-events-none">
+                {/* Glow suave detrás del logo grande para separarlo del fondo */}
+                <div className="absolute w-[400px] h-[400px] bg-white/60 rounded-full blur-[60px]" />
                 <img
                     src="/Logo Fraccionamiento Sol Verde Oro Elegante.png"
                     alt="Logo de San Isidro"
-                    className="max-w-[600px] lg:max-w-[85%] relative z-10 drop-shadow-xl"
+                    className="max-w-[600px] lg:max-w-[85%] relative z-10 drop-shadow-2xl"
                 />
             </div>
         </div>

@@ -106,7 +106,7 @@ export default function Layout({ children }) {
     const { user, logout } = useAuthStore();
     const isDashboard = location.pathname === "/";
 
-    // Sidebar hover — solo en desktop y solo fuera del dashboard
+    // ── Lógica de PC (Escritorio) ──
     const [sidebarHovered, setSidebarHovered] = useState(false);
     const hoverTimeout = useRef(null);
 
@@ -117,9 +117,10 @@ export default function Layout({ children }) {
     const handleSidebarLeave = () => {
         hoverTimeout.current = setTimeout(() => setSidebarHovered(false), 200);
     };
+    const sidebarVisibleDesktop = isDashboard || sidebarHovered;
 
-    // En dashboard: siempre visible. En otras: visible solo si hover
-    const sidebarVisible = isDashboard || sidebarHovered;
+    // ── Lógica de Celular (Móvil) ──
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleLogout = async () => {
         logout();
@@ -131,19 +132,53 @@ export default function Layout({ children }) {
             {/* ── FONDO ── */}
             <div className="app-bg" />
 
-            {/* ── SIDEBAR — desktop ── */}
+            {/* ── Fondo oscuro al abrir el menú en MÓVIL ── */}
+            {mobileMenuOpen && (
+                <div
+                    className="md:hidden fixed inset-0 bg-stone-900/50 backdrop-blur-sm z-40 transition-opacity"
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+            )}
+
+            {/* ── SIDEBAR ── 
+                Nota: Se agregaron ! (important) a las clases max-md para asegurar 
+                que las reglas nativas de .sidebar o .sidebar-collapsed no oculten el menú 
+            */}
             <aside
-                className={`sidebar ${sidebarVisible ? "sidebar-expanded" : "sidebar-collapsed"} ${!isDashboard ? "sidebar-hoverable" : ""}`}
+                className={`sidebar ${sidebarVisibleDesktop ? "sidebar-expanded" : "sidebar-collapsed"} ${!isDashboard ? "sidebar-hoverable" : ""} max-md:!flex max-md:!flex-col max-md:!fixed max-md:!inset-y-0 max-md:!left-0 max-md:!w-[280px] max-md:!bg-white/95 max-md:!backdrop-blur-3xl max-md:!z-50 max-md:!transform max-md:!transition-transform max-md:!duration-300 ${mobileMenuOpen ? "max-md:!translate-x-0" : "max-md:!-translate-x-full"}`}
                 onMouseEnter={!isDashboard ? handleSidebarEnter : undefined}
                 onMouseLeave={!isDashboard ? handleSidebarLeave : undefined}
             >
+                {/* Botón para cerrar explícitamente en móvil */}
+                {mobileMenuOpen && (
+                    <button
+                        className="md:hidden absolute top-4 right-4 text-stone-400 hover:text-stone-600 p-2 bg-stone-100/50 rounded-full"
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </button>
+                )}
+
                 {/* Logo */}
                 <div className="sidebar-logo">
                     <div className="logo-img-wrap">
                         <img
                             src="/arcos.png"
                             alt="Logo"
-                            className="logo-img"
+                            className="logo-img object-contain"
                             onError={(e) => {
                                 e.target.style.display = "none";
                                 e.target.nextSibling.style.display = "flex";
@@ -157,7 +192,7 @@ export default function Layout({ children }) {
                         </div>
                     </div>
                     <div
-                        className={`logo-text-wrap ${sidebarVisible ? "opacity-100" : "opacity-0"}`}
+                        className={`logo-text-wrap ${sidebarVisibleDesktop || mobileMenuOpen ? "opacity-100" : "opacity-0"}`}
                     >
                         <div className="logo-name">San Isidro</div>
                         <div className="logo-sub">Panel de Administración</div>
@@ -171,14 +206,17 @@ export default function Layout({ children }) {
                             key={item.to}
                             to={item.to}
                             end={item.to === "/"}
+                            onClick={() => setMobileMenuOpen(false)}
                             className={({ isActive }) =>
                                 `nav-item ${isActive ? "nav-active" : ""}`
                             }
-                            title={!sidebarVisible ? item.label : undefined}
+                            title={
+                                !sidebarVisibleDesktop ? item.label : undefined
+                            }
                         >
                             {item.icon}
                             <span
-                                className={`nav-label ${sidebarVisible ? "nav-label-visible" : "nav-label-hidden"}`}
+                                className={`nav-label ${sidebarVisibleDesktop || mobileMenuOpen ? "nav-label-visible" : "nav-label-hidden"}`}
                             >
                                 {item.label}
                             </span>
@@ -186,14 +224,14 @@ export default function Layout({ children }) {
                     ))}
                 </nav>
 
-                {/* Footer */}
-                <div className="sidebar-footer">
-                    <div className="user-chip">
+                {/* Footer y Botones de Salir */}
+                <div className="sidebar-footer max-md:flex-col max-md:items-stretch max-md:pb-6">
+                    <div className="user-chip w-full">
                         <div className="avatar">
                             {user?.name?.charAt(0).toUpperCase() || "A"}
                         </div>
                         <div
-                            className={`user-info ${sidebarVisible ? "opacity-100" : "opacity-0"}`}
+                            className={`user-info ${sidebarVisibleDesktop || mobileMenuOpen ? "opacity-100" : "opacity-0"}`}
                         >
                             <div className="user-name">
                                 {user?.name || "Administrador"}
@@ -202,10 +240,12 @@ export default function Layout({ children }) {
                                 {user?.role || "admin"}
                             </div>
                         </div>
-                        {sidebarVisible && (
+
+                        {/* ── BOTÓN PC ── */}
+                        {sidebarVisibleDesktop && (
                             <button
                                 onClick={handleLogout}
-                                className="logout-btn flex items-center justify-center text-gray-500 hover:text-orange-500 transition-colors duration-200"
+                                className="logout-btn hidden md:flex items-center justify-center text-gray-500 hover:text-orange-500 transition-colors duration-200"
                                 title="Cerrar sesión"
                             >
                                 <svg
@@ -225,13 +265,37 @@ export default function Layout({ children }) {
                             </button>
                         )}
                     </div>
+
+                    {/* ── BOTÓN MÓVIL EN SIDEBAR ── */}
+                    {mobileMenuOpen && (
+                        <button
+                            onClick={handleLogout}
+                            className="md:hidden flex items-center justify-center gap-2 w-full px-4 py-3 mt-4 text-red-600 font-bold bg-red-50 hover:bg-red-100 rounded-xl transition-all duration-200 active:scale-95 shadow-sm border border-red-100"
+                        >
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Cerrar sesión
+                        </button>
+                    )}
                 </div>
             </aside>
 
             {/* ── ZONA DE TRIGGER hover — solo en desktop fuera del dashboard ── */}
             {!isDashboard && (
                 <div
-                    className="sidebar-trigger"
+                    className="sidebar-trigger md:block hidden"
                     onMouseEnter={handleSidebarEnter}
                     onMouseLeave={handleSidebarLeave}
                 />
@@ -240,16 +304,16 @@ export default function Layout({ children }) {
             {/* ── MAIN ── */}
             <main className="main-content">
                 {/* Topbar */}
-                <header className="topbar">
-                    <div className="topbar-left">
-                        {/* Botón hamburguesa — solo móvil */}
+                <header className="topbar flex items-center justify-between">
+                    <div className="topbar-left flex items-center gap-3">
+                        {/* Botón hamburguesa — SOLO en móvil */}
                         <button
-                            className="hamburger md:hidden"
-                            onClick={() => setSidebarHovered(true)}
+                            className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 transition-colors"
+                            onClick={() => setMobileMenuOpen(true)}
                         >
                             <svg
-                                width="20"
-                                height="20"
+                                width="28"
+                                height="28"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -257,7 +321,7 @@ export default function Layout({ children }) {
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeWidth={2}
+                                    strokeWidth={2.5}
                                     d="M4 6h16M4 12h16M4 18h16"
                                 />
                             </svg>
@@ -267,33 +331,68 @@ export default function Layout({ children }) {
                                 ?.label || "Dashboard"}
                         </span>
                     </div>
-                    <span className="topbar-date">
-                        {new Date()
-                            .toLocaleDateString("es-MX", {
-                                month: "long",
-                                year: "numeric",
-                            })
-                            .replace(/^./, (char) => char.toUpperCase())}
-                    </span>
+
+                    <div className="flex items-center gap-2">
+                        <span className="topbar-date">
+                            {new Date()
+                                .toLocaleDateString("es-MX", {
+                                    month: "long",
+                                    year: "numeric",
+                                })
+                                .replace(/^./, (char) => char.toUpperCase())}
+                        </span>
+
+                        {/* ── BOTÓN CERRAR SESIÓN MÓVIL EN LA TOPBAR ── */}
+                        <button
+                            onClick={handleLogout}
+                            className="md:hidden flex items-center justify-center p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors ml-2"
+                            title="Cerrar sesión"
+                        >
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                        </button>
+                    </div>
                 </header>
 
                 {/* Contenido de la página */}
                 <div className="page-content">{children}</div>
             </main>
 
-            {/* ── BOTTOM NAV — solo móvil ── */}
-            <nav className="bottom-nav">
+            {/* ── BOTTOM NAV FLOTANTE (Liquid Glass) — solo móvil ── */}
+            <nav className="md:hidden fixed bottom-4 inset-x-4 z-20 flex items-center justify-around px-2 py-2.5 bg-white/40 backdrop-blur-2xl border-t border-l border-white/80 border-r border-b border-white/30 shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-[2rem]">
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
                 {NAV_ITEMS.map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}
                         end={item.to === "/"}
                         className={({ isActive }) =>
-                            `bottom-nav-item ${isActive ? "bottom-nav-active" : ""}`
+                            `flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 ${
+                                isActive
+                                    ? "bg-white/70 text-orange-500 shadow-[inset_0_2px_6px_rgba(255,255,255,1),0_4px_10px_rgba(0,0,0,0.05)] border border-white/80 scale-105"
+                                    : "text-stone-400 hover:text-stone-600 hover:bg-white/30 active:scale-95"
+                            }`
                         }
                     >
-                        {item.icon}
-                        <span className="bottom-nav-label">{item.label}</span>
+                        <div className="[&>svg]:w-5 [&>svg]:h-5 [&>svg]:drop-shadow-sm mb-0.5">
+                            {item.icon}
+                        </div>
+                        <span className="text-[9px] font-bold tracking-wide drop-shadow-sm">
+                            {item.label}
+                        </span>
                     </NavLink>
                 ))}
             </nav>

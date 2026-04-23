@@ -34,31 +34,31 @@ function formatDate(dateString) {
 const TIPO_CONFIG = {
     urgente: {
         label: "Urgente",
-        bg: "bg-red-100",
+        bg: "bg-red-100/50",
         text: "text-red-700",
-        border: "border-red-200",
-        dot: "bg-red-500",
+        border: "border-red-200/60",
+        dot: "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]",
     },
     informativo: {
         label: "Informativo",
-        bg: "bg-blue-100",
+        bg: "bg-blue-100/50",
         text: "text-blue-700",
-        border: "border-blue-200",
-        dot: "bg-blue-500",
+        border: "border-blue-200/60",
+        dot: "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]",
     },
     aviso: {
         label: "Aviso",
-        bg: "bg-yellow-100",
+        bg: "bg-yellow-100/50",
         text: "text-yellow-700",
-        border: "border-yellow-200",
-        dot: "bg-yellow-500",
+        border: "border-yellow-200/60",
+        dot: "bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]",
     },
     positivo: {
         label: "Positivo",
-        bg: "bg-green-100",
+        bg: "bg-green-100/50",
         text: "text-green-700",
-        border: "border-green-200",
-        dot: "bg-green-500",
+        border: "border-green-200/60",
+        dot: "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]",
     },
 };
 
@@ -100,26 +100,26 @@ function calcularEstado(pagos) {
 
 const SEMAFORO_STYLES = {
     verde: {
-        ring: "ring-green-400/60",
-        glow: "shadow-green-400/40",
-        bg: "bg-green-500/20",
-        icon: "text-green-500",
+        ring: "border-green-300/80",
+        glow: "shadow-[0_15px_35px_rgba(34,197,94,0.25)]",
+        bg: "bg-gradient-to-br from-green-400/30 to-green-500/10",
+        icon: "text-green-600",
         titulo: "text-green-700",
         pulse: "bg-green-400",
     },
     amarillo: {
-        ring: "ring-yellow-400/60",
-        glow: "shadow-yellow-400/40",
-        bg: "bg-yellow-500/20",
-        icon: "text-yellow-500",
+        ring: "border-yellow-300/80",
+        glow: "shadow-[0_15px_35px_rgba(234,179,8,0.25)]",
+        bg: "bg-gradient-to-br from-yellow-400/30 to-yellow-500/10",
+        icon: "text-yellow-600",
         titulo: "text-yellow-700",
         pulse: "bg-yellow-400",
     },
     rojo: {
-        ring: "ring-red-400/60",
-        glow: "shadow-red-400/40",
-        bg: "bg-red-500/20",
-        icon: "text-red-500",
+        ring: "border-red-300/80",
+        glow: "shadow-[0_15px_35px_rgba(239,68,68,0.25)]",
+        bg: "bg-gradient-to-br from-red-400/30 to-red-500/10",
+        icon: "text-red-600",
         titulo: "text-red-700",
         pulse: "bg-red-400",
     },
@@ -133,7 +133,7 @@ function Semaforo({ estado }) {
     const Icon =
         estado.color === "verde" ? (
             <svg
-                className="w-16 h-16"
+                className="w-16 h-16 drop-shadow-md"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -147,7 +147,7 @@ function Semaforo({ estado }) {
             </svg>
         ) : estado.color === "amarillo" ? (
             <svg
-                className="w-16 h-16"
+                className="w-16 h-16 drop-shadow-md"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -161,7 +161,7 @@ function Semaforo({ estado }) {
             </svg>
         ) : (
             <svg
-                className="w-16 h-16"
+                className="w-16 h-16 drop-shadow-md"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -176,12 +176,13 @@ function Semaforo({ estado }) {
         );
 
     return (
-        <div className="glass-card relative overflow-hidden flex flex-col items-center py-10 px-6">
-            <div className="glass-card-shine" />
+        <div className="relative overflow-hidden flex flex-col items-center py-10 px-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+            {/* Brillo curvo superior */}
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
-            {/* Círculo principal */}
+            {/* Círculo principal con Plop y Liquid Glass */}
             <div
-                className={`relative flex items-center justify-center w-36 h-36 rounded-full ring-4 ${s.ring} ${s.bg} shadow-2xl ${s.glow} mb-6`}
+                className={`relative flex items-center justify-center w-36 h-36 rounded-full border-[1.5px] ${s.ring} ${s.bg} backdrop-blur-md shadow-[inset_0_4px_10px_rgba(255,255,255,0.7)] ${s.glow} mb-6 hover:scale-105 active:scale-95 transition-all duration-300 ease-out cursor-default`}
             >
                 {/* Pulso animado */}
                 <span
@@ -190,7 +191,9 @@ function Semaforo({ estado }) {
                 <span className={s.icon}>{Icon}</span>
             </div>
 
-            <p className={`text-2xl font-bold ${s.titulo}`}>{estado.titulo}</p>
+            <p className={`text-2xl font-bold ${s.titulo} drop-shadow-sm`}>
+                {estado.titulo}
+            </p>
             <p className="text-lg text-stone-600 font-medium mt-1">
                 {estado.subtitulo}
             </p>
@@ -207,11 +210,13 @@ function TablonavisoResidente({ avisos }) {
     if (avisos.length === 0) return null;
 
     return (
-        <div className="glass-card">
-            <div className="glass-card-shine" />
-            <div className="flex items-center gap-2 mb-4">
+        <div className="relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+            {/* Brillo superior */}
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
+            <div className="flex items-center gap-2 mb-5">
                 <svg
-                    className="w-4 h-4 text-orange-400"
+                    className="w-5 h-5 text-orange-400 drop-shadow-sm"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -223,7 +228,7 @@ function TablonavisoResidente({ avisos }) {
                         d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
                     />
                 </svg>
-                <h3 className="text-sm font-700 text-stone-800">
+                <h3 className="text-sm font-bold text-stone-800 tracking-wide uppercase">
                     Tablón de Avisos
                 </h3>
             </div>
@@ -235,29 +240,29 @@ function TablonavisoResidente({ avisos }) {
                     return (
                         <div
                             key={aviso.id}
-                            className={`rounded-xl border p-4 ${cfg.bg} ${cfg.border}`}
+                            className={`relative overflow-hidden rounded-2xl border p-4 bg-white/50 backdrop-blur-md shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_2px_8px_rgba(0,0,0,0.02)] ${cfg.border} hover:bg-white/60 transition-colors duration-300`}
                         >
-                            <div className="flex items-start gap-3">
+                            <div className="flex items-start gap-3 relative z-10">
                                 <span
-                                    className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${cfg.dot}`}
+                                    className={`mt-1.5 w-2.5 h-2.5 rounded-full shrink-0 ${cfg.dot}`}
                                 />
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                                         <p
-                                            className={`text-sm font-700 ${cfg.text}`}
+                                            className={`text-sm font-bold ${cfg.text}`}
                                         >
                                             {aviso.titulo}
                                         </p>
                                         <span
-                                            className={`px-2 py-0.5 rounded-full text-xs font-600 ${cfg.bg} ${cfg.text} border ${cfg.border}`}
+                                            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${cfg.bg} ${cfg.text} border ${cfg.border} backdrop-blur-sm`}
                                         >
                                             {cfg.label}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-stone-600">
+                                    <p className="text-sm text-stone-600 leading-relaxed">
                                         {aviso.descripcion}
                                     </p>
-                                    <p className="text-xs text-stone-400 mt-1">
+                                    <p className="text-xs text-stone-400 mt-2 font-medium">
                                         {new Date(
                                             aviso.created_at,
                                         ).toLocaleDateString("es-MX", {
@@ -280,12 +285,14 @@ function TablonavisoResidente({ avisos }) {
 
 function HistorialPagos({ pagos, loading }) {
     return (
-        <div className="glass-card">
-            <div className="glass-card-shine" />
-            <div className="flex items-center justify-between mb-4">
+        <div className="relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+            {/* Brillo superior */}
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
+            <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
                     <svg
-                        className="w-4 h-4 text-orange-400"
+                        className="w-5 h-5 text-orange-400 drop-shadow-sm"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -297,32 +304,35 @@ function HistorialPagos({ pagos, loading }) {
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                         />
                     </svg>
-                    <h3 className="text-sm font-700 text-stone-800">
+                    <h3 className="text-sm font-bold text-stone-800 tracking-wide uppercase">
                         Historial de Pagos
                     </h3>
                 </div>
-                <span className="text-xs text-stone-400">
+                <span className="px-3 py-1 rounded-full bg-white/50 border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] text-xs font-semibold text-stone-500">
                     {pagos.length} registros
                 </span>
             </div>
 
             {loading ? (
                 <div className="flex items-center justify-center py-8">
-                    <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin drop-shadow-md" />
                 </div>
             ) : pagos.length === 0 ? (
-                <p className="text-sm text-stone-400 text-center py-8">
+                <p className="text-sm text-stone-400 text-center py-8 font-medium">
                     Sin pagos registrados
                 </p>
             ) : (
-                <div className="divide-y divide-black/05">
+                <div className="divide-y divide-white/50">
                     {pagos.map((pago) => (
-                        <div key={pago.id} className="panel-item">
+                        <div
+                            key={pago.id}
+                            className="flex items-center justify-between py-3 px-2 -mx-2 rounded-xl hover:bg-white/40 transition-colors duration-200"
+                        >
                             <div>
-                                <p className="item-name">
+                                <p className="text-sm font-bold text-stone-800 capitalize">
                                     {formatMonth(pago.mes)}
                                 </p>
-                                <p className="item-sub">
+                                <p className="text-xs text-stone-500 font-medium mt-0.5">
                                     {pago.tipo === "extraordinario"
                                         ? "Extraordinario"
                                         : "Ordinario"}
@@ -331,19 +341,19 @@ function HistorialPagos({ pagos, loading }) {
                                         : ""}
                                 </p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm font-700 text-stone-800">
+                            <div className="flex items-center gap-3">
+                                <span className="text-sm font-bold text-stone-800">
                                     $
                                     {parseFloat(pago.cantidad).toLocaleString(
                                         "es-MX",
                                     )}
                                 </span>
                                 {parseFloat(pago.restante) === 0 ? (
-                                    <span className="badge badge-sold">
+                                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-green-100/60 text-green-700 border border-green-200/60 backdrop-blur-sm shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
                                         Completo
                                     </span>
                                 ) : (
-                                    <span className="badge badge-due">
+                                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-red-100/60 text-red-700 border border-red-200/60 backdrop-blur-sm shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
                                         Resta $
                                         {parseFloat(pago.restante).toFixed(0)}
                                     </span>
@@ -366,7 +376,6 @@ export default function ResidentDashboard() {
     const [loadingPagos, setLoadingPagos] = useState(true);
     const [lastSync, setLastSync] = useState(null);
 
-    // REEMPLAZA fetchData completo:
     const fetchData = useCallback(async () => {
         setLoadingPagos(true);
         try {
@@ -379,7 +388,6 @@ export default function ResidentDashboard() {
             setLoadingPagos(false);
         }
 
-        // Avisos por separado — no bloquea si falla
         try {
             const avisosRes = await getAvisos();
             setAvisos(avisosRes.data || []);
@@ -403,23 +411,29 @@ export default function ResidentDashboard() {
     const tags = user?.tags || [];
 
     return (
-        <div className="min-h-screen p-4 md:p-6">
-            <div className="max-w-2xl mx-auto flex flex-col gap-4">
-                {/* Header */}
-                <div className="flex items-start justify-between">
+        // Fondo base sutil para que el glass resalte
+        <div className="min-h-screen p-4 md:p-6 bg-stone-50/50 relative">
+            {/* Elementos decorativos de fondo opcionales para dar vida al blur */}
+            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-200/30 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-stone-200/50 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="max-w-2xl mx-auto flex flex-col gap-5 relative z-10">
+                {/* Header liquid glass */}
+                <div className="flex items-start justify-between p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-3xl relative overflow-hidden">
+                    <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
                     <div>
-                        <h1 className="text-2xl font-bold text-stone-800">
+                        <h1 className="text-2xl font-bold text-stone-800 drop-shadow-sm">
                             Bienvenido, {user?.name || "Residente"}
                         </h1>
                         {tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 mt-1.5">
+                            <div className="flex flex-wrap gap-2 mt-2.5">
                                 {tags.map((t) => (
                                     <span
                                         key={t.id}
-                                        className={`px-2 py-0.5 rounded-full text-xs font-600 font-mono ${
+                                        className={`px-3 py-1 rounded-xl text-xs font-bold font-mono tracking-wider shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] ${
                                             t.activo
-                                                ? "bg-green-100 text-green-700 border border-green-200"
-                                                : "bg-red-100 text-red-600 border border-red-200"
+                                                ? "bg-green-100/60 text-green-700 border border-green-200/60 backdrop-blur-sm"
+                                                : "bg-red-100/60 text-red-600 border border-red-200/60 backdrop-blur-sm"
                                         }`}
                                     >
                                         {t.codigo}
@@ -428,12 +442,13 @@ export default function ResidentDashboard() {
                             </div>
                         )}
                     </div>
+                    {/* Botón con Plop */}
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-600 text-stone-500 bg-white/60 border border-black/08 hover:bg-white transition"
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold text-stone-600 bg-white/50 border border-white/80 shadow-[0_2px_10px_rgba(0,0,0,0.02),inset_0_1px_2px_rgba(255,255,255,1)] hover:bg-white/80 hover:shadow-[0_4px_15px_rgba(0,0,0,0.05)] active:scale-95 transition-all duration-200"
                     >
                         <svg
-                            className="w-3.5 h-3.5"
+                            className="w-4 h-4"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -441,7 +456,7 @@ export default function ResidentDashboard() {
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                strokeWidth={2}
+                                strokeWidth={2.5}
                                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                             />
                         </svg>
@@ -460,7 +475,7 @@ export default function ResidentDashboard() {
 
                 {/* Pie: última sincronización */}
                 {lastSync && (
-                    <p className="text-center text-xs text-stone-400 pb-2">
+                    <p className="text-center text-xs font-medium text-stone-400 pb-4 mix-blend-multiply">
                         Última actualización:{" "}
                         {lastSync.toLocaleTimeString("es-MX", {
                             hour: "2-digit",

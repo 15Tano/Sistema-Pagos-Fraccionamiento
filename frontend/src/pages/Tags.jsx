@@ -9,6 +9,8 @@ import {
     createTagSale,
     deleteTagSale,
 } from "../api/tags";
+// AGREGA después del último import:
+import useAuthStore from "../store/authStore";
 
 // ─── Icono centralizado ───────────────────────────────────────────────────────
 // SVGs sacados del JSX principal a un objeto para no contaminar el render tree
@@ -743,6 +745,8 @@ export default function Tags() {
     const [sales, setSales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null); // { msg, type }
+    const { user } = useAuthStore();
+    const esCapturista = user?.role === "capturista";
 
     const showToast = useCallback((msg, type = "success") => {
         setToast({ msg, type });
@@ -885,64 +889,66 @@ export default function Tags() {
             )}
 
             {/* ── KPI Cards (mismo patrón que Dashboard) ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {/* Stock */}
-                <div className="glass-card relative overflow-hidden">
-                    <div className="glass-card-shine" />
-                    <p className="kpi-label">Stock disponible</p>
-                    <p className="kpi-value text-orange-500">
-                        {unsoldTags.length}
-                    </p>
-                    <p className="kpi-sub">
-                        {sales.length} tags vendidos en total
-                    </p>
-                    <div className="kpi-icon text-orange-400">
-                        {Icon.tag("w-6 h-6")}
+            {!esCapturista && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* Stock */}
+                    <div className="glass-card relative overflow-hidden">
+                        <div className="glass-card-shine" />
+                        <p className="kpi-label">Stock disponible</p>
+                        <p className="kpi-value text-orange-500">
+                            {unsoldTags.length}
+                        </p>
+                        <p className="kpi-sub">
+                            {sales.length} tags vendidos en total
+                        </p>
+                        <div className="kpi-icon text-orange-400">
+                            {Icon.tag("w-6 h-6")}
+                        </div>
                     </div>
-                </div>
 
-                {/* Ingresos acumulados */}
-                <div className="glass-card relative overflow-hidden">
-                    <div className="glass-card-shine" />
-                    <p className="kpi-label">Ingresos acumulados</p>
-                    <p className="kpi-value text-orange-500">
-                        ${kpi.totalAcumulado.toLocaleString("es-MX")}
-                    </p>
-                    <p className="kpi-sub">en ventas de tags</p>
-                    <div className="kpi-icon text-orange-400">
-                        {Icon.cart("w-6 h-6")}
+                    {/* Ingresos acumulados */}
+                    <div className="glass-card relative overflow-hidden">
+                        <div className="glass-card-shine" />
+                        <p className="kpi-label">Ingresos acumulados</p>
+                        <p className="kpi-value text-orange-500">
+                            ${kpi.totalAcumulado.toLocaleString("es-MX")}
+                        </p>
+                        <p className="kpi-sub">en ventas de tags</p>
+                        <div className="kpi-icon text-orange-400">
+                            {Icon.cart("w-6 h-6")}
+                        </div>
                     </div>
-                </div>
 
-                {/* Mes actual vs anterior */}
-                <div className="glass-card relative overflow-hidden">
-                    <div className="glass-card-shine" />
-                    <p className="kpi-label">Este mes en tags</p>
-                    <p className="kpi-value text-orange-500">
-                        ${kpi.ventasMesActual.toLocaleString("es-MX")}
-                    </p>
-                    <div
-                        className={`flex items-center gap-1 text-xs font-600 mt-0.5 ${
-                            kpi.tendencia === "up"
-                                ? "text-green-600"
-                                : kpi.tendencia === "down"
-                                  ? "text-red-500"
-                                  : "text-stone-400"
-                        }`}
-                    >
-                        {kpi.tendencia === "up" && Icon.trendUp()}
-                        {kpi.tendencia === "down" && Icon.trendDown()}
-                        <span>
-                            {kpi.tendencia === "equal"
-                                ? "Sin cambio vs mes anterior"
-                                : `${kpi.tendencia === "up" ? "+" : ""}${kpi.pct}% vs $${kpi.ventasMesAnterior.toLocaleString("es-MX")}`}
-                        </span>
-                    </div>
-                    <div className="kpi-icon text-orange-400">
-                        {Icon.chart("w-6 h-6")}
+                    {/* Mes actual vs anterior */}
+                    <div className="glass-card relative overflow-hidden">
+                        <div className="glass-card-shine" />
+                        <p className="kpi-label">Este mes en tags</p>
+                        <p className="kpi-value text-orange-500">
+                            ${kpi.ventasMesActual.toLocaleString("es-MX")}
+                        </p>
+                        <div
+                            className={`flex items-center gap-1 text-xs font-600 mt-0.5 ${
+                                kpi.tendencia === "up"
+                                    ? "text-green-600"
+                                    : kpi.tendencia === "down"
+                                      ? "text-red-500"
+                                      : "text-stone-400"
+                            }`}
+                        >
+                            {kpi.tendencia === "up" && Icon.trendUp()}
+                            {kpi.tendencia === "down" && Icon.trendDown()}
+                            <span>
+                                {kpi.tendencia === "equal"
+                                    ? "Sin cambio vs mes anterior"
+                                    : `${kpi.tendencia === "up" ? "+" : ""}${kpi.pct}% vs $${kpi.ventasMesAnterior.toLocaleString("es-MX")}`}
+                            </span>
+                        </div>
+                        <div className="kpi-icon text-orange-400">
+                            {Icon.chart("w-6 h-6")}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* ── Contenido principal ── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">

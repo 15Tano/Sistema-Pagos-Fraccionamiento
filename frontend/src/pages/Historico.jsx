@@ -1,11 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import api from "../lib/axios";
 import { getTagSales } from "../api/tags";
+// AGREGA después del último import:
+import useAuthStore from "../store/authStore";
 
 const MONTHLY_FEE = 280;
 const CURRENT_MONTH_ISO = new Date().toISOString().slice(0, 7);
 
 function Historico() {
+    const { user } = useAuthStore();
+    const esCapturista = user?.role === "capturista";
     const [pagos, setPagos] = useState([]);
     const [vecinos, setVecinos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -40,6 +44,11 @@ function Historico() {
         selectedCollectionMonth,
         searchTipo,
     ]);
+
+    // AGREGA después del useState de activeTab:
+    useEffect(() => {
+        if (esCapturista) setActiveTab("por_dia");
+    }, [esCapturista]);
 
     const fetchInitialData = async () => {
         setLoading(true);
@@ -318,23 +327,33 @@ function Historico() {
             <div className="glass-card">
                 <div className="glass-card-shine" />{" "}
                 <div className="flex flex-wrap gap-2 mb-6">
-                    <TabButton
-                        id="resumen"
-                        label="Resumen General"
-                        count={vecinos.length}
-                    />
-                    <TabButton id="individual" label="Por Vecino" />
-                    <TabButton id="mensual" label="Por Mes Pagado" />
-                    <TabButton id="mes_cobro" label="Por Mes de Cobro" />
+                    {!esCapturista && (
+                        <TabButton
+                            id="resumen"
+                            label="Resumen General"
+                            count={vecinos.length}
+                        />
+                    )}
+                    {!esCapturista && (
+                        <TabButton id="individual" label="Por Vecino" />
+                    )}
+                    {!esCapturista && (
+                        <TabButton id="mensual" label="Por Mes Pagado" />
+                    )}
+                    {!esCapturista && (
+                        <TabButton id="mes_cobro" label="Por Mes de Cobro" />
+                    )}
                     <TabButton id="por_dia" label="Por Día de Cobro" />
-                    <TabButton
-                        id="adelantados"
-                        label="Pagos Adelantados"
-                        count={
-                            pagos.filter((p) => p.mes > CURRENT_MONTH_ISO)
-                                .length
-                        }
-                    />
+                    {!esCapturista && (
+                        <TabButton
+                            id="adelantados"
+                            label="Pagos Adelantados"
+                            count={
+                                pagos.filter((p) => p.mes > CURRENT_MONTH_ISO)
+                                    .length
+                            }
+                        />
+                    )}
                 </div>
                 <div className="bg-white/40 p-4 rounded-xl border border-black/05">
                     {" "}
