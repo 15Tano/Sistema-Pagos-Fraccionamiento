@@ -310,7 +310,7 @@ function Login({ onLogin }) {
                                     ? "Entrando..."
                                     : loginType === "admin"
                                       ? "Iniciar sesión"
-                                      : "Entrar con Tag"}
+                                      : "Entrar como Residente"}
                             </span>
                         </button>
                     </form>

@@ -7,6 +7,7 @@ import {
     deleteAviso,
 } from "../api/avisos";
 import useAuthStore from "../store/authStore";
+import api from "../lib/axios";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -419,6 +420,148 @@ function AvisosAdmin() {
     );
 }
 
+const ACCION_CONFIG = {
+    created: {
+        label: "Creó",
+        bg: "bg-green-100/60",
+        text: "text-green-700",
+        border: "border-green-200/60",
+    },
+    updated: {
+        label: "Editó",
+        bg: "bg-blue-100/60",
+        text: "text-blue-700",
+        border: "border-blue-200/60",
+    },
+    deleted: {
+        label: "Eliminó",
+        bg: "bg-red-100/60",
+        text: "text-red-700",
+        border: "border-red-200/60",
+    },
+    login: {
+        label: "Login",
+        bg: "bg-orange-100/60",
+        text: "text-orange-700",
+        border: "border-orange-200/60",
+    },
+    logout: {
+        label: "Logout",
+        bg: "bg-stone-100/60",
+        text: "text-stone-600",
+        border: "border-stone-200/60",
+    },
+};
+
+function AuditLogs() {
+    const [logs, setLogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchLogs = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await api.get("/audit-logs");
+            setLogs(res.data || []);
+        } catch {
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchLogs();
+    }, [fetchLogs]);
+
+    function formatDateTime(dt) {
+        if (!dt) return "-";
+        return new Date(dt).toLocaleString("es-MX", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }
+
+    return (
+        <div className="relative overflow-hidden flex flex-col min-h-0 p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4 relative z-10">
+                <h3 className="text-sm font-bold text-stone-800 uppercase tracking-wide">
+                    Registro de Actividad
+                </h3>
+                <button
+                    onClick={fetchLogs}
+                    className="p-1.5 text-stone-400 hover:text-orange-500 hover:bg-orange-50/50 rounded-xl transition-all active:scale-95"
+                    title="Actualizar"
+                >
+                    <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
+                    </svg>
+                </button>
+            </div>
+
+            {/* Lista */}
+            <div className="flex flex-col gap-2 relative z-10 overflow-y-auto flex-1">
+                {loading ? (
+                    <div className="flex items-center justify-center h-16">
+                        <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                ) : logs.length === 0 ? (
+                    <div className="flex items-center justify-center h-16 text-sm font-medium text-stone-400">
+                        Sin actividad registrada
+                    </div>
+                ) : (
+                    logs.map((log) => {
+                        const cfg =
+                            ACCION_CONFIG[log.accion] || ACCION_CONFIG.updated;
+                        return (
+                            <div
+                                key={log.id}
+                                className="flex items-start gap-3 p-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
+                            >
+                                {/* Badge acción */}
+                                <span
+                                    className={`shrink-0 mt-0.5 px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wide border backdrop-blur-sm shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] ${cfg.bg} ${cfg.text} ${cfg.border}`}
+                                >
+                                    {cfg.label}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-bold text-stone-700 truncate">
+                                        <span className="text-orange-600">
+                                            {log.user_name || "Sistema"}
+                                        </span>
+                                        {" · "}
+                                        <span className="text-stone-500 font-semibold">
+                                            {log.modelo_label || log.modelo}
+                                        </span>
+                                    </p>
+                                    <p className="text-[10px] font-semibold text-stone-400 mt-0.5">
+                                        {formatDateTime(log.created_at)}
+                                        {log.ip ? ` · ${log.ip}` : ""}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function Dashboard() {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -683,9 +826,9 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* 📍 Panel de Avisos (Cambio solicitado) */}
-                <div className="md:col-span-2 lg:col-span-1">
+                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <AvisosAdmin />
+                    <AuditLogs />
                 </div>
             </div>
         </div>

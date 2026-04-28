@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\VecinoController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\PagoController;
@@ -56,6 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('tag_sales/reset', [TagSaleController::class, 'reset']);
     Route::resource('tag_sales', TagSaleController::class);
     */
+
+    Route::get('/audit-logs', [AuditController::class, 'index']);
 });
 
 // ─── ZKTeco (acceso desde script Python — token separado) ─────────
