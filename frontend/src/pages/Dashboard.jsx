@@ -456,12 +456,18 @@ const ACCION_CONFIG = {
 function AuditLogs() {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+    const [total, setTotal] = useState(0);
 
-    const fetchLogs = useCallback(async () => {
+    const fetchLogs = useCallback(async (p = 1) => {
         setLoading(true);
         try {
-            const res = await api.get("/audit-logs");
-            setLogs(res.data || []);
+            const res = await api.get(`/audit-logs?page=${p}`);
+            setLogs(res.data.data || []);
+            setLastPage(res.data.last_page || 1);
+            setTotal(res.data.total || 0);
+            setPage(p);
         } catch {
         } finally {
             setLoading(false);
@@ -469,7 +475,7 @@ function AuditLogs() {
     }, []);
 
     useEffect(() => {
-        fetchLogs();
+        fetchLogs(1);
     }, [fetchLogs]);
 
     function formatDateTime(dt) {
@@ -492,25 +498,30 @@ function AuditLogs() {
                 <h3 className="text-sm font-bold text-stone-800 uppercase tracking-wide">
                     Registro de Actividad
                 </h3>
-                <button
-                    onClick={fetchLogs}
-                    className="p-1.5 text-stone-400 hover:text-orange-500 hover:bg-orange-50/50 rounded-xl transition-all active:scale-95"
-                    title="Actualizar"
-                >
-                    <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-stone-100/60 text-stone-600 border border-stone-200/60">
+                        {total} registros
+                    </span>
+                    <button
+                        onClick={() => fetchLogs(page)}
+                        className="p-1.5 text-stone-400 hover:text-orange-500 hover:bg-orange-50/50 rounded-xl transition-all active:scale-95"
+                        title="Actualizar"
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                        />
-                    </svg>
-                </button>
+                        <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             {/* Lista */}
@@ -532,23 +543,33 @@ function AuditLogs() {
                                 key={log.id}
                                 className="flex items-start gap-3 p-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
                             >
-                                {/* Badge acción */}
-                                <span
-                                    className={`shrink-0 mt-0.5 px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wide border backdrop-blur-sm shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] ${cfg.bg} ${cfg.text} ${cfg.border}`}
-                                >
-                                    {cfg.label}
-                                </span>
-                                <div className="flex-1 min-w-0">
+                                <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                    {/* Línea 1: acción + modelo */}
+                                    <div className="flex items-center gap-2">
+                                        <span
+                                            className={`shrink-0 px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wide border backdrop-blur-sm ${cfg.bg} ${cfg.text} ${cfg.border}`}
+                                        >
+                                            {cfg.label}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wide">
+                                            {log.modelo}
+                                        </span>
+                                    </div>
+                                    {/* Línea 2: usuario → label */}
                                     <p className="text-xs font-bold text-stone-700 truncate">
                                         <span className="text-orange-600">
                                             {log.user_name || "Sistema"}
                                         </span>
-                                        {" · "}
-                                        <span className="text-stone-500 font-semibold">
-                                            {log.modelo_label || log.modelo}
+                                        <span className="text-stone-300 mx-1">
+                                            →
+                                        </span>
+                                        <span className="text-stone-600">
+                                            {log.modelo_label ||
+                                                `#${log.modelo_id}`}
                                         </span>
                                     </p>
-                                    <p className="text-[10px] font-semibold text-stone-400 mt-0.5">
+                                    {/* Línea 3: fecha + IP */}
+                                    <p className="text-[10px] font-semibold text-stone-400">
                                         {formatDateTime(log.created_at)}
                                         {log.ip ? ` · ${log.ip}` : ""}
                                     </p>
@@ -558,6 +579,31 @@ function AuditLogs() {
                     })
                 )}
             </div>
+
+            {/* Paginación */}
+            {lastPage > 1 && (
+                <div className="flex items-center justify-between pt-3 mt-3 border-t border-white/40 relative z-10">
+                    <span className="text-xs font-semibold text-stone-500">
+                        Pág. {page} de {lastPage}
+                    </span>
+                    <div className="flex gap-1.5">
+                        <button
+                            onClick={() => fetchLogs(page - 1)}
+                            disabled={page === 1}
+                            className="w-7 h-7 rounded-lg border border-white/60 bg-white/40 backdrop-blur-sm text-stone-600 text-sm font-bold flex items-center justify-center hover:bg-white/60 active:scale-95 disabled:opacity-30 transition-all"
+                        >
+                            ‹
+                        </button>
+                        <button
+                            onClick={() => fetchLogs(page + 1)}
+                            disabled={page === lastPage}
+                            className="w-7 h-7 rounded-lg border border-white/60 bg-white/40 backdrop-blur-sm text-stone-600 text-sm font-bold flex items-center justify-center hover:bg-white/60 active:scale-95 disabled:opacity-30 transition-all"
+                        >
+                            ›
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -8,11 +8,11 @@ use App\Models\Tag;
 
 class AuditController extends Controller
 {
-    public function index()
+public function index()
     {
-        $logs = AuditLog::orderByDesc('created_at')->limit(100)->get();
+        $logs = AuditLog::orderByDesc('created_at')->paginate(15);
 
-        $logs->transform(function ($log) {
+        $logs->getCollection()->transform(function ($log) {
             $log->modelo_label = $this->resolverLabel($log->modelo, $log->modelo_id, $log->datos_anteriores, $log->datos_nuevos);
             return $log;
         });
