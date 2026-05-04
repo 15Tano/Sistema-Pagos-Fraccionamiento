@@ -21,7 +21,6 @@ function PaginatedPanel({ items, renderItem, emptyText }) {
 
     useEffect(() => setPage(1), [items.length]);
 
-    // Genera array de páginas visibles con ellipsis
     const getPageNumbers = () => {
         if (totalPages <= 5) {
             return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -460,23 +459,34 @@ function AuditLogs() {
     const [lastPage, setLastPage] = useState(1);
     const [total, setTotal] = useState(0);
 
-    const fetchLogs = useCallback(async (p = 1) => {
-        setLoading(true);
-        try {
-            const res = await api.get(`/audit-logs?page=${p}`);
-            setLogs(res.data.data || []);
-            setLastPage(res.data.last_page || 1);
-            setTotal(res.data.total || 0);
-            setPage(p);
-        } catch {
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    // --- ESTADOS PARA FILTRO Y BUSCADOR ---
+    const [searchTerm, setSearchTerm] = useState("");
+    const [accionFilter, setAccionFilter] = useState("");
+    // --------------------------------------
+
+    const fetchLogs = useCallback(
+        async (p = 1, search = searchTerm, accion = accionFilter) => {
+            setLoading(true);
+            try {
+                // Se agregan los parámetros a la URL
+                const res = await api.get(
+                    `/audit-logs?page=${p}&search=${search}&accion=${accion}`,
+                );
+                setLogs(res.data.data || []);
+                setLastPage(res.data.last_page || 1);
+                setTotal(res.data.total || 0);
+                setPage(p);
+            } catch {
+            } finally {
+                setLoading(false);
+            }
+        },
+        [searchTerm, accionFilter],
+    ); // Dependencias del useCallback
 
     useEffect(() => {
-        fetchLogs(1);
-    }, [fetchLogs]);
+        fetchLogs(1, searchTerm, accionFilter);
+    }, [fetchLogs, searchTerm, accionFilter]);
 
     function formatDateTime(dt) {
         if (!dt) return "-";
@@ -524,6 +534,65 @@ function AuditLogs() {
                 </div>
             </div>
 
+            {/* ── Buscador y Filtro Liquid Glass ── */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-4 relative z-10">
+                {/* Buscador de Texto */}
+                <div className="relative flex-1">
+                    <input
+                        type="text"
+                        placeholder="Buscar por usuario o acción..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-9 pr-4 py-2.5 bg-white/40 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:bg-white/60 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition-all text-sm font-medium text-stone-700 placeholder-stone-400"
+                    />
+                    <svg
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                    </svg>
+                </div>
+
+                {/* Filtro Select */}
+                <div className="relative shrink-0 sm:w-40">
+                    <select
+                        value={accionFilter}
+                        onChange={(e) => setAccionFilter(e.target.value)}
+                        className="w-full pl-4 pr-8 py-2.5 bg-white/40 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:bg-white/60 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition-all text-sm font-bold text-stone-600 appearance-none cursor-pointer"
+                    >
+                        <option value="">Todas las acciones</option>
+                        {Object.keys(ACCION_CONFIG).map((key) => (
+                            <option key={key} value={key}>
+                                {ACCION_CONFIG[key].label}
+                            </option>
+                        ))}
+                    </select>
+                    {/* Flecha personalizada del select */}
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400">
+                        <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
             {/* Lista */}
             <div className="flex flex-col gap-2 relative z-10 overflow-y-auto flex-1">
                 {loading ? (
@@ -532,7 +601,7 @@ function AuditLogs() {
                     </div>
                 ) : logs.length === 0 ? (
                     <div className="flex items-center justify-center h-16 text-sm font-medium text-stone-400">
-                        Sin actividad registrada
+                        No se encontraron resultados
                     </div>
                 ) : (
                     logs.map((log) => {
@@ -544,7 +613,6 @@ function AuditLogs() {
                                 className="flex items-start gap-3 p-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
                             >
                                 <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                    {/* Línea 1: acción + modelo */}
                                     <div className="flex items-center gap-2">
                                         <span
                                             className={`shrink-0 px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wide border backdrop-blur-sm ${cfg.bg} ${cfg.text} ${cfg.border}`}
@@ -555,7 +623,6 @@ function AuditLogs() {
                                             {log.modelo}
                                         </span>
                                     </div>
-                                    {/* Línea 2: usuario → label */}
                                     <p className="text-xs font-bold text-stone-700 truncate">
                                         <span className="text-orange-600">
                                             {log.user_name || "Sistema"}
@@ -568,7 +635,6 @@ function AuditLogs() {
                                                 `#${log.modelo_id}`}
                                         </span>
                                     </p>
-                                    {/* Línea 3: fecha + IP */}
                                     <p className="text-[10px] font-semibold text-stone-400">
                                         {formatDateTime(log.created_at)}
                                         {log.ip ? ` · ${log.ip}` : ""}

@@ -13,9 +13,11 @@ class DashboardController extends Controller
         $mesActual = now()->format('Y-m');
 
         // ── Total recaudado este mes ──
-        $totalRecaudado = DB::table('pagos')
-            ->where('mes', $mesActual)
-            ->sum('cantidad');
+$totalRecaudado = DB::table('pagos')
+            ->where('mes', $mesActual) // 1. Que pague la cuota de mayo
+            ->whereYear('created_at', now()->year) // 2. Que se haya registrado en este año
+            ->whereMonth('created_at', now()->month) // 3. Que se haya registrado en este mes
+            ->sum('cantidad');  
 
         // ── IDs de vecinos que pagaron este mes ──
         $vecinosPagaron = DB::table('pagos')

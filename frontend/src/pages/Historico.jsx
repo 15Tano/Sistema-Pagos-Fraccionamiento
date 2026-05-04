@@ -1,10 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import api from "../lib/axios";
 import { getTagSales } from "../api/tags";
-// AGREGA después del último import:
 import useAuthStore from "../store/authStore";
 
-const MONTHLY_FEE = 280;
 const CURRENT_MONTH_ISO = new Date().toISOString().slice(0, 7);
 
 function Historico() {
@@ -45,7 +43,6 @@ function Historico() {
         searchTipo,
     ]);
 
-    // AGREGA después del useState de activeTab:
     useEffect(() => {
         if (esCapturista) setActiveTab("por_dia");
     }, [esCapturista]);
@@ -128,10 +125,17 @@ function Historico() {
         [vecinos, selectedCalle],
     );
 
+    const getCurrentMonthStrictPayments = useCallback(() => {
+        return pagos.filter((p) => {
+            const isForThisMonth = p.mes === CURRENT_MONTH_ISO;
+            const paidDate = p.fecha_de_cobro || p.created_at || "";
+            const isPaidThisMonth = paidDate.slice(0, 7) === CURRENT_MONTH_ISO;
+            return isForThisMonth && isPaidThisMonth;
+        });
+    }, [pagos]);
+
     const currentMonthSummary = useMemo(() => {
-        const currentMonthPayments = pagos.filter(
-            (p) => p.mes === CURRENT_MONTH_ISO,
-        );
+        const currentMonthPayments = getCurrentMonthStrictPayments();
 
         return vecinos.map((vecino) => {
             const vecinoPayments = currentMonthPayments.filter(
@@ -142,24 +146,17 @@ function Historico() {
                 0,
             );
 
-            const totalRemaining =
-                vecinoPayments.length > 0
-                    ? vecinoPayments[0].restante
-                    : MONTHLY_FEE;
-
             const vecinoData =
                 vecinoPayments.length > 0 ? vecinoPayments[0].vecino : vecino;
 
             return {
                 ...vecinoData,
                 totalPaid,
-                totalRemaining: parseFloat(totalRemaining),
                 hasPaid: totalPaid > 0,
-                isComplete: parseFloat(totalRemaining) === 0 && totalPaid > 0,
                 payments: vecinoPayments,
             };
         });
-    }, [vecinos, pagos]);
+    }, [vecinos, getCurrentMonthStrictPayments]);
 
     const filteredCurrentMonthSummary = useMemo(() => {
         let filtered = currentMonthSummary;
@@ -167,52 +164,30 @@ function Historico() {
             filtered = filtered.filter((v) => v.calle === selectedCalle);
         }
         if (showOnlyDue) {
-            filtered = filtered.filter((v) => v.totalRemaining > 0);
+            filtered = filtered.filter((v) => !v.hasPaid);
         }
         return filtered;
     }, [currentMonthSummary, selectedCalle, showOnlyDue]);
 
-    const paymentTypeSummary = useMemo(() => {
-        const currentMonthPayments = pagos.filter(
-            (p) => p.mes === CURRENT_MONTH_ISO,
-        );
-
-        const ordinarioTotal = currentMonthPayments
-            .filter((p) => p.tipo === "ordinario")
-            .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
-
-        const extraordinarioTotal = currentMonthPayments
-            .filter((p) => p.tipo === "extraordinario")
-            .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
-
-        return { ordinarioTotal, extraordinarioTotal };
-    }, [pagos]);
-
     const resumenFinanciero = useMemo(() => {
-        const currentMonthPayments = pagos.filter(
-            (p) => p.mes === CURRENT_MONTH_ISO,
-        );
+        const currentMonthPayments = getCurrentMonthStrictPayments();
 
-        // Pagos ordinarios a $280 (cuota base)
         const ordinario = currentMonthPayments
             .filter(
                 (p) => p.tipo === "ordinario" && parseFloat(p.cantidad) === 280,
             )
             .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
 
-        // Multas extraordinarias (tipo extraordinario)
         const extraordinario = currentMonthPayments
             .filter((p) => p.tipo === "extraordinario")
             .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
 
-        // Pagos especiales: ordinarios pero con cantidad distinta a 280 ($300, $500, etc.)
         const especiales = currentMonthPayments
             .filter(
                 (p) => p.tipo === "ordinario" && parseFloat(p.cantidad) !== 280,
             )
             .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
 
-        // Ventas de tags del mes actual
         const ventasTags = tagSales
             .filter(
                 (s) =>
@@ -224,7 +199,7 @@ function Historico() {
         const total = ordinario + extraordinario + especiales + ventasTags;
 
         return { ordinario, extraordinario, especiales, ventasTags, total };
-    }, [pagos, tagSales]);
+    }, [getCurrentMonthStrictPayments, tagSales]);
 
     const formatMonth = (monthString) => {
         if (!monthString) return "-";
@@ -238,29 +213,22 @@ function Historico() {
 
     const formatDate = (dateString) => {
         if (!dateString) return "-";
-        // Extract just the date part (YYYY-MM-DD)
         const datePart = dateString.split("T")[0];
         const [year, month, day] = datePart.split("-");
-        return `${day}/${month}/${year}`; // DD/MM/YYYY format
+        return `${day}/${month}/${year}`;
     };
 
-    const getPaymentStatusBadge = (totalPaid, totalRemaining) => {
-        if (totalPaid === 0) {
+    const getPaymentStatusBadge = (hasPaid) => {
+        if (!hasPaid) {
             return (
-                <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                <span className="px-2.5 py-1 bg-red-100/60 border border-red-200 text-red-700 text-[10px] uppercase tracking-wide font-medium rounded-lg shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
                     Sin Pagar
-                </span>
-            );
-        } else if (totalRemaining === 0) {
-            return (
-                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                    Completo
                 </span>
             );
         } else {
             return (
-                <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
-                    Parcial
+                <span className="px-2.5 py-1 bg-green-100/60 border border-green-200 text-green-700 text-[10px] uppercase tracking-wide font-medium rounded-lg shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
+                    Pagado
                 </span>
             );
         }
@@ -279,19 +247,19 @@ function Historico() {
     const TabButton = ({ id, label, count }) => (
         <button
             onClick={() => setActiveTab(id)}
-            className={`px-4 py-2 font-medium text-sm rounded-xl transition-all duration-200 ${
+            className={`px-4 py-2 font-medium text-sm rounded-xl transition-all duration-300 active:scale-95 ${
                 activeTab === id
-                    ? "bg-orange-500 text-white shadow-md"
-                    : "bg-white/60 backdrop-blur-sm border border-black/08 text-stone-600 hover:bg-white"
+                    ? "bg-gradient-to-r from-orange-500 to-orange-400 text-white shadow-[0_4px_10px_rgba(249,115,22,0.3),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                    : "bg-white/40 backdrop-blur-md border border-white/60 text-stone-600 hover:bg-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]"
             }`}
         >
-            {label}
+            <span>{label}</span>
             {count !== undefined && (
                 <span
-                    className={`ml-2 px-1.5 py-0.5 text-xs rounded-full font-700 ${
+                    className={`ml-2 px-1.5 py-0.5 text-xs rounded-lg font-medium shadow-[inset_0_1px_1px_rgba(0,0,0,0.1)] ${
                         activeTab === id
-                            ? "bg-orange-400 text-white"
-                            : "bg-stone-200 text-stone-600"
+                            ? "bg-black/10 text-white"
+                            : "bg-black/5 text-stone-500"
                     }`}
                 >
                     {count}
@@ -305,7 +273,7 @@ function Historico() {
             <div className="flex items-center justify-center h-64">
                 <div className="flex items-center gap-3">
                     <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-stone-500 text-sm">
+                    <span className="text-stone-500 text-sm font-medium tracking-wide">
                         Cargando historial...
                     </span>
                 </div>
@@ -314,9 +282,9 @@ function Historico() {
     }
 
     return (
-        <div className="flex flex-col gap-4 h-full">
-            <div className="mb-2">
-                <h1 className="text-3xl font-bold text-stone-800 mb-1">
+        <div className="flex flex-col gap-5 h-full pb-20 md:pb-0">
+            <div className="mb-2 px-2">
+                <h1 className="text-3xl font-semibold text-stone-800 mb-1">
                     Histórico de Pagos
                 </h1>
                 <p className="text-sm text-stone-500">
@@ -324,9 +292,11 @@ function Historico() {
                 </p>
             </div>
 
-            <div className="glass-card">
-                <div className="glass-card-shine" />{" "}
-                <div className="flex flex-wrap gap-2 mb-6">
+            {/* ── PANEL DE FILTROS SUPERIOR (Liquid Glass) ── */}
+            <div className="relative overflow-hidden p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
+                <div className="flex flex-wrap gap-2 mb-6 relative z-10">
                     {!esCapturista && (
                         <TabButton
                             id="resumen"
@@ -355,11 +325,12 @@ function Historico() {
                         />
                     )}
                 </div>
-                <div className="bg-white/40 p-4 rounded-xl border border-black/05">
-                    {" "}
-                    <div className="flex flex-wrap gap-4 items-center">
-                        <div className="flex-1 min-w-48">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                <div className="bg-white/30 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] relative z-10">
+                    <div className="flex flex-wrap gap-4 items-end">
+                        {/* Selector de Calle */}
+                        <div className="flex-1 min-w-[200px]">
+                            <label className="block text-[11px] font-medium text-stone-500 uppercase tracking-wide mb-1.5 ml-1">
                                 Calle
                             </label>
                             <select
@@ -369,7 +340,7 @@ function Historico() {
                                     if (activeTab === "individual")
                                         setSelectedVecino("");
                                 }}
-                                className="vecino-input w-full"
+                                className="w-full px-4 py-2.5 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-600 transition-all cursor-pointer"
                             >
                                 <option value="">Todas las calles</option>
                                 {uniqueCalles.map((calle) => (
@@ -380,9 +351,10 @@ function Historico() {
                             </select>
                         </div>
 
+                        {/* Filtros Dinámicos según Pestaña */}
                         {activeTab === "individual" && (
-                            <div className="flex-1 min-w-48">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-[11px] font-medium text-stone-500 uppercase tracking-wide mb-1.5 ml-1">
                                     Vecino
                                 </label>
                                 <select
@@ -390,7 +362,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedVecino(e.target.value)
                                     }
-                                    className="vecino-input w-full"
+                                    className="w-full px-4 py-2.5 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-600 transition-all cursor-pointer"
                                 >
                                     <option value="">Seleccionar vecino</option>
                                     {filteredVecinos.map((v) => (
@@ -404,8 +376,8 @@ function Historico() {
                         )}
 
                         {activeTab === "mensual" && (
-                            <div className="flex-1 min-w-48">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-[11px] font-medium text-stone-500 uppercase tracking-wide mb-1.5 ml-1">
                                     Mes Pagado
                                 </label>
                                 <input
@@ -414,14 +386,14 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedMonth(e.target.value)
                                     }
-                                    className="vecino-input w-full"
+                                    className="w-full px-4 py-2.5 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-600 transition-all cursor-pointer"
                                 />
                             </div>
                         )}
 
                         {activeTab === "mes_cobro" && (
-                            <div className="flex-1 min-w-48">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-[11px] font-medium text-stone-500 uppercase tracking-wide mb-1.5 ml-1">
                                     Mes de Cobro
                                 </label>
                                 <input
@@ -432,14 +404,14 @@ function Historico() {
                                             e.target.value,
                                         )
                                     }
-                                    className="vecino-input w-full"
+                                    className="w-full px-4 py-2.5 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-600 transition-all cursor-pointer"
                                 />
                             </div>
                         )}
 
                         {activeTab === "por_dia" && (
-                            <div className="flex-1 min-w-48">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-[11px] font-medium text-stone-500 uppercase tracking-wide mb-1.5 ml-1">
                                     Fecha de Cobro
                                 </label>
                                 <input
@@ -448,14 +420,14 @@ function Historico() {
                                     onChange={(e) =>
                                         setSelectedDate(e.target.value)
                                     }
-                                    className="vecino-input w-full"
+                                    className="w-full px-4 py-2.5 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-600 transition-all cursor-pointer"
                                 />
                             </div>
                         )}
 
                         {activeTab !== "resumen" && (
-                            <div className="flex-1 min-w-48">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-[11px] font-medium text-stone-500 uppercase tracking-wide mb-1.5 ml-1">
                                     Tipo
                                 </label>
                                 <select
@@ -463,7 +435,7 @@ function Historico() {
                                     onChange={(e) =>
                                         setSearchTipo(e.target.value)
                                     }
-                                    className="vecino-input w-full"
+                                    className="w-full px-4 py-2.5 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-600 transition-all cursor-pointer"
                                 >
                                     <option value="">Todos los tipos</option>
                                     <option value="ordinario">Ordinario</option>
@@ -475,7 +447,7 @@ function Historico() {
                         )}
 
                         {activeTab === "resumen" && (
-                            <div className="flex items-center pt-6">
+                            <div className="flex items-center gap-2 pb-2">
                                 <input
                                     type="checkbox"
                                     id="showOnlyDue"
@@ -483,30 +455,31 @@ function Historico() {
                                     onChange={(e) =>
                                         setShowOnlyDue(e.target.checked)
                                     }
-                                    className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                                    className="w-4 h-4 text-orange-500 border-white/60 rounded focus:ring-orange-500/20 bg-white/50"
                                 />
                                 <label
                                     htmlFor="showOnlyDue"
-                                    className="text-sm font-medium text-gray-700"
+                                    className="text-sm font-medium text-stone-600 cursor-pointer"
                                 >
-                                    Solo con adeudos
+                                    Solo sin pagar
                                 </label>
                             </div>
                         )}
 
-                        <div className="flex gap-2">
+                        {/* Botones de Acción */}
+                        <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                             <button
                                 onClick={clearFilters}
-                                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                                className="flex-1 sm:flex-none px-5 py-2.5 bg-white/50 backdrop-blur-sm border border-white/60 text-stone-600 text-sm font-medium rounded-xl hover:bg-white/80 transition-all shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] active:scale-95"
                             >
                                 Limpiar
                             </button>
                             {activeTab !== "resumen" && (
                                 <button
                                     onClick={fetchPagos}
-                                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+                                    className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-400 text-white text-sm font-medium rounded-xl shadow-[0_4px_10px_rgba(249,115,22,0.3),inset_0_1px_2px_rgba(255,255,255,0.4)] hover:from-orange-400 hover:to-orange-500 transition-all active:scale-95"
                                 >
-                                    Actualizar
+                                    Buscar
                                 </button>
                             )}
                         </div>
@@ -514,88 +487,86 @@ function Historico() {
                 </div>
             </div>
 
-            <div className="glass-card overflow-hidden">
-                <div className="glass-card-shine" />
+            {/* ── CONTENIDO PRINCIPAL (Tablas y Resúmenes) ── */}
+            <div className="relative overflow-hidden bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
                 {activeTab === "resumen" && (
-                    <div>
-                        <div className="px-6 py-4 border-b border-black/06">
-                            <h3 className="text-sm font-700 text-stone-800">
+                    <div className="relative z-10 flex flex-col">
+                        <div className="px-6 py-5 border-b border-white/40 bg-white/20">
+                            <h3 className="text-lg font-semibold text-stone-800">
                                 Resumen del Mes Actual (
                                 {formatMonth(CURRENT_MONTH_ISO)})
                             </h3>
-                            <p className="text-orange-700 text-sm">
-                                Estado de pagos de todos los vecinos
+                            <p className="text-orange-600 text-xs font-medium uppercase tracking-wide mt-1">
+                                Solo refleja ingresos físicos del mes en curso
                             </p>
                         </div>
+
                         <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-black/03">
+                            <table className="w-full text-left">
+                                <thead className="bg-black/5 border-b border-white/40">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                        <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                             Vecino
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                        <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                             Dirección
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                        <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                             Estado
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
-                                            Pagado
+                                        <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
+                                            Monto Pagado
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
-                                            Restante
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                        <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                             Tag
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200">
+                                <tbody className="divide-y divide-white/40">
                                     {filteredCurrentMonthSummary.map(
                                         (vecino) => (
                                             <tr
                                                 key={vecino.id}
-                                                className="hover:bg-orange-50/40 transition-colors"
+                                                className="hover:bg-white/40 transition-colors"
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <p className="item-name">
+                                                    <p className="text-sm font-medium text-stone-800 capitalize">
                                                         {vecino.nombre}
                                                     </p>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
                                                     {vecino.calle} #
                                                     {vecino.numero_casa}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {getPaymentStatusBadge(
-                                                        vecino.totalPaid,
-                                                        vecino.totalRemaining,
+                                                        vecino.hasPaid,
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-700">
                                                     $
-                                                    {vecino.totalPaid.toFixed(
-                                                        2,
+                                                    {vecino.totalPaid.toLocaleString(
+                                                        "es-MX",
+                                                        {
+                                                            minimumFractionDigits: 2,
+                                                        },
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    $
-                                                    {vecino.totalRemaining.toFixed(
-                                                        2,
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <td className="px-6 py-4 whitespace-nowrap text-xs text-stone-400">
                                                     {vecino.tags &&
                                                     vecino.tags.length > 0 ? (
-                                                        vecino.tags
-                                                            .map(
-                                                                (tag) =>
-                                                                    tag.codigo,
-                                                            )
-                                                            .join(", ")
+                                                        <span className="bg-stone-100/50 px-2.5 py-1 rounded-lg border border-stone-200/50 text-stone-600">
+                                                            {vecino.tags
+                                                                .map(
+                                                                    (tag) =>
+                                                                        tag.codigo,
+                                                                )
+                                                                .join(", ")}
+                                                        </span>
                                                     ) : (
-                                                        <span className="text-gray-400 italic">
+                                                        <span className="italic text-stone-300">
                                                             Sin Tag
                                                         </span>
                                                     )}
@@ -606,150 +577,128 @@ function Historico() {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="border-t border-black/06">
-                            {/* Fila 1: contadores de estado */}
-                            <div className="grid grid-cols-3 gap-0 divide-x divide-black/06 border-b border-black/06">
-                                <div className="px-6 py-4 text-center">
-                                    <p className="text-2xl font-bold text-green-600">
-                                        {
-                                            filteredCurrentMonthSummary.filter(
-                                                (v) => v.isComplete,
-                                            ).length
-                                        }
+
+                        {/* Desglose de Contadores de Estado */}
+                        <div className="grid grid-cols-2 gap-0 divide-x divide-white/40 border-t border-b border-white/40 bg-white/20">
+                            <div className="px-6 py-5 text-center">
+                                <p className="text-3xl font-bold text-green-600">
+                                    {
+                                        filteredCurrentMonthSummary.filter(
+                                            (v) => v.hasPaid,
+                                        ).length
+                                    }
+                                </p>
+                                <p className="text-[11px] font-medium text-stone-500 uppercase tracking-wide mt-1">
+                                    Pagados
+                                </p>
+                            </div>
+                            <div className="px-6 py-5 text-center">
+                                <p className="text-3xl font-bold text-red-500">
+                                    {
+                                        filteredCurrentMonthSummary.filter(
+                                            (v) => !v.hasPaid,
+                                        ).length
+                                    }
+                                </p>
+                                <p className="text-[11px] font-medium text-stone-500 uppercase tracking-wide mt-1">
+                                    Sin Pagar
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Desglose Financiero */}
+                        <div className="p-6 md:p-8 bg-white/10">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-2">
+                                <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl p-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] text-center">
+                                    <p className="text-xs font-medium text-stone-500 mb-1">
+                                        Cuotas Ordinarias
                                     </p>
-                                    <p className="text-xs text-stone-500 mt-0.5">
-                                        Pagos completos
+                                    <p className="text-xl font-medium text-stone-800">
+                                        $
+                                        {resumenFinanciero.ordinario.toLocaleString(
+                                            "es-MX",
+                                        )}
+                                    </p>
+                                    <p className="text-[10px] text-stone-400 mt-1">
+                                        a $280 c/u
                                     </p>
                                 </div>
-                                <div className="px-6 py-4 text-center">
-                                    <p className="text-2xl font-bold text-orange-500">
-                                        {
-                                            filteredCurrentMonthSummary.filter(
-                                                (v) =>
-                                                    v.hasPaid && !v.isComplete,
-                                            ).length
-                                        }
+                                <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl p-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] text-center">
+                                    <p className="text-xs font-medium text-stone-500 mb-1">
+                                        Multas
                                     </p>
-                                    <p className="text-xs text-stone-500 mt-0.5">
-                                        Pagos parciales
+                                    <p className="text-xl font-medium text-stone-800">
+                                        $
+                                        {resumenFinanciero.extraordinario.toLocaleString(
+                                            "es-MX",
+                                        )}
+                                    </p>
+                                    <p className="text-[10px] text-stone-400 mt-1">
+                                        Extraordinarios
                                     </p>
                                 </div>
-                                <div className="px-6 py-4 text-center">
-                                    <p className="text-2xl font-bold text-red-500">
-                                        {
-                                            filteredCurrentMonthSummary.filter(
-                                                (v) => !v.hasPaid,
-                                            ).length
-                                        }
+                                <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl p-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] text-center">
+                                    <p className="text-xs font-medium text-stone-500 mb-1">
+                                        Pagos Especiales
                                     </p>
-                                    <p className="text-xs text-stone-500 mt-0.5">
-                                        Sin pagar
+                                    <p className="text-xl font-medium text-stone-800">
+                                        $
+                                        {resumenFinanciero.especiales.toLocaleString(
+                                            "es-MX",
+                                        )}
+                                    </p>
+                                    <p className="text-[10px] text-stone-400 mt-1">
+                                        $300, $500, etc.
+                                    </p>
+                                </div>
+                                <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl p-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] text-center">
+                                    <p className="text-xs font-medium text-stone-500 mb-1">
+                                        Venta Tags
+                                    </p>
+                                    <p className="text-xl font-medium text-stone-800">
+                                        $
+                                        {resumenFinanciero.ventasTags.toLocaleString(
+                                            "es-MX",
+                                        )}
+                                    </p>
+                                    <p className="text-[10px] text-stone-400 mt-1">
+                                        {
+                                            tagSales.filter(
+                                                (s) =>
+                                                    (
+                                                        s.sold_at ||
+                                                        s.created_at ||
+                                                        ""
+                                                    ).slice(0, 7) ===
+                                                    CURRENT_MONTH_ISO,
+                                            ).length
+                                        }{" "}
+                                        tags
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Fila 2: desglose financiero */}
-                            <div className="px-6 py-4">
-                                <p className="text-xs font-700 text-stone-500 uppercase tracking-wide mb-3">
-                                    Desglose financiero —{" "}
-                                    {new Date().toLocaleDateString("es-MX", {
-                                        month: "long",
-                                        year: "numeric",
-                                    })}
+                            {/* Total General Cierre GIGANTE */}
+                            <div className="mt-8 flex flex-col items-center justify-center bg-gradient-to-b from-orange-400/10 to-orange-500/10 border border-orange-200/50 rounded-3xl p-8 shadow-sm">
+                                <p className="text-xs font-semibold text-orange-800/60 uppercase tracking-widest mb-2">
+                                    Total Recaudado Real
                                 </p>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                                    {/* Ordinarios $280 */}
-                                    <div className="bg-white/60 border border-black/06 rounded-xl px-4 py-3">
-                                        <p className="text-xs text-stone-400 mb-1">
-                                            Cuotas ordinarias
-                                        </p>
-                                        <p className="text-lg font-bold text-stone-800">
-                                            $
-                                            {resumenFinanciero.ordinario.toLocaleString(
-                                                "es-MX",
-                                            )}
-                                        </p>
-                                        <p className="text-xs text-stone-400">
-                                            a $280 c/u
-                                        </p>
-                                    </div>
-
-                                    {/* Extraordinarios */}
-                                    <div className="bg-white/60 border border-black/06 rounded-xl px-4 py-3">
-                                        <p className="text-xs text-stone-400 mb-1">
-                                            Multas extraordinarias
-                                        </p>
-                                        <p className="text-lg font-bold text-stone-800">
-                                            $
-                                            {resumenFinanciero.extraordinario.toLocaleString(
-                                                "es-MX",
-                                            )}
-                                        </p>
-                                        <p className="text-xs text-stone-400">
-                                            tipo extraordinario
-                                        </p>
-                                    </div>
-
-                                    {/* Especiales $300/$500 */}
-                                    <div className="bg-white/60 border border-black/06 rounded-xl px-4 py-3">
-                                        <p className="text-xs text-stone-400 mb-1">
-                                            Pagos especiales
-                                        </p>
-                                        <p className="text-lg font-bold text-stone-800">
-                                            $
-                                            {resumenFinanciero.especiales.toLocaleString(
-                                                "es-MX",
-                                            )}
-                                        </p>
-                                        <p className="text-xs text-stone-400">
-                                            $300, $500, etc.
-                                        </p>
-                                    </div>
-
-                                    {/* Ventas de tags */}
-                                    <div className="bg-white/60 border border-black/06 rounded-xl px-4 py-3">
-                                        <p className="text-xs text-stone-400 mb-1">
-                                            Ventas de tags
-                                        </p>
-                                        <p className="text-lg font-bold text-stone-800">
-                                            $
-                                            {resumenFinanciero.ventasTags.toLocaleString(
-                                                "es-MX",
-                                            )}
-                                        </p>
-                                        <p className="text-xs text-stone-400">
-                                            {
-                                                tagSales.filter(
-                                                    (s) =>
-                                                        (
-                                                            s.sold_at ||
-                                                            s.created_at ||
-                                                            ""
-                                                        ).slice(0, 7) ===
-                                                        CURRENT_MONTH_ISO,
-                                                ).length
-                                            }{" "}
-                                            tags · $150 c/u
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Total general */}
-                                <div className="flex items-center justify-between bg-orange-50/80 border border-orange-200/60 rounded-xl px-5 py-3">
-                                    <p className="text-sm font-700 text-stone-700">
-                                        Total ingresado este mes
-                                    </p>
-                                    <p className="text-2xl font-bold text-orange-600">
-                                        $
-                                        {resumenFinanciero.total.toLocaleString(
-                                            "es-MX",
-                                        )}
-                                    </p>
-                                </div>
+                                <p className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-orange-600 drop-shadow-md">
+                                    $
+                                    {resumenFinanciero.total.toLocaleString(
+                                        "es-MX",
+                                        {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        },
+                                    )}
+                                </p>
                             </div>
                         </div>
                     </div>
                 )}
+
+                {/* ── VISTA DE TABLAS (Demás Pestañas) ── */}
                 {[
                     "individual",
                     "mensual",
@@ -757,9 +706,9 @@ function Historico() {
                     "por_dia",
                     "adelantados",
                 ].includes(activeTab) && (
-                    <div>
-                        <div className="px-6 py-4 border-b border-black/06">
-                            <h3 className="text-sm font-700 text-stone-800">
+                    <div className="relative z-10 flex flex-col h-full min-h-[400px]">
+                        <div className="px-6 py-5 border-b border-white/40 bg-white/20">
+                            <h3 className="text-lg font-semibold text-stone-800">
                                 {activeTab === "individual" &&
                                     `Historial Individual`}
                                 {activeTab === "mensual" &&
@@ -774,111 +723,106 @@ function Historico() {
                         </div>
 
                         {activeTab === "individual" && !selectedVecino ? (
-                            <div className="p-12 text-center text-gray-500">
-                                <div className="text-4xl mb-4">👤</div>
-                                <div className="text-lg font-medium mb-2">
+                            <div className="flex flex-col items-center justify-center p-16 text-center text-stone-400 flex-1">
+                                <div className="text-6xl mb-4 opacity-50 drop-shadow-sm">
+                                    👤
+                                </div>
+                                <div className="text-lg font-medium text-stone-600 mb-2">
                                     Seleccione un vecino
                                 </div>
-                                <div className="text-sm">
-                                    Use los filtros para seleccionar un vecino y
-                                    ver su historial completo
+                                <div className="text-sm max-w-xs">
+                                    Use los filtros de arriba para ver el
+                                    historial de pagos de un residente
+                                    específico.
                                 </div>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-black/03">
+                            <div className="overflow-x-auto flex-1">
+                                <table className="w-full text-left">
+                                    <thead className="bg-black/5 border-b border-white/40">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                            <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                                 Vecino
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                            <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                                 Dirección
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                            <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                                 Mes Pagado
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                            <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                                 Tipo
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                            <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                                 Cantidad
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                            <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                                 Estado
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-600 text-stone-500 uppercase tracking-wide">
+                                            <th className="px-6 py-4 text-[11px] font-medium text-stone-500 uppercase tracking-wider">
                                                 Fecha Cobro
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-200">
+                                    <tbody className="divide-y divide-white/40">
                                         {pagos.length === 0 ? (
                                             <tr>
                                                 <td
                                                     colSpan="7"
-                                                    className="px-6 py-8 text-center text-gray-500"
+                                                    className="px-6 py-12 text-center text-stone-500 font-medium"
                                                 >
                                                     No hay pagos registrados
+                                                    para este filtro.
                                                 </td>
                                             </tr>
                                         ) : (
                                             pagos.map((pago) => (
                                                 <tr
                                                     key={pago.id}
-                                                    className="hover:bg-orange-50/40 transition-colors"
+                                                    className="hover:bg-white/40 transition-colors"
                                                 >
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <p className="item-name">
-                                                            {pago.vecino.nombre}
-                                                        </p>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-800 capitalize">
+                                                        {pago.vecino.nombre}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        <p className="item-sub">
-                                                            {pago.vecino.calle}{" "}
-                                                            #
-                                                            {
-                                                                pago.vecino
-                                                                    .numero_casa
-                                                            }
-                                                        </p>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
+                                                        {pago.vecino.calle} #
+                                                        {
+                                                            pago.vecino
+                                                                .numero_casa
+                                                        }
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-700 capitalize">
                                                         {formatMonth(pago.mes)}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span
-                                                            className={`px-2 py-1 text-xs font-medium rounded-full ${pago.tipo === "extraordinario" ? "bg-orange-100 text-orange-800" : "bg-blue-100 text-blue-800"}`}
+                                                            className={`px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide rounded-lg border shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] ${
+                                                                pago.tipo ===
+                                                                "extraordinario"
+                                                                    ? "bg-orange-100/60 border-orange-200 text-orange-800"
+                                                                    : "bg-blue-100/60 border-blue-200 text-blue-800"
+                                                            }`}
                                                         >
-                                                            {pago.tipo
-                                                                .charAt(0)
-                                                                .toUpperCase() +
-                                                                pago.tipo.slice(
-                                                                    1,
-                                                                )}
+                                                            {pago.tipo}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-800">
                                                         $
                                                         {parseFloat(
                                                             pago.cantidad,
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        {pago.restante > 0 ? (
-                                                            <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
-                                                                Resta $
-                                                                {parseFloat(
-                                                                    pago.restante,
-                                                                ).toFixed(2)}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                                                Completo
-                                                            </span>
+                                                        ).toLocaleString(
+                                                            "es-MX",
+                                                            {
+                                                                minimumFractionDigits: 2,
+                                                            },
                                                         )}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className="px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide rounded-lg border bg-green-100/60 border-green-200 text-green-700 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
+                                                            Completado
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-xs text-stone-400">
                                                         {pago.fecha_de_cobro
                                                             ? formatDate(
                                                                   pago.fecha_de_cobro,
@@ -892,13 +836,14 @@ function Historico() {
                                 </table>
                             </div>
                         )}
-                    </div>
-                )}
-                {activeTab !== "resumen" && pagos.length > 0 && (
-                    <div className="px-6 py-4 border-t border-black/06">
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="text-center">
-                                <p className="text-xl font-bold text-orange-500">
+
+                        {/* Cierre de Totales en Lista GIGANTE */}
+                        {activeTab !== "resumen" && pagos.length > 0 && (
+                            <div className="px-6 py-10 border-t border-white/40 bg-gradient-to-b from-white/10 to-white/30 mt-auto flex flex-col items-center justify-center">
+                                <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
+                                    Suma Recaudada
+                                </p>
+                                <p className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-orange-700 drop-shadow-md">
                                     $
                                     {pagos
                                         .reduce(
@@ -906,28 +851,13 @@ function Historico() {
                                                 sum + parseFloat(p.cantidad),
                                             0,
                                         )
-                                        .toFixed(2)}
-                                </p>
-                                <p className="text-xs text-stone-500 mt-0.5">
-                                    Total Recaudado
-                                </p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-xl font-bold text-gray-900">
-                                    $
-                                    {pagos
-                                        .reduce(
-                                            (sum, p) =>
-                                                sum + parseFloat(p.restante),
-                                            0,
-                                        )
-                                        .toFixed(2)}
-                                </p>
-                                <p className="text-xs text-stone-500 mt-0.5">
-                                    Total Restante
+                                        .toLocaleString("es-MX", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        })}
                                 </p>
                             </div>
-                        </div>
+                        )}
                     </div>
                 )}
             </div>
