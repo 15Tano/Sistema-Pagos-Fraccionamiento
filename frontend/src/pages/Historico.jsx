@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import api from "../lib/axios";
 import { getTagSales } from "../api/tags";
 import useAuthStore from "../store/authStore";
@@ -125,20 +125,15 @@ function Historico() {
         [vecinos, selectedCalle],
     );
 
-    const getCurrentMonthStrictPayments = useCallback(() => {
-        return pagos.filter((p) => {
-            const isForThisMonth = p.mes === CURRENT_MONTH_ISO;
-            const paidDate = p.fecha_de_cobro || p.created_at || "";
-            const isPaidThisMonth = paidDate.slice(0, 7) === CURRENT_MONTH_ISO;
-            return isForThisMonth && isPaidThisMonth;
-        });
-    }, [pagos]);
-
+    // ── ESTADO DE CUENTA: Solo le importa qué cuota mensual se está pagando ──
     const currentMonthSummary = useMemo(() => {
-        const currentMonthPayments = getCurrentMonthStrictPayments();
+        // Solo agarramos los pagos cuyo recibo diga "Este mes" (ej. 2026-05)
+        const paymentsForCurrentMonthFee = pagos.filter(
+            (p) => p.mes === CURRENT_MONTH_ISO,
+        );
 
         return vecinos.map((vecino) => {
-            const vecinoPayments = currentMonthPayments.filter(
+            const vecinoPayments = paymentsForCurrentMonthFee.filter(
                 (p) => p.vecino_id === vecino.id,
             );
             const totalPaid = vecinoPayments.reduce(
@@ -156,7 +151,7 @@ function Historico() {
                 payments: vecinoPayments,
             };
         });
-    }, [vecinos, getCurrentMonthStrictPayments]);
+    }, [vecinos, pagos]);
 
     const filteredCurrentMonthSummary = useMemo(() => {
         let filtered = currentMonthSummary;
@@ -169,20 +164,26 @@ function Historico() {
         return filtered;
     }, [currentMonthSummary, selectedCalle, showOnlyDue]);
 
+    // ── FLUJO DE CAJA: Solo le importa la fecha en la que entró el billete ──
     const resumenFinanciero = useMemo(() => {
-        const currentMonthPayments = getCurrentMonthStrictPayments();
+        // Solo agarramos los pagos que entraron FÍSICAMENTE a la caja en este mes,
+        // sin importar si están pagando deudas viejas o meses adelantados.
+        const paymentsCollectedThisMonth = pagos.filter((p) => {
+            const paidDate = p.fecha_de_cobro || p.created_at || "";
+            return paidDate.slice(0, 7) === CURRENT_MONTH_ISO;
+        });
 
-        const ordinario = currentMonthPayments
+        const ordinario = paymentsCollectedThisMonth
             .filter(
                 (p) => p.tipo === "ordinario" && parseFloat(p.cantidad) === 280,
             )
             .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
 
-        const extraordinario = currentMonthPayments
+        const extraordinario = paymentsCollectedThisMonth
             .filter((p) => p.tipo === "extraordinario")
             .reduce((sum, p) => sum + parseFloat(p.cantidad), 0);
 
-        const especiales = currentMonthPayments
+        const especiales = paymentsCollectedThisMonth
             .filter(
                 (p) => p.tipo === "ordinario" && parseFloat(p.cantidad) !== 280,
             )
@@ -199,7 +200,7 @@ function Historico() {
         const total = ordinario + extraordinario + especiales + ventasTags;
 
         return { ordinario, extraordinario, especiales, ventasTags, total };
-    }, [getCurrentMonthStrictPayments, tagSales]);
+    }, [pagos, tagSales]);
 
     const formatMonth = (monthString) => {
         if (!monthString) return "-";
@@ -272,7 +273,7 @@ function Historico() {
         return (
             <div className="flex items-center justify-center h-64">
                 <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin drop-shadow-md" />
                     <span className="text-stone-500 text-sm font-medium tracking-wide">
                         Cargando historial...
                     </span>
@@ -499,7 +500,7 @@ function Historico() {
                                 {formatMonth(CURRENT_MONTH_ISO)})
                             </h3>
                             <p className="text-orange-600 text-xs font-medium uppercase tracking-wide mt-1">
-                                Solo refleja ingresos físicos del mes en curso
+                                Estado de deudas para este mes
                             </p>
                         </div>
 
@@ -581,7 +582,7 @@ function Historico() {
                         {/* Desglose de Contadores de Estado */}
                         <div className="grid grid-cols-2 gap-0 divide-x divide-white/40 border-t border-b border-white/40 bg-white/20">
                             <div className="px-6 py-5 text-center">
-                                <p className="text-3xl font-bold text-green-600">
+                                <p className="text-3xl font-semibold text-green-600">
                                     {
                                         filteredCurrentMonthSummary.filter(
                                             (v) => v.hasPaid,
@@ -593,7 +594,7 @@ function Historico() {
                                 </p>
                             </div>
                             <div className="px-6 py-5 text-center">
-                                <p className="text-3xl font-bold text-red-500">
+                                <p className="text-3xl font-semibold text-red-500">
                                     {
                                         filteredCurrentMonthSummary.filter(
                                             (v) => !v.hasPaid,
@@ -608,6 +609,13 @@ function Historico() {
 
                         {/* Desglose Financiero */}
                         <div className="p-6 md:p-8 bg-white/10">
+                            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-4">
+                                Ingresos Físicos Recibidos en —{" "}
+                                {new Date().toLocaleDateString("es-MX", {
+                                    month: "long",
+                                    year: "numeric",
+                                })}
+                            </p>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-2">
                                 <div className="bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl p-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] text-center">
                                     <p className="text-xs font-medium text-stone-500 mb-1">
@@ -683,7 +691,7 @@ function Historico() {
                                 <p className="text-xs font-semibold text-orange-800/60 uppercase tracking-widest mb-2">
                                     Total Recaudado Real
                                 </p>
-                                <p className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-orange-600 drop-shadow-md">
+                                <p className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-orange-600 drop-shadow-md">
                                     $
                                     {resumenFinanciero.total.toLocaleString(
                                         "es-MX",
@@ -843,7 +851,7 @@ function Historico() {
                                 <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
                                     Suma Recaudada
                                 </p>
-                                <p className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-orange-700 drop-shadow-md">
+                                <p className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-orange-700 drop-shadow-md">
                                     $
                                     {pagos
                                         .reduce(

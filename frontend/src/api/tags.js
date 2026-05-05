@@ -15,13 +15,16 @@ export const toggleTag = (id) => api.patch(`/tags/${id}/toggle`);
 export const getTagStock = () => api.get("/tags/stock");
 
 /** Historial completo de ventas con tag relacionado */
-// CÁMBIALO A ESTO:
 export const getTagSales = () => api.get("/tag_sales");
+
 // ── Tag Sales ─────────────────────────────────────────────────────────────────
 
-/** Registra la venta de un tag (tag_id entero) */
-export const createTagSale = (tagId) =>
-    api.post("/tag_sales", { tag_id: tagId });
+/** Registra la venta de un tag asignándolo a un vecino */
+export const createTagSale = (tagId, vecinoId) =>
+    api.post("/tag_sales", {
+        tag_id: tagId,
+        vecino_id: vecinoId,
+    });
 
 /** Elimina una venta por su ID */
 export const deleteTagSale = (saleId) => api.delete(`/tag_sales/${saleId}`);
