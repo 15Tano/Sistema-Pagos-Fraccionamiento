@@ -11,10 +11,18 @@ use App\Http\Controllers\TagSaleController;
 use App\Http\Controllers\Api\ZkApiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AvisosController;
+use App\Http\Controllers\VecinoAccesoController;
+use App\Http\Controllers\CapturistaController;
+
+
 
 
 // ─── AUTH (públicas) ──────────────────────────────────────────────
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/vecinos/registro-acceso', [VecinoAccesoController::class, 'store']);
+Route::post('/capturista/verify-pin', [CapturistaController::class, 'verifyPin']);
+
+
 
 // ─── RUTAS PROTEGIDAS ─────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {

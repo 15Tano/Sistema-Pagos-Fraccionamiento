@@ -10,6 +10,7 @@ import Tags from "./pages/Tags.jsx";
 import Historico from "./pages/Historico.jsx";
 import ResidentDashboard from "./pages/ResidentDashboard.jsx";
 import GuestView from "./pages/GuestView.jsx";
+import RegistroAccesoVecino from "./pages/RegistroAccesoVecino";
 
 const PrivateRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, user } = useAuthStore();
@@ -79,6 +80,12 @@ function App() {
                         </PrivateRoute>
                     }
                 />
+
+                <Route
+                    path="/capturista/registro-acceso"
+                    element={<RegistroAccesoVecino />}
+                />
+
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </BrowserRouter>

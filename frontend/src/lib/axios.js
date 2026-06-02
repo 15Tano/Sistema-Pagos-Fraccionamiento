@@ -25,10 +25,16 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Token expirado o inválido → limpiar sesión y redirigir
-            localStorage.removeItem("auth_token");
-            localStorage.removeItem("auth_user");
-            window.location.href = "/login";
+            // No redirigir en rutas públicas que no requieren sesión
+            const rutasPublicas = ["/capturista/registro-acceso"];
+            const esRutaPublica = rutasPublicas.some((r) =>
+                window.location.pathname.startsWith(r),
+            );
+            if (!esRutaPublica) {
+                localStorage.removeItem("auth_token");
+                localStorage.removeItem("auth_user");
+                window.location.href = "/login";
+            }
         }
         return Promise.reject(error);
     },

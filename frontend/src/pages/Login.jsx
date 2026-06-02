@@ -84,6 +84,21 @@ const EyeOffIcon = ({ className }) => (
         />
     </svg>
 );
+const KeyIcon = ({ className }) => (
+    <svg
+        className={className}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+        />
+    </svg>
+);
 
 // Tu Logo Pequeño (para el formulario)
 const YourLogoIcon = ({ className }) => (
@@ -314,6 +329,30 @@ function Login({ onLogin }) {
                             </span>
                         </button>
                     </form>
+
+                    {/* --- SEPARADOR --- */}
+                    <div className="mt-8 flex items-center justify-center space-x-4">
+                        <div className="h-px bg-white/40 w-full flex-1" />
+                        <span className="text-xs font-semibold text-stone-400 tracking-wider uppercase">
+                            o
+                        </span>
+                        <div className="h-px bg-white/40 w-full flex-1" />
+                    </div>
+
+                    {/* --- BOTÓN ACCESO CAPTURISTAS (LIQUID GLASS) --- */}
+                    <div className="mt-6 relative z-10">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                (window.location.href =
+                                    "/capturista/registro-acceso")
+                            }
+                            className="w-full flex items-center justify-center px-4 py-3 bg-white/20 backdrop-blur-md border border-white/40 rounded-xl text-sm font-bold text-stone-600 hover:text-stone-800 hover:bg-white/40 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-[0_4px_15px_rgba(0,0,0,0.03),inset_0_1px_2px_rgba(255,255,255,0.5)]"
+                        >
+                            <KeyIcon className="w-4 h-4 mr-2 text-stone-500" />
+                            Acceso para Capturistas
+                        </button>
+                    </div>
                 </div>
             </div>
 
