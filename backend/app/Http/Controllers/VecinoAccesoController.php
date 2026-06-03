@@ -40,7 +40,6 @@ class VecinoAccesoController extends Controller
                 'required',
                 'string',
                 // Mínimo 6 caracteres; puedes usar Password::min(8)->... si prefieres más estricto
-                Password::min(6),
             ],
         ], [
             // Mensajes personalizados en español

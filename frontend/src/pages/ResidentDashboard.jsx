@@ -283,13 +283,31 @@ function TablonavisoResidente({ avisos }) {
 
 // ─── Historial de pagos ───────────────────────────────────────────────────────
 
+// ─── Historial de pagos ───────────────────────────────────────────────────────
+
 function HistorialPagos({ pagos, loading }) {
+    // 1. Estado para el año (inicia en 2026 como pediste)
+    const [selectedYear, setSelectedYear] = useState("2026");
+
+    // 2. Extraer años únicos del historial para llenar el select
+    const availableYears = useMemo(() => {
+        // Sacamos el año de la fecha "YYYY-MM"
+        const years = new Set(pagos.map((p) => p.mes.split("-")[0]));
+        years.add("2026"); // Aseguramos que 2026 siempre exista como opción
+        return Array.from(years).sort((a, b) => b - a); // Orden descendente
+    }, [pagos]);
+
+    // 3. Filtrar los pagos que correspondan al año seleccionado
+    const filteredPagos = useMemo(() => {
+        return pagos.filter((p) => p.mes.startsWith(selectedYear));
+    }, [pagos, selectedYear]);
+
     return (
         <div className="relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
             {/* Brillo superior */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-5 relative z-10">
                 <div className="flex items-center gap-2">
                     <svg
                         className="w-5 h-5 text-orange-400 drop-shadow-sm"
@@ -305,32 +323,55 @@ function HistorialPagos({ pagos, loading }) {
                         />
                     </svg>
                     <h3 className="text-sm font-bold text-stone-800 tracking-wide uppercase">
-                        Historial de Pagos
+                        Historial
                     </h3>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-white/50 border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] text-xs font-semibold text-stone-500">
-                    {pagos.length} registros
-                </span>
+
+                {/* Controles: Select de año y Contador */}
+                <div className="flex items-center gap-2">
+                    <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(e.target.value)}
+                        className="bg-white/50 backdrop-blur-md border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] rounded-xl px-2.5 py-1 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-orange-400/50 appearance-none cursor-pointer"
+                        style={{
+                            backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23555" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                            backgroundRepeat: "no-repeat",
+                            backgroundPosition: "right 6px center",
+                            paddingRight: "1.75rem",
+                        }}
+                    >
+                        {availableYears.map((year) => (
+                            <option key={year} value={year}>
+                                {year}
+                            </option>
+                        ))}
+                    </select>
+
+                    <span className="px-3 py-1 rounded-full bg-white/50 border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] text-xs font-semibold text-stone-500">
+                        {filteredPagos.length}
+                    </span>
+                </div>
             </div>
 
             {loading ? (
                 <div className="flex items-center justify-center py-8">
                     <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin drop-shadow-md" />
                 </div>
-            ) : pagos.length === 0 ? (
+            ) : filteredPagos.length === 0 ? (
                 <p className="text-sm text-stone-400 text-center py-8 font-medium">
-                    Sin pagos registrados
+                    Sin pagos registrados en {selectedYear}
                 </p>
             ) : (
-                <div className="divide-y divide-white/50">
-                    {pagos.map((pago) => (
+                <div className="divide-y divide-white/50 relative z-10">
+                    {filteredPagos.map((pago) => (
                         <div
                             key={pago.id}
                             className="flex items-center justify-between py-3 px-2 -mx-2 rounded-xl hover:bg-white/40 transition-colors duration-200"
                         >
                             <div>
                                 <p className="text-sm font-bold text-stone-800 capitalize">
-                                    {formatMonth(pago.mes)}
+                                    {formatMonth(pago.mes).split(" ")[0]}{" "}
+                                    {/* Opcional: Mostrar solo el mes si ya tienes el año en el filtro */}
                                 </p>
                                 <p className="text-xs text-stone-500 font-medium mt-0.5">
                                     {pago.tipo === "extraordinario"
