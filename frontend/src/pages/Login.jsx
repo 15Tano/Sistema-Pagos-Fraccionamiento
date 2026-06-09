@@ -131,7 +131,9 @@ function Login({ onLogin }) {
             const { token, user } = await login(identifier, password);
             setAuth(token, user);
 
-            if (user.role === "admin" || user.role === "capturista") {
+            if (user.role === "vigilancia") {
+                window.location.href = "/vigilancia";
+            } else if (user.role === "admin" || user.role === "capturista") {
                 window.location.href = "/";
             } else {
                 window.location.href = "/residente";

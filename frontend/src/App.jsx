@@ -11,6 +11,7 @@ import Historico from "./pages/Historico.jsx";
 import ResidentDashboard from "./pages/ResidentDashboard.jsx";
 import GuestView from "./pages/GuestView.jsx";
 import RegistroAccesoVecino from "./pages/RegistroAccesoVecino";
+import VistaVigilancia from "./pages/VistaVigilancia";
 
 const PrivateRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, user } = useAuthStore();
@@ -85,6 +86,8 @@ function App() {
                     path="/capturista/registro-acceso"
                     element={<RegistroAccesoVecino />}
                 />
+
+                <Route path="/vigilancia" element={<VistaVigilancia />} />
 
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
