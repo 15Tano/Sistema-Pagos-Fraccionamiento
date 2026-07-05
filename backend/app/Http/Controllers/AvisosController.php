@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Aviso;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AvisosController extends Controller
 {
-    // GET /api/avisos — público, lo leen residentes y admin
     public function index()
     {
         return response()->json(
@@ -17,45 +17,65 @@ class AvisosController extends Controller
         );
     }
 
-    // POST /api/avisos — solo admin
     public function store(Request $request)
     {
         $request->validate([
             'titulo'      => 'required|string|max:255',
             'descripcion' => 'required|string',
             'tipo'        => 'required|in:urgente,informativo,aviso,positivo',
+            'imagen'      => 'nullable|image|max:10240',
         ]);
 
-        $aviso = Aviso::create([
-            'titulo'      => $request->titulo,
-            'descripcion' => $request->descripcion,
-            'tipo'        => $request->tipo,
-            'activo'      => true,
-        ]);
+        $data = $request->only(['titulo', 'descripcion', 'tipo']);
+        $data['activo'] = true;
+
+        if ($request->hasFile('imagen')) {
+            $data['imagen'] = $request->file('imagen')->store('avisos', 'public');
+        }
+
+        $aviso = Aviso::create($data);
 
         return response()->json($aviso, 201);
     }
 
-    // PUT /api/avisos/{id} — solo admin
     public function update(Request $request, $id)
     {
         $aviso = Aviso::findOrFail($id);
 
         $request->validate([
-            'titulo'      => 'sometimes|string|max:255',
-            'descripcion' => 'sometimes|string',
-            'tipo'        => 'sometimes|in:urgente,informativo,aviso,positivo',
+            'titulo'           => 'sometimes|string|max:255',
+            'descripcion'      => 'sometimes|string',
+            'tipo'             => 'sometimes|in:urgente,informativo,aviso,positivo',
+            'imagen'           => 'nullable|image|max:10240',
+            'eliminar_imagen'  => 'nullable|boolean',
         ]);
 
-        $aviso->update($request->only(['titulo', 'descripcion', 'tipo']));
+        $data = $request->only(['titulo', 'descripcion', 'tipo']);
+
+        if ($request->hasFile('imagen')) {
+            if ($aviso->imagen) {
+                Storage::disk('public')->delete($aviso->imagen);
+            }
+            $data['imagen'] = $request->file('imagen')->store('avisos', 'public');
+        } elseif ($request->boolean('eliminar_imagen') && $aviso->imagen) {
+            Storage::disk('public')->delete($aviso->imagen);
+            $data['imagen'] = null;
+        }
+
+        $aviso->update($data);
 
         return response()->json($aviso);
     }
 
-    // DELETE /api/avisos/{id} — solo admin
     public function destroy($id)
     {
-        Aviso::findOrFail($id)->delete();
+        $aviso = Aviso::findOrFail($id);
+
+        if ($aviso->imagen) {
+            Storage::disk('public')->delete($aviso->imagen);
+        }
+
+        $aviso->delete();
         return response()->json(['message' => 'Aviso eliminado']);
     }
 }

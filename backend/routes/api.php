@@ -67,16 +67,20 @@ Route::middleware('auth:sanctum')->group(function () {
     */
 
     Route::get('/audit-logs', [AuditController::class, 'index']);
+
+    Route::get('/avisos', [AvisosController::class, 'index']);
+    Route::post('/avisos', [AvisosController::class, 'store']);
+    Route::put('/avisos/{id}', [AvisosController::class, 'update']);
+    Route::delete('/avisos/{id}', [AvisosController::class, 'destroy']);
 });
 
 // ─── ZKTeco (acceso desde script Python — token separado) ─────────
 Route::get('/vencimientos', [ZkApiController::class, 'index']);
 
 //Rutas de aviso
-use App\Http\Controllers\AvisoController;
 
 // Dentro del grupo auth:sanctum:
-Route::get('/avisos', [AvisosController::class, 'index']);
+/*Route::get('/avisos', [AvisosController::class, 'index']);
 Route::post('/avisos', [AvisosController::class, 'store']);
 Route::put('/avisos/{id}', [AvisosController::class, 'update']);
-Route::delete('/avisos/{id}', [AvisosController::class, 'destroy']);
+Route::delete('/avisos/{id}', [AvisosController::class, 'destroy']);*/
