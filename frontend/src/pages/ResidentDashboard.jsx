@@ -207,7 +207,10 @@ function Semaforo({ estado }) {
 // ─── Tablón de avisos (vista residente) ───────────────────────────────────────
 
 function TablonavisoResidente({ avisos }) {
-    if (avisos.length === 0) return null;
+    const [imagenAmpliada, setImagenAmpliada] = useState(null);
+
+    // Asumo que TIPO_CONFIG viene de tus props o contexto global, lo dejo igual.
+    // if (avisos.length === 0) return null; // <- Opcional: descomenta si validas que haya avisos.
 
     return (
         <div className="relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
@@ -262,6 +265,25 @@ function TablonavisoResidente({ avisos }) {
                                     <p className="text-sm text-stone-600 leading-relaxed">
                                         {aviso.descripcion}
                                     </p>
+
+                                    {/* Imagen del aviso */}
+                                    {aviso.imagen_url && (
+                                        <button
+                                            onClick={() =>
+                                                setImagenAmpliada(
+                                                    aviso.imagen_url,
+                                                )
+                                            }
+                                            className="mt-3 block w-full max-w-xs rounded-xl overflow-hidden border border-white/60 shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:opacity-90 active:scale-[0.98] transition-all"
+                                        >
+                                            <img
+                                                src={aviso.imagen_url}
+                                                alt={aviso.titulo}
+                                                className="w-full h-40 object-cover"
+                                            />
+                                        </button>
+                                    )}
+
                                     <p className="text-xs text-stone-400 mt-2 font-medium">
                                         {new Date(
                                             aviso.created_at,
@@ -277,6 +299,54 @@ function TablonavisoResidente({ avisos }) {
                     );
                 })}
             </div>
+
+            {/* Lightbox con estilo Glassmorphism (Ajustado) */}
+            {imagenAmpliada && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8"
+                    onClick={() => setImagenAmpliada(null)}
+                >
+                    {/* Fondo oscuro translúcido */}
+                    <div className="absolute inset-0 bg-white-900/20 backdrop-blur-sm" />
+
+                    {/* Contenedor Glassmorphism Shrink-Wrap */}
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="relative w-auto h-auto bg-white/20 backdrop-blur-[8px] backdrop-saturate-200 border border-white/50 p-2 sm:p-3 z-10 rounded-2xl sm:rounded-[2rem] shadow-[0_25px_50px_rgba(0,0,0,0.3),inset_0_2px_10px_rgba(255,255,255,0.4)]"
+                    >
+                        {/* Botón Flotante Absoluto */}
+                        <button
+                            onClick={() => setImagenAmpliada(null)}
+                            className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 p-2 text-stone-600 hover:text-stone-900 bg-white/90 hover:bg-white border border-white/60 shadow-xl rounded-full transition-all active:scale-95 z-20"
+                        >
+                            <svg
+                                className="w-5 h-5 sm:w-6 sm:h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2.5}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+
+                        {/* Imagen Responsive */}
+                        <img
+                            src={imagenAmpliada}
+                            alt="Aviso ampliado"
+                            className="w-auto h-auto object-contain rounded-xl sm:rounded-3xl"
+                            style={{
+                                maxHeight: "80dvh",
+                                maxWidth: "100%",
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -417,6 +487,33 @@ export default function ResidentDashboard() {
     const [loadingPagos, setLoadingPagos] = useState(true);
     const [lastSync, setLastSync] = useState(null);
 
+    // ── Modal de cámaras ──
+    const [camarasOpen, setCamarasOpen] = useState(false);
+    const [camarasVisible, setCamarasVisible] = useState(false);
+
+    const openCamaras = () => {
+        setCamarasOpen(true);
+        requestAnimationFrame(() => setCamarasVisible(true));
+    };
+
+    const closeCamaras = () => {
+        setCamarasVisible(false);
+        setTimeout(() => setCamarasOpen(false), 250);
+    };
+
+    // ── Modal de correo ──
+    const [correoOpen, setCorreoOpen] = useState(false);
+    const [correoVisible, setCorreoVisible] = useState(false);
+
+    const openCorreo = () => {
+        setCorreoOpen(true);
+        requestAnimationFrame(() => setCorreoVisible(true));
+    };
+    const closeCorreo = () => {
+        setCorreoVisible(false);
+        setTimeout(() => setCorreoOpen(false), 300);
+    };
+
     const fetchData = useCallback(async () => {
         setLoadingPagos(true);
         try {
@@ -505,6 +602,53 @@ export default function ResidentDashboard() {
                     </button>
                 </div>
 
+                {/* ── Pill de correo (ahora clickeable) + botón cámaras ── */}
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={openCorreo}
+                        style={{ touchAction: "manipulation" }}
+                        className="flex items-center gap-2.5 flex-1 min-w-0 px-4 py-2.5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 rounded-2xl shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_8px_rgba(0,0,0,0.03)] hover:bg-white/60 active:scale-[0.98] transition-all duration-200 text-left"
+                    >
+                        <svg
+                            className="w-4 h-4 text-orange-400 shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
+                        </svg>
+                        <span className="text-xs font-semibold text-stone-600 truncate">
+                            casetasanisidro088@gmail.com
+                        </span>
+                    </button>
+
+                    <button
+                        onClick={openCamaras}
+                        title="Ver rango de cámaras"
+                        style={{ touchAction: "manipulation" }}
+                        className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-white/50 backdrop-blur-xl border border-white/80 shadow-[0_4px_14px_rgba(0,0,0,0.05),inset_0_1px_2px_rgba(255,255,255,0.9)] hover:bg-white/75 active:scale-95 transition-all duration-200"
+                    >
+                        <svg
+                            className="w-5 h-5 text-stone-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
+                        </svg>
+                    </button>
+                </div>
+
                 {/* Semáforo */}
                 <Semaforo estado={estado} />
 
@@ -513,6 +657,144 @@ export default function ResidentDashboard() {
 
                 {/* Historial */}
                 <HistorialPagos pagos={pagos} loading={loadingPagos} />
+
+                {/* ── Modal de correo (info de contacto) ── */}
+                {correoOpen && (
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                        style={{ touchAction: "manipulation" }}
+                        onClick={closeCorreo}
+                    >
+                        <div
+                            className="absolute inset-0 bg-stone-900/25 transition-opacity duration-300"
+                            style={{ opacity: correoVisible ? 1 : 0 }}
+                        />
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="liquid-modal relative w-full max-w-sm bg-white/55 backdrop-blur-[20px] backdrop-saturate-200 border-t border-l border-white/70 border-r border-b border-white/30 p-6 z-10"
+                            style={{
+                                borderRadius: correoVisible ? "2rem" : "9999px",
+                                transform: correoVisible
+                                    ? "scale(1)"
+                                    : "scale(0.4)",
+                                opacity: correoVisible ? 1 : 0,
+                                filter: correoVisible
+                                    ? "blur(0px)"
+                                    : "blur(4px)",
+                                transformOrigin: "bottom right",
+                                transition:
+                                    "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out, filter 0.35s ease-out",
+                                boxShadow:
+                                    "0 25px 70px rgba(0,0,0,0.15), inset 0 2px 10px rgba(255,255,255,0.6)",
+                            }}
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-lg font-bold text-stone-800">
+                                    Contacto de Vigilancia
+                                </h3>
+                                <button
+                                    onClick={closeCorreo}
+                                    className="p-2 text-stone-500 hover:text-stone-800 bg-white/50 hover:bg-white/70 rounded-full transition-all active:scale-95"
+                                >
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2.5}
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p className="text-sm text-stone-600 leading-relaxed">
+                                Para quejas, sugerencias, solicitud de video u
+                                otro tema relacionado con seguridad, escribe a:
+                            </p>
+                            <p className="text-sm font-bold text-orange-500 mt-2 break-all">
+                                casetasanisidro088@gmail.com
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* ── Modal de cámaras (Responsivo y Ajustado) ── */}
+                {camarasOpen && (
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+                        style={{ touchAction: "manipulation" }}
+                        onClick={closeCamaras}
+                    >
+                        {/* Fondo oscuro translúcido (Más claro: 40% en lugar de 900 sólido) */}
+                        <div
+                            className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-300"
+                            style={{ opacity: camarasVisible ? 1 : 0 }}
+                        />
+
+                        {/* Contenedor Glassmorphism Responsivo */}
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative w-full max-w-lg flex flex-col bg-white/45 backdrop-blur-[5px] backdrop-saturate-200 border-t border-l border-white/70 border-r border-b border-white/30 z-10 overflow-hidden"
+                            style={{
+                                maxHeight: "90dvh", // El modal nunca será más alto que el 90% de la pantalla
+                                borderRadius: camarasVisible
+                                    ? "2rem"
+                                    : "9999px", // Suavizamos a 2rem para móviles
+                                transform: camarasVisible
+                                    ? "scale(1)"
+                                    : "scale(0.35)",
+                                opacity: camarasVisible ? 1 : 0,
+                                filter: camarasVisible
+                                    ? "blur(0px)"
+                                    : "blur(4px)",
+                                transformOrigin: "top right",
+                                transition:
+                                    "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out, filter 0.35s ease-out",
+                                boxShadow:
+                                    "0 25px 70px rgba(0,0,0,0.15), inset 0 2px 10px rgba(255,255,255,0.6)",
+                            }}
+                        >
+                            {/* Header Fijo (No hace scroll) */}
+                            <div className="flex items-center justify-between p-5 border-b border-white/30 shrink-0">
+                                <h3 className="text-lg font-bold text-stone-800">
+                                    Rango de Cámaras
+                                </h3>
+                                <button
+                                    onClick={closeCamaras}
+                                    className="p-2 text-stone-500 hover:text-stone-800 bg-white/40 hover:bg-white/70 rounded-full transition-all active:scale-95"
+                                >
+                                    <svg
+                                        className="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2.5}
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Contenido (Si no cabe en el cel, esta área hace scroll) */}
+                            <div className="p-5 overflow-y-auto">
+                                <img
+                                    src="/CAMARAS_page-0001.jpg"
+                                    alt="Rango de cámaras de seguridad"
+                                    className="w-full h-auto object-contain rounded-xl border border-white/60"
+                                    style={{ touchAction: "manipulation" }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Pie: última sincronización */}
                 {lastSync && (

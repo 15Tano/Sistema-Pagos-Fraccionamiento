@@ -144,8 +144,12 @@ function AvisosAdmin() {
         titulo: "",
         descripcion: "",
         tipo: "informativo",
+        imagen: null,
+        eliminarImagen: false,
     });
     const [saving, setSaving] = useState(false);
+
+    const [preview, setPreview] = useState(null);
 
     const fetchAvisos = useCallback(async () => {
         try {
@@ -160,7 +164,14 @@ function AvisosAdmin() {
 
     const openCreate = () => {
         setEditing(null);
-        setForm({ titulo: "", descripcion: "", tipo: "informativo" });
+        setForm({
+            titulo: "",
+            descripcion: "",
+            tipo: "informativo",
+            imagen: null,
+            eliminarImagen: false,
+        });
+        setPreview(null);
         setShowModal(true);
     };
 
@@ -170,8 +181,23 @@ function AvisosAdmin() {
             titulo: aviso.titulo,
             descripcion: aviso.descripcion,
             tipo: aviso.tipo,
+            imagen: null,
+            eliminarImagen: false,
         });
+        setPreview(aviso.imagen_url || null);
         setShowModal(true);
+    };
+
+    const handleImagenChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setForm({ ...form, imagen: file, eliminarImagen: false });
+        setPreview(URL.createObjectURL(file));
+    };
+
+    const handleRemoveImagen = () => {
+        setForm({ ...form, imagen: null, eliminarImagen: true });
+        setPreview(null);
     };
 
     const handleSave = async () => {
@@ -245,9 +271,20 @@ function AvisosAdmin() {
                                     className="flex items-center gap-3 p-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
                                 >
                                     <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        {/* --- AQUÍ VA LA IMAGEN --- */}
+                                        {aviso.imagen_url && (
+                                            <img
+                                                src={aviso.imagen_url}
+                                                alt=""
+                                                className="w-10 h-10 rounded-xl object-cover shrink-0 border border-white/60 shadow-sm"
+                                            />
+                                        )}
+
+                                        {/* --- PUNTO DE COLOR --- */}
                                         <span
                                             className={`w-2.5 h-2.5 rounded-full shrink-0 ${cfg.dot}`}
                                         />
+
                                         <p className="text-sm font-bold text-stone-800 truncate drop-shadow-sm">
                                             {aviso.titulo}
                                         </p>
@@ -346,6 +383,66 @@ function AvisosAdmin() {
                                 }
                                 className="w-full px-4 py-3 bg-white/40 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_2px_6px_rgba(0,0,0,0.02)] focus:outline-none focus:bg-white/60 focus:ring-4 focus:ring-orange-500/20 focus:border-orange-400 transition-all font-medium text-stone-600 resize-none"
                             />
+
+                            {/* Imagen */}
+                            <div className="p-4 bg-white/30 backdrop-blur-sm rounded-2xl border border-white/50">
+                                <p className="text-xs font-bold text-stone-500 mb-3 uppercase tracking-wide">
+                                    Imagen (opcional)
+                                </p>
+
+                                {preview ? (
+                                    <div className="relative">
+                                        <img
+                                            src={preview}
+                                            alt="preview"
+                                            className="w-full h-40 object-cover rounded-xl shadow-inner"
+                                        />
+                                        <button
+                                            onClick={handleRemoveImagen}
+                                            className="absolute top-2 right-2 p-1.5 bg-stone-900/60 backdrop-blur-sm text-white rounded-full hover:bg-red-500/80 transition-colors"
+                                        >
+                                            <svg
+                                                className="w-3.5 h-3.5"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2.5}
+                                                    d="M6 18L18 6M6 6l12 12"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-stone-300 rounded-xl cursor-pointer hover:border-orange-400 hover:bg-orange-50/30 transition-all">
+                                        <svg
+                                            className="w-6 h-6 text-stone-400 mb-1"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                            />
+                                        </svg>
+                                        <span className="text-xs font-medium text-stone-400">
+                                            Subir imagen
+                                        </span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleImagenChange}
+                                        />
+                                    </label>
+                                )}
+                            </div>
 
                             {/* Selector de tipo con círculos de color */}
                             <div className="p-4 bg-white/30 backdrop-blur-sm rounded-2xl border border-white/50">
