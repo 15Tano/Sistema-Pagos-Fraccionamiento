@@ -517,6 +517,17 @@ export default function ResidentDashboard() {
         setTimeout(() => setCorreoOpen(false), 300);
     };
 
+    const [camarasOpen, setCamarasOpen] = useState(false);
+    const [camarasVisible, setCamarasVisible] = useState(false);
+    const openCamaras = () => {
+        setCamarasOpen(true);
+        requestAnimationFrame(() => setCamarasVisible(true));
+    };
+    const closeCamaras = () => {
+        setCamarasVisible(false);
+        setTimeout(() => setCamarasOpen(false), 300);
+    };
+
     const fetchData = useCallback(async () => {
         setLoadingPagos(true);
         try {
