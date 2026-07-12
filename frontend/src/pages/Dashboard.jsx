@@ -345,7 +345,7 @@ function AvisosAdmin() {
 
             {/* ── Modal crear/editar (Liquid Glass) ── */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                     {/* Backdrop */}
                     <div
                         className="absolute inset-0 bg-stone-900/20 backdrop-blur-sm transition-opacity"
@@ -353,7 +353,7 @@ function AvisosAdmin() {
                     />
 
                     {/* Modal */}
-                    <div className="relative w-full max-w-md bg-white/60 backdrop-blur-2xl border-t border-l border-white/80 border-r border-b border-white/40 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1),inset_0_2px_10px_rgba(255,255,255,0.8)] p-8 z-10 transform transition-all scale-100">
+                    <div className="relative w-full max-w-md bg-white/40 backdrop-blur-sm border-t border-l border-white/80 border-r border-b border-white/40 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1),inset_0_2px_10px_rgba(255,255,255,0.8)] p-8 z-10 transform transition-all scale-100">
                         <h3 className="text-xl font-bold text-stone-800 mb-6 drop-shadow-sm">
                             {editing ? "Editar aviso" : "Nuevo aviso"}
                         </h3>
@@ -446,7 +446,7 @@ function AvisosAdmin() {
 
                             {/* Selector de tipo con círculos de color */}
                             <div className="p-4 bg-white/30 backdrop-blur-sm rounded-2xl border border-white/50">
-                                <p className="text-xs font-bold text-stone-500 mb-3 uppercase tracking-wide">
+                                <p className="text-xs font-bold text-stone-700 mb-3 uppercase tracking-wide">
                                     Prioridad
                                 </p>
                                 <div className="flex gap-4 justify-around">

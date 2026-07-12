@@ -16,7 +16,6 @@ export const createAviso = (data) => {
 
 export const updateAviso = (id, data) => {
     const fd = new FormData();
-    fd.append("_method", "PUT"); // method spoofing
     fd.append("titulo", data.titulo);
     fd.append("descripcion", data.descripcion);
     fd.append("tipo", data.tipo);

@@ -371,7 +371,7 @@ export default function Layout({ children }) {
             </main>
 
             {/* ── BOTTOM NAV FLOTANTE (Liquid Glass) — solo móvil ── */}
-            <nav className="md:hidden fixed bottom-4 inset-x-4 z-20 flex items-center justify-around px-2 py-2.5 bg-white/40 backdrop-blur-2xl border-t border-l border-white/80 border-r border-b border-white/30 shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-[2rem]">
+            <nav className="md:hidden fixed bottom-4 inset-x-4 z-20 flex items-center justify-around px-2 py-2.5 bg-white/5 backdrop-blur-sm border-t border-l border-white/80 border-r border-b border-white/30 shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-[2rem]">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
                 {NAV_ITEMS.map((item) => (
@@ -382,8 +382,8 @@ export default function Layout({ children }) {
                         className={({ isActive }) =>
                             `flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 ${
                                 isActive
-                                    ? "bg-white/70 text-orange-500 shadow-[inset_0_2px_6px_rgba(255,255,255,1),0_4px_10px_rgba(0,0,0,0.05)] border border-white/80 scale-105"
-                                    : "text-stone-400 hover:text-stone-600 hover:bg-white/30 active:scale-95"
+                                    ? "bg-white/60 text-orange-500 shadow-[inset_0_2px_6px_rgba(255,255,255,1),0_4px_10px_rgba(0,0,0,0.05)] border border-white/90 scale-105"
+                                    : "text-stone-600 hover:text-stone-600 hover:bg-white/30 active:scale-95"
                             }`
                         }
                     >

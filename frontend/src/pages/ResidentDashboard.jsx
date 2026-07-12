@@ -209,6 +209,25 @@ function Semaforo({ estado }) {
 function TablonavisoResidente({ avisos }) {
     const [imagenAmpliada, setImagenAmpliada] = useState(null);
 
+    useEffect(() => {
+        if (imagenAmpliada) {
+            const scrollY = window.scrollY;
+            document.body.style.position = "fixed";
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = "100%";
+
+            return () => {
+                document.body.style.position = "";
+                document.body.style.top = "";
+                document.body.style.width = "";
+                window.scrollTo(0, scrollY);
+            };
+        }
+    }, [imagenAmpliada]);
+
+    if (avisos.length === 0) return null;
+
+    // ... resto del componente sin cambios
     // Asumo que TIPO_CONFIG viene de tus props o contexto global, lo dejo igual.
     // if (avisos.length === 0) return null; // <- Opcional: descomenta si validas que haya avisos.
 
@@ -487,24 +506,8 @@ export default function ResidentDashboard() {
     const [loadingPagos, setLoadingPagos] = useState(true);
     const [lastSync, setLastSync] = useState(null);
 
-    // ── Modal de cámaras ──
-    const [camarasOpen, setCamarasOpen] = useState(false);
-    const [camarasVisible, setCamarasVisible] = useState(false);
-
-    const openCamaras = () => {
-        setCamarasOpen(true);
-        requestAnimationFrame(() => setCamarasVisible(true));
-    };
-
-    const closeCamaras = () => {
-        setCamarasVisible(false);
-        setTimeout(() => setCamarasOpen(false), 250);
-    };
-
-    // ── Modal de correo ──
     const [correoOpen, setCorreoOpen] = useState(false);
     const [correoVisible, setCorreoVisible] = useState(false);
-
     const openCorreo = () => {
         setCorreoOpen(true);
         requestAnimationFrame(() => setCorreoVisible(true));
@@ -538,6 +541,15 @@ export default function ResidentDashboard() {
 
     const estado = useMemo(() => calcularEstado(pagos), [pagos]);
 
+    const diasBloqueado = useMemo(() => {
+        const hoy = new Date();
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        return Math.max(
+            1,
+            Math.floor((hoy - inicioMes) / (1000 * 60 * 60 * 24)) + 1,
+        );
+    }, []);
+
     const handleLogout = useCallback(async () => {
         try {
             await apiLogout();
@@ -547,6 +559,183 @@ export default function ResidentDashboard() {
     }, [storeLogout]);
 
     const tags = user?.tags || [];
+
+    // ── Pantalla de bloqueo ──
+    if (!loadingPagos && estado.color === "rojo") {
+        return (
+            <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-red-950 via-red-900 to-stone-950 flex items-center justify-center p-4">
+                {/* Formas fantasma del dashboard, simuladas — no datos reales */}
+                <div className="absolute inset-0 opacity-[0.07] pointer-events-none p-6 flex flex-col gap-5 max-w-2xl mx-auto">
+                    <div className="h-20 bg-white rounded-3xl" />
+                    <div className="h-14 bg-white rounded-2xl" />
+                    <div className="h-40 bg-white rounded-[2rem]" />
+                    <div className="h-32 bg-white rounded-[2rem]" />
+                </div>
+
+                <div className="absolute top-[-15%] left-[-10%] w-96 h-96 bg-red-600/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-[-15%] right-[-10%] w-96 h-96 bg-red-800/30 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="relative z-10 w-full max-w-sm">
+                    {/* Header mínimo: nombre + salir */}
+                    <div className="flex items-center justify-between mb-6 px-1">
+                        <p className="text-sm font-bold text-red-200/80">
+                            {user?.name || "Residente"}
+                        </p>
+                        <button
+                            onClick={handleLogout}
+                            className="text-xs font-bold text-red-200/60 hover:text-red-100 transition-colors"
+                        >
+                            Salir
+                        </button>
+                    </div>
+
+                    {/* Card principal */}
+                    <div className="relative overflow-hidden p-7 bg-white/[0.07] backdrop-blur-2xl border-t border-l border-white/20 border-r border-b border-white/5 shadow-[0_25px_70px_rgba(0,0,0,0.4)] rounded-[2.5rem] text-center">
+                        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-300/40 to-transparent" />
+
+                        <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-red-500/20 border border-red-400/30 flex items-center justify-center animate-pulse">
+                            <svg
+                                className="w-7 h-7 text-red-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                />
+                            </svg>
+                        </div>
+
+                        <h1 className="text-xl font-bold text-white mb-1.5">
+                            Acceso Restringido
+                        </h1>
+                        <p className="text-sm text-red-200/80 leading-relaxed mb-5">
+                            {estado.descripcion}
+                        </p>
+
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/15 border border-red-400/25 mb-6">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                            <span className="text-[11px] font-bold text-red-200 uppercase tracking-wide">
+                                Bloqueado hace {diasBloqueado}{" "}
+                                {diasBloqueado === 1 ? "día" : "días"}
+                            </span>
+                        </div>
+
+                        {tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 justify-center mb-6">
+                                {tags.map((t) => (
+                                    <span
+                                        key={t.id}
+                                        className="relative px-3 py-1 rounded-xl text-xs font-bold font-mono tracking-wider bg-white/5 text-white/30 border border-white/10 grayscale"
+                                    >
+                                        {t.codigo}
+                                        <svg
+                                            className="w-3 h-3 absolute -top-1.5 -right-1.5 text-red-400"
+                                            fill="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        <p className="text-sm font-semibold text-red-100">
+                            Recupera el acceso con tu pago extemporáneo
+                        </p>
+                    </div>
+
+                    {/* Contacto de vigilancia, siempre disponible */}
+                    <button
+                        onClick={openCorreo}
+                        className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl text-xs font-semibold text-red-200/70 hover:bg-white/10 hover:text-red-100 transition-all"
+                    >
+                        <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
+                        </svg>
+                        Contactar a vigilancia
+                    </button>
+                </div>
+
+                {/* Modal de correo — mismo que en el dashboard normal */}
+                {correoOpen && (
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                        style={{ touchAction: "manipulation" }}
+                        onClick={closeCorreo}
+                    >
+                        <div
+                            className="absolute inset-0 bg-black/50 transition-opacity duration-300"
+                            style={{ opacity: correoVisible ? 1 : 0 }}
+                        />
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative w-full max-w-sm bg-white/95 backdrop-blur-2xl p-6 z-10"
+                            style={{
+                                borderRadius: correoVisible ? "2rem" : "9999px",
+                                transform: correoVisible
+                                    ? "scale(1)"
+                                    : "scale(0.4)",
+                                opacity: correoVisible ? 1 : 0,
+                                filter: correoVisible
+                                    ? "blur(0px)"
+                                    : "blur(4px)",
+                                transformOrigin: "bottom center",
+                                transition:
+                                    "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out, filter 0.35s ease-out",
+                                boxShadow: "0 25px 70px rgba(0,0,0,0.3)",
+                            }}
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-lg font-bold text-stone-800">
+                                    Contacto de Vigilancia
+                                </h3>
+                                <button
+                                    onClick={closeCorreo}
+                                    className="p-2 text-stone-500 hover:text-stone-800 bg-stone-100 hover:bg-stone-200 rounded-full transition-all active:scale-95"
+                                >
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2.5}
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p className="text-sm text-stone-600 leading-relaxed">
+                                Para quejas, sugerencias, solicitud de video u
+                                otro tema relacionado con seguridad, escribe a:
+                            </p>
+                            <p className="text-sm font-bold text-orange-500 mt-2 break-all">
+                                vigilanciasanisidro@gmail.com
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
 
     return (
         // Fondo base sutil para que el glass resalte
