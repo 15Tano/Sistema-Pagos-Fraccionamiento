@@ -3,6 +3,7 @@ import api from "../lib/axios";
 import useAuthStore from "../store/authStore";
 import { getAvisos } from "../api/avisos";
 import { logout as apiLogout } from "../api/auth";
+import { createPortal } from "react-dom";
 
 console.log("VERSION 2.0 - CARGADA");
 
@@ -212,9 +213,7 @@ function TablonavisoResidente({ avisos }) {
 
     useEffect(() => {
         if (imagenAmpliada) {
-            // Bloqueamos el scroll de forma segura sin romper el layout
             document.body.style.overflow = "hidden";
-            // Un pequeño delay para que la transición CSS se dispare correctamente
             requestAnimationFrame(() => setImagenVisible(true));
         } else {
             document.body.style.overflow = "auto";
@@ -228,15 +227,10 @@ function TablonavisoResidente({ avisos }) {
 
     const closeImagen = () => {
         setImagenVisible(false);
-        // Esperamos a que termine la animación (300ms) antes de desmontar el componente
         setTimeout(() => setImagenAmpliada(null), 300);
     };
 
     if (avisos.length === 0) return null;
-
-    // ... resto del componente sin cambios
-    // Asumo que TIPO_CONFIG viene de tus props o contexto global, lo dejo igual.
-    // if (avisos.length === 0) return null; // <- Opcional: descomenta si validas que haya avisos.
 
     return (
         <div className="relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
@@ -326,75 +320,79 @@ function TablonavisoResidente({ avisos }) {
                 })}
             </div>
 
-            {/* Lightbox de Aviso (Responsivo y Ajustado al estilo Cámaras) */}
-            {imagenAmpliada && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-                    style={{ touchAction: "manipulation" }}
-                    onClick={closeImagen}
-                >
-                    {/* Fondo oscuro translúcido (Mismo del de cámaras) */}
+            {/* 2. SOLUCIÓN AQUÍ: Envolvemos el Modal en createPortal */}
+            {imagenAmpliada &&
+                createPortal(
                     <div
-                        className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-300"
-                        style={{ opacity: imagenVisible ? 1 : 0 }}
-                    />
-
-                    {/* Contenedor Glassmorphism Responsivo */}
-                    <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="relative w-full max-w-lg flex flex-col bg-white/45 backdrop-blur-[5px] backdrop-saturate-200 border-t border-l border-white/70 border-r border-b border-white/30 z-10 overflow-hidden"
-                        style={{
-                            maxHeight: "90dvh",
-                            borderRadius: imagenVisible ? "2rem" : "9999px",
-                            transform: imagenVisible
-                                ? "scale(1)"
-                                : "scale(0.35)",
-                            opacity: imagenVisible ? 1 : 0,
-                            filter: imagenVisible ? "blur(0px)" : "blur(4px)",
-                            transformOrigin: "center", // Centrado porque es una imagen flotante
-                            transition:
-                                "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out, filter 0.35s ease-out",
-                            boxShadow:
-                                "0 25px 70px rgba(0,0,0,0.15), inset 0 2px 10px rgba(255,255,255,0.6)",
-                        }}
+                        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6"
+                        style={{ touchAction: "manipulation" }}
+                        onClick={closeImagen}
                     >
-                        {/* Header Fijo para el botón de cerrar (Igual que cámaras pero sin título) */}
-                        <div className="flex items-center justify-end p-4 border-b border-white/30 shrink-0">
-                            <button
-                                onClick={closeImagen}
-                                className="p-2 text-stone-500 hover:text-stone-800 bg-white/40 hover:bg-white/70 rounded-full transition-all active:scale-95"
-                            >
-                                <svg
-                                    className="w-5 h-5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2.5}
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
+                        {/* Fondo oscuro translúcido */}
+                        <div
+                            className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-300"
+                            style={{ opacity: imagenVisible ? 1 : 0 }}
+                        />
 
-                        {/* Contenido (Hace scroll si la imagen es muy alta) */}
-                        <div className="p-5 overflow-y-auto flex items-center justify-center">
-                            <img
-                                src={imagenAmpliada}
-                                alt="Aviso ampliado"
-                                className="w-full h-auto object-contain rounded-xl border border-white/60"
-                                style={{
-                                    touchAction: "manipulation",
-                                    maxHeight: "65dvh", // Evita que empuje el modal fuera de la pantalla
-                                }}
-                            />
+                        {/* Contenedor Glassmorphism Responsivo */}
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative w-full max-w-lg flex flex-col bg-white/45 backdrop-blur-[5px] backdrop-saturate-200 border-t border-l border-white/70 border-r border-b border-white/30 z-10 overflow-hidden"
+                            style={{
+                                maxHeight: "90dvh",
+                                borderRadius: imagenVisible ? "2rem" : "9999px",
+                                transform: imagenVisible
+                                    ? "scale(1)"
+                                    : "scale(0.35)",
+                                opacity: imagenVisible ? 1 : 0,
+                                filter: imagenVisible
+                                    ? "blur(0px)"
+                                    : "blur(4px)",
+                                transformOrigin: "center",
+                                transition:
+                                    "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out, filter 0.35s ease-out",
+                                boxShadow:
+                                    "0 25px 70px rgba(0,0,0,0.15), inset 0 2px 10px rgba(255,255,255,0.6)",
+                            }}
+                        >
+                            {/* Header Fijo */}
+                            <div className="flex items-center justify-end p-4 border-b border-white/30 shrink-0">
+                                <button
+                                    onClick={closeImagen}
+                                    className="p-2 text-stone-500 hover:text-stone-800 bg-white/40 hover:bg-white/70 rounded-full transition-all active:scale-95"
+                                >
+                                    <svg
+                                        className="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2.5}
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Contenido */}
+                            <div className="p-5 overflow-y-auto flex items-center justify-center">
+                                <img
+                                    src={imagenAmpliada}
+                                    alt="Aviso ampliado"
+                                    className="w-full h-auto object-contain rounded-xl border border-white/60"
+                                    style={{
+                                        touchAction: "manipulation",
+                                        maxHeight: "65dvh",
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </div>
-            )}
+                    </div>,
+                    document.body, // <- Le dice a React que renderice esto al final del <body>
+                )}
         </div>
     );
 }
