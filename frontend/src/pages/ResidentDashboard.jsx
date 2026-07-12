@@ -571,16 +571,34 @@ export default function ResidentDashboard() {
 
     const tags = user?.tags || [];
 
+    // ── Loading inicial ──
+    if (loadingPagos) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-stone-50/50">
+                <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
+
     // ── Pantalla de bloqueo ──
     if (!loadingPagos && estado.color === "rojo") {
         return (
-            <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-red-950 via-red-900 to-stone-950 flex items-center justify-center p-4">
+            <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-red-950 via-red-600 to-stone-950 flex items-center justify-center p-4">
                 {/* Formas fantasma del dashboard, simuladas — no datos reales */}
-                <div className="absolute inset-0 opacity-[0.07] pointer-events-none p-6 flex flex-col gap-5 max-w-2xl mx-auto">
-                    <div className="h-20 bg-white rounded-3xl" />
-                    <div className="h-14 bg-white rounded-2xl" />
-                    <div className="h-40 bg-white rounded-[2rem]" />
-                    <div className="h-32 bg-white rounded-[2rem]" />
+                {/* Formas fantasma del dashboard, simuladas — no datos reales */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div
+                        className="p-6 flex flex-col gap-5 max-w-2xl mx-auto opacity-[0.14]"
+                        style={{ filter: "blur(14px)" }}
+                    >
+                        <div className="h-20 bg-white rounded-3xl" />
+                        <div className="flex gap-3">
+                            <div className="h-11 flex-1 bg-white rounded-2xl" />
+                            <div className="h-11 w-11 bg-white rounded-full shrink-0" />
+                        </div>
+                        <div className="h-48 bg-white rounded-[2rem]" />
+                        <div className="h-80 bg-white rounded-[2rem]" />
+                    </div>
                 </div>
 
                 <div className="absolute top-[-15%] left-[-10%] w-96 h-96 bg-red-600/20 rounded-full blur-3xl pointer-events-none" />
@@ -589,24 +607,24 @@ export default function ResidentDashboard() {
                 <div className="relative z-10 w-full max-w-sm">
                     {/* Header mínimo: nombre + salir */}
                     <div className="flex items-center justify-between mb-6 px-1">
-                        <p className="text-sm font-bold text-red-200/80">
+                        <p className="text-lg font-bold text-red-200/80">
                             {user?.name || "Residente"}
                         </p>
                         <button
                             onClick={handleLogout}
-                            className="text-xs font-bold text-red-200/60 hover:text-red-100 transition-colors"
+                            className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/60 shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.8)] text-sm font-bold text-red-200/80 hover:text-red-600 hover:bg-red-50/50 hover:border-red-200/60 transition-all active:scale-95"
                         >
                             Salir
                         </button>
                     </div>
 
                     {/* Card principal */}
-                    <div className="relative overflow-hidden p-7 bg-white/[0.07] backdrop-blur-2xl border-t border-l border-white/20 border-r border-b border-white/5 shadow-[0_25px_70px_rgba(0,0,0,0.4)] rounded-[2.5rem] text-center">
+                    <div className="relative overflow-hidden p-7 bg-white/[0.07] backdrop-blur-md border-t border-l border-white/20 border-r border-b border-white/5 shadow-[0_25px_70px_rgba(0,0,0,0.4)] rounded-[2.5rem] text-center">
                         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-300/40 to-transparent" />
 
                         <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-red-500/20 border border-red-400/30 flex items-center justify-center animate-pulse">
                             <svg
-                                className="w-7 h-7 text-red-300"
+                                className="w-10 h-10 text-red-100"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -621,7 +639,7 @@ export default function ResidentDashboard() {
                         </div>
 
                         <h1 className="text-xl font-bold text-white mb-1.5">
-                            Acceso Restringido
+                            Acceso Temporalmente Suspendido
                         </h1>
                         <p className="text-sm text-red-200/80 leading-relaxed mb-5">
                             {estado.descripcion}
@@ -663,7 +681,7 @@ export default function ResidentDashboard() {
                     {/* Contacto de vigilancia, siempre disponible */}
                     <button
                         onClick={openCorreo}
-                        className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl text-xs font-semibold text-red-200/70 hover:bg-white/10 hover:text-red-100 transition-all"
+                        className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/40 rounded-2xl text-xs font-semibold text-red-100/70 hover:bg-white/10 hover:text-red-100 transition-all"
                     >
                         <svg
                             className="w-4 h-4"
