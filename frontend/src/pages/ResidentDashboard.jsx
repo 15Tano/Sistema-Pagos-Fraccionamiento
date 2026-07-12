@@ -208,22 +208,29 @@ function Semaforo({ estado }) {
 
 function TablonavisoResidente({ avisos }) {
     const [imagenAmpliada, setImagenAmpliada] = useState(null);
+    const [imagenVisible, setImagenVisible] = useState(false);
 
     useEffect(() => {
         if (imagenAmpliada) {
-            const scrollY = window.scrollY;
-            document.body.style.position = "fixed";
-            document.body.style.top = `-${scrollY}px`;
-            document.body.style.width = "100%";
-
-            return () => {
-                document.body.style.position = "";
-                document.body.style.top = "";
-                document.body.style.width = "";
-                window.scrollTo(0, scrollY);
-            };
+            // Bloqueamos el scroll de forma segura sin romper el layout
+            document.body.style.overflow = "hidden";
+            // Un pequeño delay para que la transición CSS se dispare correctamente
+            requestAnimationFrame(() => setImagenVisible(true));
+        } else {
+            document.body.style.overflow = "auto";
+            setImagenVisible(false);
         }
+
+        return () => {
+            document.body.style.overflow = "auto";
+        };
     }, [imagenAmpliada]);
+
+    const closeImagen = () => {
+        setImagenVisible(false);
+        // Esperamos a que termine la animación (300ms) antes de desmontar el componente
+        setTimeout(() => setImagenAmpliada(null), 300);
+    };
 
     if (avisos.length === 0) return null;
 
@@ -319,50 +326,72 @@ function TablonavisoResidente({ avisos }) {
                 })}
             </div>
 
-            {/* Lightbox con estilo Glassmorphism (Ajustado) */}
+            {/* Lightbox de Aviso (Responsivo y Ajustado al estilo Cámaras) */}
             {imagenAmpliada && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8"
-                    onClick={() => setImagenAmpliada(null)}
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+                    style={{ touchAction: "manipulation" }}
+                    onClick={closeImagen}
                 >
-                    {/* Fondo oscuro translúcido */}
-                    <div className="absolute inset-0 bg-white-900/20 backdrop-blur-sm" />
+                    {/* Fondo oscuro translúcido (Mismo del de cámaras) */}
+                    <div
+                        className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-300"
+                        style={{ opacity: imagenVisible ? 1 : 0 }}
+                    />
 
-                    {/* Contenedor Glassmorphism Shrink-Wrap */}
+                    {/* Contenedor Glassmorphism Responsivo */}
                     <div
                         onClick={(e) => e.stopPropagation()}
-                        className="relative w-auto h-auto bg-white/20 backdrop-blur-[8px] backdrop-saturate-200 border border-white/50 p-2 sm:p-3 z-10 rounded-2xl sm:rounded-[2rem] shadow-[0_25px_50px_rgba(0,0,0,0.3),inset_0_2px_10px_rgba(255,255,255,0.4)]"
+                        className="relative w-full max-w-lg flex flex-col bg-white/45 backdrop-blur-[5px] backdrop-saturate-200 border-t border-l border-white/70 border-r border-b border-white/30 z-10 overflow-hidden"
+                        style={{
+                            maxHeight: "90dvh",
+                            borderRadius: imagenVisible ? "2rem" : "9999px",
+                            transform: imagenVisible
+                                ? "scale(1)"
+                                : "scale(0.35)",
+                            opacity: imagenVisible ? 1 : 0,
+                            filter: imagenVisible ? "blur(0px)" : "blur(4px)",
+                            transformOrigin: "center", // Centrado porque es una imagen flotante
+                            transition:
+                                "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out, filter 0.35s ease-out",
+                            boxShadow:
+                                "0 25px 70px rgba(0,0,0,0.15), inset 0 2px 10px rgba(255,255,255,0.6)",
+                        }}
                     >
-                        {/* Botón Flotante Absoluto */}
-                        <button
-                            onClick={() => setImagenAmpliada(null)}
-                            className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 p-2 text-stone-600 hover:text-stone-900 bg-white/90 hover:bg-white border border-white/60 shadow-xl rounded-full transition-all active:scale-95 z-20"
-                        >
-                            <svg
-                                className="w-5 h-5 sm:w-6 sm:h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                        {/* Header Fijo para el botón de cerrar (Igual que cámaras pero sin título) */}
+                        <div className="flex items-center justify-end p-4 border-b border-white/30 shrink-0">
+                            <button
+                                onClick={closeImagen}
+                                className="p-2 text-stone-500 hover:text-stone-800 bg-white/40 hover:bg-white/70 rounded-full transition-all active:scale-95"
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2.5}
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
+                                <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2.5}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
 
-                        {/* Imagen Responsive */}
-                        <img
-                            src={imagenAmpliada}
-                            alt="Aviso ampliado"
-                            className="w-auto h-auto object-contain rounded-xl sm:rounded-3xl"
-                            style={{
-                                maxHeight: "80dvh",
-                                maxWidth: "100%",
-                            }}
-                        />
+                        {/* Contenido (Hace scroll si la imagen es muy alta) */}
+                        <div className="p-5 overflow-y-auto flex items-center justify-center">
+                            <img
+                                src={imagenAmpliada}
+                                alt="Aviso ampliado"
+                                className="w-full h-auto object-contain rounded-xl border border-white/60"
+                                style={{
+                                    touchAction: "manipulation",
+                                    maxHeight: "65dvh", // Evita que empuje el modal fuera de la pantalla
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
