@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import useAuthStore from "./store/authStore";
 import Layout from "./components/layout/layout.jsx";
+import { linkOneSignalUser, unlinkOneSignalUser } from "./lib/onesignal";
 
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -28,6 +30,16 @@ const AdminRoute = ({ children }) => (
 );
 
 function App() {
+    const { isAuthenticated, user } = useAuthStore();
+
+    useEffect(() => {
+        if (isAuthenticated && user?.id) {
+            linkOneSignalUser(user.id);
+        } else {
+            unlinkOneSignalUser();
+        }
+    }, [isAuthenticated, user?.id]);
+
     return (
         <BrowserRouter>
             <Routes>
