@@ -4,6 +4,8 @@ import useAuthStore from "../store/authStore";
 import { getAvisos } from "../api/avisos";
 import { logout as apiLogout } from "../api/auth";
 import { createPortal } from "react-dom";
+import { promptPush } from "../lib/onesignal";
+import NotificationBanner from "../components/NotificationBanner";
 
 console.log("VERSION 2.0 - CARGADA");
 
@@ -796,6 +798,7 @@ export default function ResidentDashboard() {
     return (
         // Fondo base sutil para que el glass resalte
         <div className="min-h-screen p-4 md:p-6 bg-stone-50/50 relative">
+            <NotificationBanner />
             {/* Elementos decorativos de fondo opcionales para dar vida al blur */}
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-200/30 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-stone-200/50 rounded-full blur-3xl pointer-events-none" />
