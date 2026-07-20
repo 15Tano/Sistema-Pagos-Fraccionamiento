@@ -17,6 +17,7 @@ import PantallaBloqueada from "./components/PantallaBloqueada";
 import ModalContacto from "./components/ModalContacto";
 import ModalRecibo from "./components/ModalRecibo";
 import ModalCamaras from "./components/ModalCamaras";
+import DeveloperBadge from "../../components/DeveloperBadge";
 
 console.log("VERSION 2.0 - CARGADA");
 
@@ -78,7 +79,10 @@ export default function ResidentDashboard() {
     const diasBloqueado = useMemo(() => {
         const hoy = new Date();
         const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-        return Math.max(1, Math.floor((hoy - inicioMes) / (1000 * 60 * 60 * 24)) + 1);
+        return Math.max(
+            1,
+            Math.floor((hoy - inicioMes) / (1000 * 60 * 60 * 24)) + 1,
+        );
     }, []);
 
     const handleLogout = useCallback(async () => {
@@ -122,15 +126,26 @@ export default function ResidentDashboard() {
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-stone-200/50 rounded-full blur-3xl pointer-events-none" />
 
             <div className="max-w-2xl mx-auto flex flex-col gap-5 relative z-10">
-                <DashboardHeader user={user} tags={tags} onLogout={handleLogout} />
+                <DashboardHeader
+                    user={user}
+                    tags={tags}
+                    onLogout={handleLogout}
+                />
 
-                <AccionesRapidas onAbrirCorreo={correo.open} onAbrirCamaras={camaras.open} />
+                <AccionesRapidas
+                    onAbrirCorreo={correo.open}
+                    onAbrirCamaras={camaras.open}
+                />
 
                 <Semaforo estado={estado} />
 
                 <TablonAvisoResidente avisos={avisos} />
 
-                <HistorialPagos pagos={pagos} loading={loadingPagos} onVerRecibo={openRecibo} />
+                <HistorialPagos
+                    pagos={pagos}
+                    loading={loadingPagos}
+                    onVerRecibo={openRecibo}
+                />
 
                 <ModalContacto
                     isOpen={correo.isOpen}
@@ -151,6 +166,8 @@ export default function ResidentDashboard() {
                     isVisible={camaras.isVisible}
                     onClose={camaras.close}
                 />
+
+                <DeveloperBadge />
 
                 {/* Pie: última sincronización */}
                 {lastSync && (

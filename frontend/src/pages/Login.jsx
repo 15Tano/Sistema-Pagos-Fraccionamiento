@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { login } from "../api/auth";
 import useAuthStore from "../store/authStore";
+import DeveloperBadge from "../components/DeveloperBadge";
 
 // --- Custom SVG Icons ---
 const UserIcon = ({ className }) => (
@@ -357,6 +358,8 @@ function Login({ onLogin }) {
                     </div>
                 </div>
             </div>
+
+            <DeveloperBadge />
 
             {/* Right Column: Imagen Grande */}
             <div className="hidden lg:flex w-1/2 items-center justify-center p-8 relative z-10 pointer-events-none">
