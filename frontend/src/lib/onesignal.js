@@ -15,6 +15,7 @@ export function initOneSignal() {
 export async function linkOneSignalUser(vecinoId) {
     await initPromise; // espera a que init() haya terminado de verdad
     await OneSignal.login(String(vecinoId));
+    await OneSignal.User.addTag("rol", "residente");
 }
 
 export async function unlinkOneSignalUser() {
