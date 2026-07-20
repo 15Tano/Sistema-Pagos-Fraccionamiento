@@ -10,7 +10,7 @@ import Vecinos from "./pages/Vecinos.jsx";
 import Pagos from "./pages/Pagos.jsx";
 import Tags from "./pages/Tags.jsx";
 import Historico from "./pages/Historico.jsx";
-import ResidentDashboard from "./pages/ResidentDashboard.jsx";
+import ResidentDashboard from "./pages/ResidentDashboard";
 import GuestView from "./pages/GuestView.jsx";
 import RegistroAccesoVecino from "./pages/RegistroAccesoVecino";
 import VistaVigilancia from "./pages/VistaVigilancia";
