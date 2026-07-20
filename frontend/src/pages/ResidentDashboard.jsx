@@ -403,16 +403,15 @@ function TablonavisoResidente({ avisos }) {
 
 // ─── Historial de pagos ───────────────────────────────────────────────────────
 
-function HistorialPagos({ pagos, loading }) {
+function HistorialPagos({ pagos, loading, onVerRecibo }) {
     // 1. Estado para el año (inicia en 2026 como pediste)
     const [selectedYear, setSelectedYear] = useState("2026");
 
     // 2. Extraer años únicos del historial para llenar el select
     const availableYears = useMemo(() => {
-        // Sacamos el año de la fecha "YYYY-MM"
         const years = new Set(pagos.map((p) => p.mes.split("-")[0]));
-        years.add("2026"); // Aseguramos que 2026 siempre exista como opción
-        return Array.from(years).sort((a, b) => b - a); // Orden descendente
+        years.add("2026");
+        return Array.from(years).sort((a, b) => b - a);
     }, [pagos]);
 
     // 3. Filtrar los pagos que correspondan al año seleccionado
@@ -422,7 +421,6 @@ function HistorialPagos({ pagos, loading }) {
 
     return (
         <div className="relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
-            {/* Brillo superior */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
             <div className="flex items-center justify-between mb-5 relative z-10">
@@ -445,7 +443,6 @@ function HistorialPagos({ pagos, loading }) {
                     </h3>
                 </div>
 
-                {/* Controles: Select de año y Contador */}
                 <div className="flex items-center gap-2">
                     <select
                         value={selectedYear}
@@ -489,7 +486,6 @@ function HistorialPagos({ pagos, loading }) {
                             <div>
                                 <p className="text-sm font-bold text-stone-800 capitalize">
                                     {formatMonth(pago.mes).split(" ")[0]}{" "}
-                                    {/* Opcional: Mostrar solo el mes si ya tienes el año en el filtro */}
                                 </p>
                                 <p className="text-xs text-stone-500 font-medium mt-0.5">
                                     {pago.tipo === "extraordinario"
@@ -508,9 +504,12 @@ function HistorialPagos({ pagos, loading }) {
                                     )}
                                 </span>
                                 {parseFloat(pago.restante) === 0 ? (
-                                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-green-100/60 text-green-700 border border-green-200/60 backdrop-blur-sm shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
+                                    <button
+                                        onClick={() => onVerRecibo(pago)}
+                                        className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-green-100/60 text-green-700 border border-green-200/60 backdrop-blur-sm shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] hover:bg-green-200/70 transition-colors cursor-pointer"
+                                    >
                                         Completo
-                                    </span>
+                                    </button>
                                 ) : (
                                     <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-red-100/60 text-red-700 border border-red-200/60 backdrop-blur-sm shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
                                         Resta $
@@ -534,6 +533,9 @@ export default function ResidentDashboard() {
     const [avisos, setAvisos] = useState([]);
     const [loadingPagos, setLoadingPagos] = useState(true);
     const [lastSync, setLastSync] = useState(null);
+    const [reciboAbierto, setReciboAbierto] = useState(false);
+    const [reciboVisible, setReciboVisible] = useState(false);
+    const [pagoSeleccionado, setPagoSeleccionado] = useState(null);
 
     const [correoOpen, setCorreoOpen] = useState(false);
     const [correoVisible, setCorreoVisible] = useState(false);
@@ -557,6 +559,20 @@ export default function ResidentDashboard() {
         setTimeout(() => setCamarasOpen(false), 300);
     };
 
+    const openRecibo = (pago) => {
+        setPagoSeleccionado(pago);
+        setReciboAbierto(true);
+        requestAnimationFrame(() => setReciboVisible(true));
+    };
+
+    const closeRecibo = () => {
+        setReciboVisible(false);
+        setTimeout(() => {
+            setReciboAbierto(false);
+            setPagoSeleccionado(null);
+        }, 300);
+    };
+
     const fetchData = useCallback(async () => {
         setLoadingPagos(true);
         try {
@@ -578,6 +594,17 @@ export default function ResidentDashboard() {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const reciboUuid = params.get("recibo");
+        if (reciboUuid && pagos.length > 0) {
+            const pago = pagos.find((p) => p.uuid === reciboUuid);
+            if (pago) {
+                openRecibo(pago);
+            }
+        }
+    }, [pagos]);
 
     const estado = useMemo(() => calcularEstado(pagos), [pagos]);
 
@@ -904,7 +931,11 @@ export default function ResidentDashboard() {
                 <TablonavisoResidente avisos={avisos} />
 
                 {/* Historial */}
-                <HistorialPagos pagos={pagos} loading={loadingPagos} />
+                <HistorialPagos
+                    pagos={pagos}
+                    loading={loadingPagos}
+                    onVerRecibo={openRecibo}
+                />
 
                 {/* ── Modal de correo (info de contacto) ── */}
                 {correoOpen && (
@@ -966,6 +997,127 @@ export default function ResidentDashboard() {
                             <p className="text-sm font-bold text-orange-500 mt-2 break-all">
                                 casetasanisidro088@gmail.com
                             </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* ── Modal de recibo de pago ── */}
+                {reciboAbierto && pagoSeleccionado && (
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+                        style={{ touchAction: "manipulation" }}
+                        onClick={closeRecibo}
+                    >
+                        <div
+                            className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-300"
+                            style={{ opacity: reciboVisible ? 1 : 0 }}
+                        />
+
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative w-full max-w-md flex flex-col bg-white/45 backdrop-blur-[5px] backdrop-saturate-200 border-t border-l border-white/70 border-r border-b border-white/30 z-10 overflow-hidden"
+                            style={{
+                                maxHeight: "90dvh",
+                                borderRadius: reciboVisible ? "2rem" : "9999px",
+                                transform: reciboVisible
+                                    ? "scale(1)"
+                                    : "scale(0.35)",
+                                opacity: reciboVisible ? 1 : 0,
+                                filter: reciboVisible
+                                    ? "blur(0px)"
+                                    : "blur(4px)",
+                                transformOrigin: "top right",
+                                transition:
+                                    "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out, filter 0.35s ease-out",
+                                boxShadow:
+                                    "0 25px 70px rgba(0,0,0,0.15), inset 0 2px 10px rgba(255,255,255,0.6)",
+                            }}
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-5 border-b border-white/30 shrink-0">
+                                <h3 className="text-lg font-bold text-stone-800">
+                                    Recibo de pago
+                                </h3>
+                                <button
+                                    onClick={closeRecibo}
+                                    className="p-2 text-stone-500 hover:text-stone-800 bg-white/40 hover:bg-white/70 rounded-full transition-all active:scale-95"
+                                >
+                                    <svg
+                                        className="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2.5}
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Contenido */}
+                            <div className="p-6 overflow-y-auto">
+                                <div className="text-center mb-6">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-orange-500">
+                                        Fraccionamiento San Isidro
+                                    </p>
+                                    <p className="text-xs text-stone-400 mt-1">
+                                        No. de recibo:{" "}
+                                        {String(pagoSeleccionado.id).padStart(
+                                            6,
+                                            "0",
+                                        )}
+                                    </p>
+                                </div>
+
+                                <div className="border-t border-white/60 my-4" />
+
+                                <div className="space-y-3 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-stone-500 font-semibold">
+                                            Mes pagado
+                                        </span>
+                                        <span className="text-stone-800 font-bold capitalize text-right">
+                                            {formatMonth(pagoSeleccionado.mes)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-stone-500 font-semibold">
+                                            Tipo
+                                        </span>
+                                        <span className="text-stone-800 font-bold capitalize text-right">
+                                            {pagoSeleccionado.tipo}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-stone-500 font-semibold">
+                                            Fecha de pago
+                                        </span>
+                                        <span className="text-stone-800 font-bold text-right">
+                                            {formatDate(
+                                                pagoSeleccionado.fecha_de_cobro,
+                                            )}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-white/60 my-4" />
+
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm font-bold text-stone-600">
+                                        Total pagado
+                                    </span>
+                                    <span className="text-2xl font-bold text-orange-600">
+                                        $
+                                        {parseFloat(
+                                            pagoSeleccionado.cantidad,
+                                        ).toLocaleString("es-MX")}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
