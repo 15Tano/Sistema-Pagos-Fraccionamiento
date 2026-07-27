@@ -307,4 +307,32 @@ class PagoController extends Controller
             }
         }
     }
+
+// RECIBO
+// ─────────────────────────────────────────
+public function recibo(Request $request, $uuid)
+{
+    $pago = Pago::with('vecino')->where('uuid', $uuid)->firstOrFail();
+
+    $user = $request->user();
+    $esAdmin = in_array($user->role, ['admin', 'capturista']);
+
+    if (!$esAdmin && (!$pago->vecino || $pago->vecino->user_id !== $user->id)) {
+        abort(403, 'No autorizado para ver este recibo.');
+    }
+
+    return response()->json([
+        'numero_recibo'  => $pago->id,
+        'vecino'         => $pago->vecino->nombre,
+        'calle'          => $pago->vecino->calle,
+        'numero_casa'    => $pago->vecino->numero_casa,
+        'mes'            => $pago->mes,
+        'cantidad'       => $pago->cantidad,
+        'tipo'           => $pago->tipo,
+        'fecha_de_cobro' => $pago->fecha_de_cobro,
+        'emitido'        => $pago->created_at,
+    ]);
+}
+
+    // ─────────────────────────────────────────
 }

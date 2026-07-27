@@ -1,47 +1,42 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Support\Facades\DB;
 use App\Models\Vecino;
 use App\Models\Tag;
-
 class DashboardController extends Controller
 {
     public function stats()
     {
         $mesActual = now()->format('Y-m');
-
-        // ── Total recaudado este mes ──
-$totalRecaudado = DB::table('pagos')
-            ->where('mes', $mesActual) // 1. Que pague la cuota de mayo
-            ->whereYear('created_at', now()->year) // 2. Que se haya registrado en este año
-            ->whereMonth('created_at', now()->month) // 3. Que se haya registrado en este mes
-            ->sum('cantidad');  
-
-        // ── IDs de vecinos que pagaron este mes ──
+        // ── 1. FLUJO DE CAJA REAL (El dinero que cuadra con tu Histórico) ──
+        // Sumamos TODO el dinero que entró físicamente este mes (Atrasos, Actuales, Adelantos y Tags)
+        $ingresosPagos = DB::table('pagos')
+            ->whereMonth(DB::raw('COALESCE(fecha_de_cobro, created_at)'), now()->month)
+            ->whereYear(DB::raw('COALESCE(fecha_de_cobro, created_at)'), now()->year)
+            ->sum('cantidad');
+        $ingresosTags = DB::table('tag_sales')
+            ->whereMonth(DB::raw('COALESCE(sold_at, created_at)'), now()->month)
+            ->whereYear(DB::raw('COALESCE(sold_at, created_at)'), now()->year)
+            ->sum('price');
+        $totalRecaudado = $ingresosPagos + $ingresosTags;
+        // ── 2. ESTADO DE CUENTA (Vecinos que ya cubrieron la cuota del mes) ──
         $vecinosPagaron = DB::table('pagos')
             ->where('mes', $mesActual)
             ->distinct()
             ->pluck('vecino_id');
-
         // ── Total vecinos ──
         $totalVecinos = Vecino::count();
-
-        // ── Morosos: vecinos con al menos un tag vendido que no pagaron ──
-        // Un tag "activo para acceso" = fue vendido (tiene tagSale)
+        // ── Morosos: vecinos con al menos un tag vendido que no pagaron el mes actual ──
         $morosos = Vecino::with(['tags' => fn($q) => $q->whereHas('tagSale')])
             ->whereHas('tags', fn($q) => $q->whereHas('tagSale'))
             ->whereNotIn('id', $vecinosPagaron)
             ->select('id', 'nombre', 'calle', 'numero_casa')
             ->orderBy('calle')
             ->get();
-
         // ── Tags vendidos y stock ──
         $tagsVendidos = DB::table('tag_sales')->count();
         $totalTags    = Tag::count();
         $tagsEnStock  = max(0, $totalTags - $tagsVendidos);
-
         // ── Últimas ventas de tags ──
         $ultimasVentas = DB::table('tag_sales')
             ->join('tags', 'tag_sales.tag_id', '=', 'tags.id')
@@ -53,7 +48,6 @@ $totalRecaudado = DB::table('pagos')
             ->orderByDesc('tag_sales.created_at')
             ->limit(20)
             ->get();
-
         return response()->json([
             'mes'                => $mesActual,
             'total_recaudado'    => (float) $totalRecaudado,

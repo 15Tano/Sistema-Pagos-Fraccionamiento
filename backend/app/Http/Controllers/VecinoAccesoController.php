@@ -39,7 +39,6 @@ class VecinoAccesoController extends Controller
             'password' => [
                 'required',
                 'string',
-                // Mínimo 6 caracteres; puedes usar Password::min(8)->... si prefieres más estricto
             ],
         ], [
             // Mensajes personalizados en español
@@ -70,7 +69,7 @@ class VecinoAccesoController extends Controller
                 'name'     => $vecino->nombre,   // nombre legible
                 'username' => $validated['username'],
                 'password' => $validated['password'], // se hashea por el cast
-                'role'     => 'vecino',               // rol fijo para este flujo
+                'role'     => 'residente',               // rol fijo para este flujo
             ]);
 
             // Enlazar el vecino con el nuevo usuario
@@ -82,5 +81,48 @@ class VecinoAccesoController extends Controller
         return response()->json([
             'message' => 'Acceso creado correctamente.',
         ], 201);
+    }
+
+    /**
+     * POST /api/vecinos/eliminar-acceso
+     *
+     * Elimina las credenciales de acceso (User) de un vecino
+     * y desvincula vecinos.user_id.
+     */
+    public function destroy(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'vecino_id' => ['required', 'integer', 'exists:vecinos,id'],
+        ], [
+            'vecino_id.required' => 'Debes seleccionar un vecino.',
+            'vecino_id.exists'   => 'El vecino seleccionado no existe en la base de datos.',
+        ]);
+
+        $vecino = Vecino::findOrFail($validated['vecino_id']);
+
+        if ($vecino->user_id === null) {
+            return response()->json([
+                'message' => 'Este vecino no cuenta con credenciales de acceso.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($vecino) {
+            $user = User::find($vecino->user_id);
+
+            // Desvincular primero, para no depender de que el delete del user salga bien
+            $vecino->update(['user_id' => null]);
+
+            if ($user) {
+                // Revoca cualquier token de Sanctum activo — si no haces esto, el
+                // residente puede seguir usando la PWA con la sesión ya abierta
+                // aunque borres el registro de User.
+                $user->tokens()->delete();
+                $user->delete();
+            }
+        });
+
+        return response()->json([
+            'message' => 'Acceso eliminado correctamente.',
+        ]);
     }
 }

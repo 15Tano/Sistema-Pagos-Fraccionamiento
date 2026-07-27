@@ -1,53 +1,45 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Vecino;
-
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
+        \Log::info('--- NUEVO INTENTO DE LOGIN ---');
+        \Log::info('Todo lo que envió React: ', $request->all());
         $request->validate([
             'email'    => 'required', // Este campo recibirá email o username
             'password' => 'required',
         ]);
-
         $input    = trim($request->input('email'));
         $password = $request->input('password');
-
         // 1. Intentamos buscar por Email (Admin) o Username (Residente)
         $user = User::where('email', $input)
                     ->orWhere('username', $input)
                     ->first();
-
         // 2. Validación de existencia y contraseña
         if (!$user || !Hash::check($password, $user->password)) {
             return response()->json([
                 'message' => 'Credenciales incorrectas.'
             ], 401);
         }
-
         // 3. Lógica según el Rol
         $responseData = [
             'id'   => $user->id,
             'name' => $user->name,
             'role' => $user->role,
         ];
-
         if ($user->role === 'residente') {
             // Buscamos al vecino vinculado
             $vecino = Vecino::where('user_id', $user->id)->first();
-
             if (!$vecino) {
                 return response()->json([
                     'message' => 'Usuario residente sin vecino vinculado.'
                 ], 401);
             }
-
             // Agregamos datos del vecino y sus tags al response
             $responseData['vecino_id']   = $vecino->id;
             $responseData['vecino_uuid'] = $vecino->uuid;
@@ -57,22 +49,18 @@ class AuthController extends Controller
                 'activo' => $t->activo,
             ]);
         }
-
         // 4. Generar Token y responder
         $token = $user->createToken('auth-token')->plainTextToken;
-
         return response()->json([
             'token' => $token,
             'user'  => $responseData,
         ]);
     }
-
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sesión cerrada correctamente.']);
     }
-
     public function me(Request $request)
     {
         // Cargamos la relación del vecino si es residente para que el frontend tenga todo
