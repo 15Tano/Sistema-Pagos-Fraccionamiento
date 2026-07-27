@@ -5,9 +5,11 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\Pago;
 use App\Models\Vecino;
 use App\Models\Tag;
+use App\Models\Aviso;
 use App\Observers\PagoObserver;
 use App\Observers\VecinoObserver;
 use App\Observers\TagObserver;
+use App\Observers\AvisoObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,5 +20,6 @@ class AppServiceProvider extends ServiceProvider
         Pago::observe(PagoObserver::class);
         Vecino::observe(VecinoObserver::class);
         Tag::observe(TagObserver::class);
+        Aviso::observe(AvisoObserver::class);
     }
 }
