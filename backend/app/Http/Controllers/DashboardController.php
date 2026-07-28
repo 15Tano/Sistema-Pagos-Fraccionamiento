@@ -37,6 +37,27 @@ class DashboardController extends Controller
         $tagsVendidos = DB::table('tag_sales')->count();
         $totalTags    = Tag::count();
         $tagsEnStock  = max(0, $totalTags - $tagsVendidos);
+
+        // ── Ranking de adopción por plaza (% de vecinos con cuenta de residente) ──
+        $rankingPlazas = Vecino::select('calle')
+            ->selectRaw('COUNT(*) as total_vecinos')
+            ->selectRaw('SUM(CASE WHEN user_id IS NOT NULL THEN 1 ELSE 0 END) as con_cuenta')
+            ->groupBy('calle')
+            ->get()
+            ->map(function ($row) {
+                $porcentaje = $row->total_vecinos > 0
+                    ? round(($row->con_cuenta / $row->total_vecinos) * 100, 1)
+                    : 0;
+                return [
+                    'calle'      => $row->calle,
+                    'total'      => (int) $row->total_vecinos,
+                    'con_cuenta' => (int) $row->con_cuenta,
+                    'porcentaje' => $porcentaje,
+                ];
+            })
+            ->sortByDesc('porcentaje')
+            ->values();
+
         // ── Últimas ventas de tags ──
         $ultimasVentas = DB::table('tag_sales')
             ->join('tags', 'tag_sales.tag_id', '=', 'tags.id')
@@ -48,6 +69,9 @@ class DashboardController extends Controller
             ->orderByDesc('tag_sales.created_at')
             ->limit(20)
             ->get();
+
+    
+    
         return response()->json([
             'mes'                => $mesActual,
             'total_recaudado'    => (float) $totalRecaudado,
@@ -57,6 +81,7 @@ class DashboardController extends Controller
             'tags_en_stock'      => $tagsEnStock,
             'morosos'            => $morosos,
             'ultimas_ventas'     => $ultimasVentas,
+            'ranking_plazas'     => $rankingPlazas,
         ]);
     }
 }
