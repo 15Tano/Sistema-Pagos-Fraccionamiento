@@ -3,8 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import useAuthStore from "./store/authStore";
 import Layout from "./components/layout/layout.jsx";
 import { linkOneSignalUser, unlinkOneSignalUser } from "./lib/onesignal";
-
-import Login from "./pages/Login.jsx";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Vecinos from "./pages/Vecinos.jsx";
 import Pagos from "./pages/Pagos.jsx";
