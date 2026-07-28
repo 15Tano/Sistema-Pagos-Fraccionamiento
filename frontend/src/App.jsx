@@ -29,6 +29,17 @@ const AdminRoute = ({ children }) => (
     </PrivateRoute>
 );
 
+const RootRoute = () => {
+    const { isAuthenticated, user } = useAuthStore();
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    if (user?.role === "residente") return <Navigate to="/residente" replace />;
+    return (
+        <AdminRoute>
+            <Dashboard />
+        </AdminRoute>
+    );
+};
+
 function App() {
     const { isAuthenticated, user } = useAuthStore();
 
@@ -45,14 +56,7 @@ function App() {
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/guest" element={<GuestView />} />
-                <Route
-                    path="/"
-                    element={
-                        <AdminRoute>
-                            <Dashboard />
-                        </AdminRoute>
-                    }
-                />
+                <Route path="/" element={<RootRoute />} />
                 <Route
                     path="/vecinos"
                     element={
