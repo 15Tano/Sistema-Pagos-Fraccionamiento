@@ -7,6 +7,7 @@ import {
 } from "../../../api/avisos";
 import { TIPO_CONFIG_ADMIN } from "../config/avisosConfig";
 import AvisoModal from "./AvisoModal";
+import PaginatedPanel from "./PaginatedPanel";
 
 export default function AvisosAdmin() {
     const [avisos, setAvisos] = useState([]);
@@ -127,20 +128,18 @@ export default function AvisosAdmin() {
                     </button>
                 </div>
 
-                <div className="flex flex-col gap-2 relative z-10 overflow-y-auto">
-                    {avisos.length === 0 ? (
-                        <div className="flex items-center justify-center h-16 text-sm font-medium text-stone-400">
-                            Sin avisos publicados
-                        </div>
-                    ) : (
-                        avisos.map((aviso) => {
+                <div className="relative z-10 flex-1 min-h-0 flex flex-col">
+                    <PaginatedPanel
+                        items={avisos}
+                        emptyText="Sin avisos publicados"
+                        renderItem={(aviso) => {
                             const cfg =
                                 TIPO_CONFIG_ADMIN[aviso.tipo] ||
                                 TIPO_CONFIG_ADMIN.informativo;
                             return (
                                 <div
                                     key={aviso.id}
-                                    className="flex items-center gap-3 p-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
+                                    className="flex items-center gap-3 p-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 mb-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
                                 >
                                     <div className="flex items-center gap-3 flex-1 min-w-0">
                                         {/* --- AQUÍ VA LA IMAGEN --- */}
@@ -210,8 +209,8 @@ export default function AvisosAdmin() {
                                     </div>
                                 </div>
                             );
-                        })
-                    )}
+                        }}
+                    />
                 </div>
             </div>
 
