@@ -119,7 +119,7 @@ export default function ResidentDashboard() {
     }
 
     return (
-        <div className="min-h-screen p-4 md:p-6 bg-stone-50/50 relative">
+        <div className="min-h-dvh p-4 md:p-6 bg-stone-50/50 relative">
             <NotificationBanner />
             {/* Elementos decorativos de fondo opcionales para dar vida al blur */}
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-200/30 rounded-full blur-3xl pointer-events-none" />

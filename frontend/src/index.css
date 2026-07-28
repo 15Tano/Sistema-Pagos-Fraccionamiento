@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+    overscroll-behavior-y: none;
+    height: 100%;
+}
+
 /* ── APP SHELL ── */
 .app-shell {
     min-height: 100vh;
