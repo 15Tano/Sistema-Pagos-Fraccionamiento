@@ -5,7 +5,7 @@ import Layout from "./components/layout/layout.jsx";
 import { linkOneSignalUser, unlinkOneSignalUser } from "./lib/onesignal";
 
 import Login from "./pages/Login.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
+import Dashboard from "./pages/Dashboard";
 import Vecinos from "./pages/Vecinos.jsx";
 import Pagos from "./pages/Pagos.jsx";
 import Tags from "./pages/Tags.jsx";
