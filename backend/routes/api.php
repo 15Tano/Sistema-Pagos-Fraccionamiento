@@ -75,3 +75,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // ─── ZKTeco (acceso desde script Python — token separado) ─────────
 Route::get('/vencimientos', [ZkApiController::class, 'index']);
+
+Route::get('/ping', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toDateTimeString(),
+    ]);
+});
