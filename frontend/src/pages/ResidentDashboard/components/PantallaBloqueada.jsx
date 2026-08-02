@@ -48,7 +48,12 @@ export default function PantallaBloqueada({
                     <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-300/40 to-transparent" />
 
                     <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-red-500/20 border border-red-400/30 flex items-center justify-center animate-pulse">
-                        <svg className="w-10 h-10 text-red-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                            className="w-10 h-10 text-red-100"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -68,7 +73,8 @@ export default function PantallaBloqueada({
                     <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/15 border border-red-400/25 mb-6">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                         <span className="text-[11px] font-bold text-red-200 uppercase tracking-wide">
-                            Bloqueado hace {diasBloqueado} {diasBloqueado === 1 ? "día" : "días"}
+                            Bloqueado hace {diasBloqueado}{" "}
+                            {diasBloqueado === 1 ? "día" : "días"}
                         </span>
                     </div>
 
@@ -102,7 +108,12 @@ export default function PantallaBloqueada({
                     onClick={correo.open}
                     className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/40 rounded-2xl text-xs font-semibold text-red-100/70 hover:bg-white/10 hover:text-red-100 transition-all"
                 >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
                         <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -118,7 +129,7 @@ export default function PantallaBloqueada({
                 isOpen={correo.isOpen}
                 isVisible={correo.isVisible}
                 onClose={correo.close}
-                email="vigilanciasanisidro@gmail.com"
+                email="casetasanisidro088@gmail.com"
                 boxClassName="bg-white/95 backdrop-blur-2xl"
                 transformOrigin="bottom center"
             />
