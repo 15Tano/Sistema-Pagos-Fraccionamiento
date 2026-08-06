@@ -27,6 +27,13 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
     const dropdownRef = useRef(null);
     const [pagoConfirmado, setPagoConfirmado] = useState(null);
 
+    // ── búsqueda de vecino: estado de carga, resultados totales y navegación por teclado ──
+    const [searching, setSearching] = useState(false);
+    const [totalEncontrados, setTotalEncontrados] = useState(0);
+    const [highlightedIndex, setHighlightedIndex] = useState(-1);
+    const abortRef = useRef(null);
+    const RESULTADOS_VISIBLES = 15; // antes 8 — muchos vecinos comparten calle y se cortaban
+
     // Poblar form al editar
     useEffect(() => {
         if (editingPago) {
@@ -57,6 +64,21 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
         }
     }, [editingPago]);
 
+    // Cerrar el dropdown de búsqueda al hacer click fuera
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(e.target)
+            ) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const resetForm = () => {
         setSelectedVecino(null);
         setVecinoSearch("");
@@ -72,23 +94,63 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
     const handleVecinoSearch = (val) => {
         setVecinoSearch(val);
         setSelectedVecino(null);
+        setHighlightedIndex(-1);
         clearTimeout(searchTimeout.current);
+        abortRef.current?.abort();
+
         if (!val.trim()) {
             setVecinoResults([]);
             setShowDropdown(false);
+            setSearching(false);
             return;
         }
+
+        setShowDropdown(true);
+        setSearching(true);
         searchTimeout.current = setTimeout(async () => {
+            const controller = new AbortController();
+            abortRef.current = controller;
             try {
                 const res = await api.get("/vecinos", {
-                    params: { search: val, per_page: 8 },
+                    params: { search: val, per_page: RESULTADOS_VISIBLES },
+                    signal: controller.signal,
                 });
                 setVecinoResults(res.data.data || []);
-                setShowDropdown(true);
-            } catch {
-                setVecinoResults([]);
+                setTotalEncontrados(
+                    res.data.total ?? (res.data.data || []).length,
+                );
+            } catch (err) {
+                // Una búsqueda cancelada (porque llegó una más nueva) no debe
+                // borrar resultados que ya se están mostrando de la búsqueda actual.
+                if (err.code !== "ERR_CANCELED") {
+                    setVecinoResults([]);
+                    setTotalEncontrados(0);
+                }
+            } finally {
+                if (abortRef.current === controller) setSearching(false);
             }
-        }, 200);
+        }, 150);
+    };
+
+    const handleVecinoKeyDown = (e) => {
+        if (!showDropdown || vecinoResults.length === 0) return;
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setHighlightedIndex((i) => (i + 1) % vecinoResults.length);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setHighlightedIndex(
+                (i) => (i - 1 + vecinoResults.length) % vecinoResults.length,
+            );
+        } else if (e.key === "Enter") {
+            if (highlightedIndex >= 0) {
+                e.preventDefault();
+                selectVecino(vecinoResults[highlightedIndex]);
+            }
+        } else if (e.key === "Escape") {
+            setShowDropdown(false);
+            setHighlightedIndex(-1);
+        }
     };
 
     const selectVecino = (v) => {
@@ -96,6 +158,7 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
         setVecinoSearch(`${v.nombre} — ${v.calle} #${v.numero_casa}`);
         setShowDropdown(false);
         setVecinoResults([]);
+        setHighlightedIndex(-1);
     };
 
     const recargo = tipo === "extraordinario" ? RECARGO_EXTRA : 0;
@@ -191,6 +254,11 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                                     <SearchIcon />
                                 </div>
                             )}
+                            {searching && (
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                                    <div className="w-4 h-4 border-2 border-stone-300 border-t-orange-500 rounded-full animate-spin" />
+                                </div>
+                            )}
                             <input
                                 type="text"
                                 value={vecinoSearch}
@@ -201,8 +269,13 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                                     vecinoResults.length > 0 &&
                                     setShowDropdown(true)
                                 }
+                                onKeyDown={handleVecinoKeyDown}
                                 placeholder="Buscar por nombre, apellidos o número de casa..."
-                                className="w-full pl-10 pr-10 py-3 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-700 placeholder-stone-400 transition-all"
+                                className={`w-full pl-10 pr-10 py-3 backdrop-blur-md border rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 text-sm font-medium placeholder-stone-400 transition-all ${
+                                    selectedVecino
+                                        ? "bg-green-50/70 border-green-300/70 focus:ring-green-500/20 focus:border-green-400 text-stone-700"
+                                        : "bg-white/50 border-white/60 focus:ring-orange-500/20 focus:border-orange-400 text-stone-700"
+                                }`}
                                 disabled={loading}
                             />
                             {vecinoSearch && (
@@ -218,43 +291,86 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                                     <XIcon />
                                 </button>
                             )}
-                            {showDropdown && vecinoResults.length > 0 && (
+                            {showDropdown && (
                                 <div className="absolute z-30 top-full left-0 right-0 mt-1.5 bg-white/95 backdrop-blur-xl border border-white/80 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] overflow-hidden max-h-60 overflow-y-auto">
-                                    {vecinoResults.map((v) => (
-                                        <button
-                                            key={v.id}
-                                            type="button"
-                                            onClick={() => selectVecino(v)}
-                                            className="w-full px-5 py-3 text-left hover:bg-orange-50/80 border-b border-black/5 last:border-0 transition-colors"
-                                        >
-                                            <p className="text-sm font-semibold text-stone-800">
-                                                {v.nombre}
-                                            </p>
-                                            <p className="text-xs font-medium text-stone-500 mt-0.5">
-                                                {v.calle} #{v.numero_casa}
-                                            </p>
-                                        </button>
-                                    ))}
+                                    {searching ? (
+                                        <div className="px-5 py-4 flex items-center gap-2.5 text-sm font-medium text-stone-400">
+                                            <div className="w-3.5 h-3.5 border-2 border-stone-300 border-t-orange-500 rounded-full animate-spin" />
+                                            Buscando...
+                                        </div>
+                                    ) : vecinoResults.length > 0 ? (
+                                        <>
+                                            {vecinoResults.map((v, i) => (
+                                                <button
+                                                    key={v.id}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        selectVecino(v)
+                                                    }
+                                                    onMouseEnter={() =>
+                                                        setHighlightedIndex(i)
+                                                    }
+                                                    className={`w-full px-5 py-3 text-left border-b border-black/5 last:border-0 transition-colors ${
+                                                        i === highlightedIndex
+                                                            ? "bg-orange-50/80"
+                                                            : "hover:bg-orange-50/80"
+                                                    }`}
+                                                >
+                                                    <p className="text-sm font-semibold text-stone-800">
+                                                        {v.nombre}
+                                                    </p>
+                                                    <p className="text-xs font-medium text-stone-500 mt-0.5">
+                                                        {v.calle} #
+                                                        {v.numero_casa}
+                                                    </p>
+                                                </button>
+                                            ))}
+                                            {totalEncontrados >
+                                                vecinoResults.length && (
+                                                <p className="px-5 py-2 text-[11px] font-medium text-stone-400 bg-stone-50/80 border-t border-black/5">
+                                                    +
+                                                    {totalEncontrados -
+                                                        vecinoResults.length}{" "}
+                                                    más — sigue escribiendo para
+                                                    afinar
+                                                </p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="px-5 py-4 text-sm font-medium text-stone-400">
+                                            Sin resultados para "{vecinoSearch}"
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
                         {selectedVecino && (
-                            <div className="mt-2.5 px-4 py-2.5 rounded-xl bg-green-100/40 border border-green-200/60 text-xs text-green-700 font-medium shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] flex items-center gap-2">
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M5 13l4 4L19 7"
-                                    />
-                                </svg>
-                                {selectedVecino.nombre} — {selectedVecino.calle}{" "}
-                                #{selectedVecino.numero_casa}
+                            <div className="mt-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300/70 shadow-[0_4px_14px_rgba(34,197,94,0.15),inset_0_1px_2px_rgba(255,255,255,0.8)] flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shrink-0 shadow-[0_3px_8px_rgba(34,197,94,0.35)]">
+                                    <svg
+                                        className="w-5 h-5 text-white"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={3}
+                                            d="M5 13l4 4L19 7"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-sm font-bold text-stone-800 truncate">
+                                        {selectedVecino.nombre}
+                                    </p>
+                                    <p className="text-xs font-medium text-green-700/80">
+                                        {selectedVecino.calle} #
+                                        {selectedVecino.numero_casa} · Vecino
+                                        seleccionado
+                                    </p>
+                                </div>
                             </div>
                         )}
                     </div>
