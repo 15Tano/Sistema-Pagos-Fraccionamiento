@@ -134,7 +134,9 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                     numero_casa: selectedVecino.numero_casa,
                     total: totalCalc,
                     mesesPagados,
+                    mes,
                     tipo,
+                    fechaHora: new Date(),
                 });
             }
             resetForm();
