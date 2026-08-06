@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import api from "../../../lib/axios";
 import { SearchIcon, XIcon } from "./Icons";
 import { CUOTAS, RECARGO_EXTRA } from "../constantes";
+import PagoRegistradoModal from "./PagoRegistradoModal";
 import { getLocalToday, getLocalMonth } from "../fechas";
 
 // ── FORMULARIO DE PAGO ──
@@ -24,6 +25,7 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
     const [error, setError] = useState("");
     const searchTimeout = useRef(null);
     const dropdownRef = useRef(null);
+    const [pagoConfirmado, setPagoConfirmado] = useState(null);
 
     // Poblar form al editar
     useEffect(() => {
@@ -126,6 +128,14 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                 await api.put(`/pagos/${editingPago.uuid}`, payload);
             } else {
                 await api.post("/pagos", payload);
+                setPagoConfirmado({
+                    nombre: selectedVecino.nombre,
+                    calle: selectedVecino.calle,
+                    numero_casa: selectedVecino.numero_casa,
+                    total: totalCalc,
+                    mesesPagados,
+                    tipo,
+                });
             }
             resetForm();
             onSaved();
@@ -389,6 +399,10 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                     </button>
                 </div>
             </form>
+            <PagoRegistradoModal
+                pago={pagoConfirmado}
+                onClose={() => setPagoConfirmado(null)}
+            />
         </div>
     );
 }
