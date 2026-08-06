@@ -6,7 +6,7 @@ import { linkOneSignalUser, unlinkOneSignalUser } from "./lib/onesignal";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Vecinos from "./pages/Vecinos.jsx";
-import Pagos from "./pages/Pagos.jsx";
+import Pagos from "./pages/Pagos";
 import Tags from "./pages/Tags.jsx";
 import Historico from "./pages/Historico.jsx";
 import ResidentDashboard from "./pages/ResidentDashboard";
