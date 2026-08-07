@@ -16,15 +16,19 @@ class VecinoController extends Controller
 
     $query = Vecino::with(['tags']);
 
+
     if ($search) {
         $query->where(function ($q) use ($search) {
-            // Búsqueda simultánea en nombre, calle y numero_casa
+            // Búsqueda simultánea en nombre, calle, numero_casa y tag
             $terms = explode(' ', trim($search));
             foreach ($terms as $term) {
                 $q->where(function ($inner) use ($term) {
                     $inner->where('nombre', 'like', "%{$term}%")
-                          ->orWhere('calle', 'like', "%{$term}%")
-                          ->orWhere('numero_casa', 'like', "%{$term}%");
+                        ->orWhere('calle', 'like', "%{$term}%")
+                        ->orWhere('numero_casa', 'like', "%{$term}%")
+                        ->orWhereHas('tags', function ($tagQuery) use ($term) {
+                            $tagQuery->where('codigo', 'like', "%{$term}%");
+                        });
                 });
             }
         });

@@ -341,7 +341,7 @@ export default function VistaVigilancia() {
                                 vecinoResults.length > 0 &&
                                 setShowDropdown(true)
                             }
-                            placeholder="Nombre, apellidos o número de casa..."
+                            placeholder="Nombre, casa o número de tag..."
                             className="w-full pl-12 pr-12 py-3.5 bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-400 focus:bg-white/80 text-base font-medium text-stone-800 placeholder-stone-500 transition-all hover:bg-white/60"
                         />
                         {vecinoSearch && (
