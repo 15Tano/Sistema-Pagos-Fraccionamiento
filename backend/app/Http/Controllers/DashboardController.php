@@ -39,25 +39,34 @@ class DashboardController extends Controller
         $tagsEnStock  = max(0, $totalTags - $tagsVendidos);
 
         // ── Ranking de adopción por plaza (% de vecinos con cuenta de residente) ──
-        $rankingPlazas = Vecino::select('calle')
-            ->selectRaw('COUNT(*) as total_vecinos')
-            ->selectRaw('SUM(CASE WHEN user_id IS NOT NULL THEN 1 ELSE 0 END) as con_cuenta')
-            ->groupBy('calle')
-            ->get()
-            ->map(function ($row) {
-                $porcentaje = $row->total_vecinos > 0
-                    ? round(($row->con_cuenta / $row->total_vecinos) * 100, 1)
-                    : 0;
-                return [
-                    'calle'      => $row->calle,
-                    'total'      => (int) $row->total_vecinos,
-                    'con_cuenta' => (int) $row->con_cuenta,
-                    'porcentaje' => $porcentaje,
-                ];
-            })
-            ->sortByDesc('porcentaje')
-            ->values();
+$vecinosPlaza = Vecino::select('id', 'nombre', 'calle', 'numero_casa', 'user_id')->get();
 
+$rankingPlazas = $vecinosPlaza
+    ->groupBy('calle')
+    ->map(function ($grupo, $calle) {
+        $total = $grupo->count();
+        $conCuenta = $grupo->whereNotNull('user_id')->count();
+        $porcentaje = $total > 0 ? round(($conCuenta / $total) * 100, 1) : 0;
+
+        $sinCuenta = $grupo->whereNull('user_id')
+            ->sortBy('numero_casa')
+            ->values()
+            ->map(fn($v) => [
+                'id'          => $v->id,
+                'nombre'      => $v->nombre,
+                'numero_casa' => $v->numero_casa,
+            ]);
+
+        return [
+            'calle'              => $calle,
+            'total'              => $total,
+            'con_cuenta'         => $conCuenta,
+            'porcentaje'         => $porcentaje,
+            'vecinos_sin_cuenta' => $sinCuenta,
+        ];
+    })
+    ->sortByDesc('porcentaje')
+    ->values();
         // ── Últimas ventas de tags ──
         $ultimasVentas = DB::table('tag_sales')
             ->join('tags', 'tag_sales.tag_id', '=', 'tags.id')

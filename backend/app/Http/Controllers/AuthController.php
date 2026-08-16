@@ -26,6 +26,30 @@ class AuthController extends Controller
                 'message' => 'Credenciales incorrectas.'
             ], 401);
         }
+
+        // 3.5 Validación de horario para equipos de cobro
+        $asignacion = null;
+        if ($user->role === 'capturista') {
+            $asignacion = \App\Models\AsignacionCobro::where('user_id', $user->id)
+                ->whereDate('fecha', today())
+                ->first();
+
+            if (!$asignacion) {
+                return response()->json([
+                    'message' => 'No tienes acceso asignado el día de hoy.'
+                ], 403);
+            }
+
+            $inicio = \Carbon\Carbon::parse($asignacion->fecha->toDateString() . ' ' . $asignacion->hora_inicio);
+            $fin    = \Carbon\Carbon::parse($asignacion->fecha->toDateString() . ' ' . $asignacion->hora_fin);
+
+            if (!now()->between($inicio, $fin)) {
+                return response()->json([
+                    'message' => 'Fuera del horario permitido de cobro.'
+                ], 403);
+            }
+        }
+
         // 3. Lógica según el Rol
         $responseData = [
             'id'   => $user->id,
@@ -50,7 +74,8 @@ class AuthController extends Controller
             ]);
         }
         // 4. Generar Token y responder
-        $token = $user->createToken('auth-token')->plainTextToken;
+        $expiracion = $asignacion ? $fin : null;
+        $token = $user->createToken('auth-token', ['*'], $expiracion)->plainTextToken;
         return response()->json([
             'token' => $token,
             'user'  => $responseData,

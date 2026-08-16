@@ -13,6 +13,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { user } = useAuthStore();
+    const [plazaExpandida, setPlazaExpandida] = useState(null);
     const esCapturista = user?.role === "capturista";
 
     const rankingConPosicion = useMemo(() => {
@@ -252,50 +253,98 @@ export default function Dashboard() {
                     <PaginatedPanel
                         items={rankingConPosicion}
                         emptyText="Sin datos de plazas aún."
-                        renderItem={(plaza) => (
-                            <div
-                                key={plaza.calle}
-                                className="flex items-center gap-3 p-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 mb-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
-                            >
-                                <div className="w-7 h-7 shrink-0 flex items-center justify-center">
-                                    {plaza.rank <= 3 ? (
-                                        <span className="text-lg">
-                                            {plaza.rank === 1
-                                                ? "🥇"
-                                                : plaza.rank === 2
-                                                  ? "🥈"
-                                                  : "🥉"}
-                                        </span>
-                                    ) : (
-                                        <span className="text-xs font-bold text-stone-400">
-                                            #{plaza.rank}
-                                        </span>
-                                    )}
+                        renderItem={(plaza) => {
+                            const expandida = plazaExpandida === plaza.calle;
+                            return (
+                                <div
+                                    key={plaza.calle}
+                                    className="p-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 mb-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
+                                >
+                                    <button
+                                        onClick={() =>
+                                            setPlazaExpandida(
+                                                expandida ? null : plaza.calle,
+                                            )
+                                        }
+                                        className="w-full flex items-center gap-3 text-left"
+                                    >
+                                        <div className="w-7 h-7 shrink-0 flex items-center justify-center">
+                                            {plaza.rank <= 3 ? (
+                                                <span className="text-lg">
+                                                    {plaza.rank === 1
+                                                        ? "🥇"
+                                                        : plaza.rank === 2
+                                                          ? "🥈"
+                                                          : "🥉"}
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs font-bold text-stone-400">
+                                                    #{plaza.rank}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <p className="text-sm font-bold text-stone-800 capitalize truncate drop-shadow-sm">
+                                                    {plaza.calle}
+                                                </p>
+                                                <span className="text-xs font-bold text-stone-600 shrink-0 ml-2">
+                                                    {plaza.porcentaje}%
+                                                </span>
+                                            </div>
+                                            <div className="w-full h-2 rounded-full bg-white/60 border border-white/60 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
+                                                <div
+                                                    className="h-full rounded-full bg-gradient-to-r from-orange-400 to-orange-500 shadow-[0_0_4px_rgba(249,115,22,0.4)] transition-all duration-500"
+                                                    style={{
+                                                        width: `${plaza.porcentaje}%`,
+                                                    }}
+                                                />
+                                            </div>
+                                            <p className="text-[10px] font-semibold text-stone-400 mt-1">
+                                                {plaza.con_cuenta} de{" "}
+                                                {plaza.total} vecinos
+                                                registrados
+                                                {plaza.vecinos_sin_cuenta
+                                                    .length > 0 && (
+                                                    <span className="text-orange-500">
+                                                        {" "}
+                                                        ·{" "}
+                                                        {
+                                                            plaza
+                                                                .vecinos_sin_cuenta
+                                                                .length
+                                                        }{" "}
+                                                        faltan{" "}
+                                                        {expandida ? "▲" : "▼"}
+                                                    </span>
+                                                )}
+                                            </p>
+                                        </div>
+                                    </button>
+
+                                    {expandida &&
+                                        plaza.vecinos_sin_cuenta.length > 0 && (
+                                            <div className="mt-3 pt-3 border-t border-white/50 flex flex-col gap-1.5">
+                                                {plaza.vecinos_sin_cuenta.map(
+                                                    (v) => (
+                                                        <div
+                                                            key={v.id}
+                                                            className="flex items-center justify-between px-2.5 py-1.5 bg-orange-50/40 rounded-lg"
+                                                        >
+                                                            <span className="text-xs font-semibold text-stone-700 capitalize">
+                                                                {v.nombre}
+                                                            </span>
+                                                            <span className="text-[10px] font-bold text-stone-400">
+                                                                #{v.numero_casa}
+                                                            </span>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        )}
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <p className="text-sm font-bold text-stone-800 capitalize truncate drop-shadow-sm">
-                                            {plaza.calle}
-                                        </p>
-                                        <span className="text-xs font-bold text-stone-600 shrink-0 ml-2">
-                                            {plaza.porcentaje}%
-                                        </span>
-                                    </div>
-                                    <div className="w-full h-2 rounded-full bg-white/60 border border-white/60 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
-                                        <div
-                                            className="h-full rounded-full bg-gradient-to-r from-orange-400 to-orange-500 shadow-[0_0_4px_rgba(249,115,22,0.4)] transition-all duration-500"
-                                            style={{
-                                                width: `${plaza.porcentaje}%`,
-                                            }}
-                                        />
-                                    </div>
-                                    <p className="text-[10px] font-semibold text-stone-400 mt-1">
-                                        {plaza.con_cuenta} de {plaza.total}{" "}
-                                        vecinos registrados
-                                    </p>
-                                </div>
-                            </div>
-                        )}
+                            );
+                        }}
                     />
                 </PanelSeccion>
 
