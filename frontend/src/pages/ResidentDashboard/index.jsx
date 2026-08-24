@@ -104,7 +104,7 @@ export default function ResidentDashboard() {
     );
 
     useEffect(() => {
-        if (encuesta && !yaVotoEncuesta) {
+        if (encuesta?.activa && !yaVotoEncuesta) {
             encuestaModal.open();
         }
     }, [encuesta, yaVotoEncuesta]);
@@ -213,7 +213,7 @@ export default function ResidentDashboard() {
                     onVotar={handleVotarEncuesta}
                 />
 
-                {encuesta && !yaVotoEncuesta && (
+                {encuesta?.activa && !yaVotoEncuesta && (
                     <BotonEncuesta onClick={encuestaModal.open} />
                 )}
 

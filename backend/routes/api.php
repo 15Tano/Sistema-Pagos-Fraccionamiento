@@ -80,6 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/encuestas', [EncuestaController::class, 'store']);
         Route::patch('/encuestas/{encuesta}/toggle', [EncuestaController::class, 'toggle']);
         Route::get('/encuestas/{encuesta}/resultados', [EncuestaController::class, 'resultados']);
+        Route::get('/encuestas/{encuesta}/votos', [EncuestaController::class, 'votos']);
 });
 
 // ─── ZKTeco (acceso desde script Python — token separado) ─────────

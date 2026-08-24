@@ -12,5 +12,7 @@ export const createEncuesta = (data) => api.post("/encuestas", data);
 
 export const toggleEncuesta = (id) => api.patch(`/encuestas/${id}/toggle`);
 
+export const getVotosEncuesta = (id) => api.get(`/encuestas/${id}/votos`);
+
 export const getResultadosEncuesta = (id) =>
     api.get(`/encuestas/${id}/resultados`);

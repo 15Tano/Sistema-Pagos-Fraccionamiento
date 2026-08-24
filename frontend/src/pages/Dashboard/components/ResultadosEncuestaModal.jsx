@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { createPortal } from "react-dom";
+import { getVotosEncuesta } from "../../../api/encuestas";
 
 export default function ResultadosEncuestaModal({
     open,
@@ -7,7 +9,30 @@ export default function ResultadosEncuestaModal({
     loading,
     onClose,
 }) {
+    const [mostrarDetalle, setMostrarDetalle] = useState(false);
+    const [votos, setVotos] = useState(null);
+    const [loadingVotos, setLoadingVotos] = useState(false);
+
     if (!open) return null;
+
+    const toggleDetalle = async () => {
+        if (mostrarDetalle) {
+            setMostrarDetalle(false);
+            return;
+        }
+        setMostrarDetalle(true);
+        if (votos === null) {
+            setLoadingVotos(true);
+            try {
+                const res = await getVotosEncuesta(encuesta.id);
+                setVotos(res.data || []);
+            } catch {
+                setVotos([]);
+            } finally {
+                setLoadingVotos(false);
+            }
+        }
+    };
 
     return createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
@@ -16,7 +41,7 @@ export default function ResultadosEncuestaModal({
                 onClick={onClose}
             />
 
-            <div className="relative w-full max-w-md bg-white/40 backdrop-blur-sm border-t border-l border-white/80 border-r border-b border-white/40 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1),inset_0_2px_10px_rgba(255,255,255,0.8)] p-8 z-10">
+            <div className="relative w-full max-w-md max-h-[85vh] overflow-y-auto bg-white/40 backdrop-blur-sm border-t border-l border-white/80 border-r border-b border-white/40 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1),inset_0_2px_10px_rgba(255,255,255,0.8)] p-8 z-10">
                 <h3 className="text-lg font-bold text-stone-800 mb-1 drop-shadow-sm pr-8">
                     {encuesta?.pregunta}
                 </h3>
@@ -63,6 +88,67 @@ export default function ResultadosEncuestaModal({
                         <p className="text-center text-xs text-stone-400 mb-2">
                             {resultados.total_votos} vecinos han votado
                         </p>
+
+                        {resultados.total_votos > 0 && (
+                            <button
+                                onClick={toggleDetalle}
+                                className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-orange-600 hover:text-orange-700 transition-colors"
+                            >
+                                {mostrarDetalle
+                                    ? "Ocultar detalle"
+                                    : "Ver quién votó qué"}
+                                <svg
+                                    className={`w-3.5 h-3.5 transition-transform ${mostrarDetalle ? "rotate-180" : ""}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2.5}
+                                        d="M19 9l-7 7-7-7"
+                                    />
+                                </svg>
+                            </button>
+                        )}
+
+                        {mostrarDetalle && (
+                            <div className="mt-2 pt-3 border-t border-white/50 max-h-56 overflow-y-auto space-y-1.5">
+                                {loadingVotos ? (
+                                    <div className="flex justify-center py-4">
+                                        <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                ) : votos && votos.length > 0 ? (
+                                    votos.map((v, i) => (
+                                        <div
+                                            key={i}
+                                            className="flex items-center justify-between px-3 py-2 bg-white/50 rounded-lg border border-white/60"
+                                        >
+                                            <div className="min-w-0">
+                                                <p className="text-xs font-bold text-stone-700 truncate capitalize">
+                                                    {v.vecino}
+                                                </p>
+                                                {(v.calle || v.numero_casa) && (
+                                                    <p className="text-[10px] text-stone-400">
+                                                        {v.calle}{" "}
+                                                        {v.numero_casa &&
+                                                            `#${v.numero_casa}`}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <span className="text-[11px] font-semibold text-orange-600 shrink-0 ml-2 truncate max-w-[40%]">
+                                                {v.opcion}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-center text-xs text-stone-400 py-2">
+                                        Sin votos aún.
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </>
                 ) : (
                     <p className="text-center text-sm text-stone-400 py-4">

@@ -90,12 +90,12 @@ class EncuestaController extends Controller
         $this->assertAdmin($request);
 
         $data = $request->validate([
-            'pregunta' => 'required|string|max:255',
-            'descripcion' => 'nullable|string|max:500',
-            'opciones' => 'required|array|min:2',
-            'opciones.*' => 'required|string|max:100',
-            'fecha_cierre' => 'nullable|date',
-        ]);
+        'pregunta' => 'required|string|max:500',
+        'descripcion' => 'nullable|string|max:1000',
+        'opciones' => 'required|array|min:2',
+        'opciones.*' => 'required|string|max:300',
+        'fecha_cierre' => 'nullable|date',
+    ]);
 
         return Encuesta::create($data);
     }
@@ -112,6 +112,27 @@ class EncuestaController extends Controller
         $this->assertAdmin($request);
         return response()->json($this->calcularResultados($encuesta));
     }
+
+    public function votos(Request $request, Encuesta $encuesta)
+{
+    $this->assertAdmin($request);
+
+    $votos = VotoEncuesta::where('encuesta_id', $encuesta->id)
+        ->with('vecino:id,nombre,calle,numero_casa')
+        ->latest()
+        ->get()
+        ->map(function ($voto) use ($encuesta) {
+            return [
+                'vecino' => $voto->vecino->nombre ?? 'Vecino eliminado',
+                'calle' => $voto->vecino->calle ?? null,
+                'numero_casa' => $voto->vecino->numero_casa ?? null,
+                'opcion' => $encuesta->opciones[$voto->opcion_index] ?? '—',
+                'fecha' => $voto->created_at,
+            ];
+        });
+
+    return response()->json($votos);
+}
 
     /**
      * Estructura compartida entre el endpoint de residente (activa/votar)
