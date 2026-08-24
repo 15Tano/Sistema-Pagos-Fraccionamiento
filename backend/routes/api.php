@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ZkApiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CapturistaController;
 use App\Http\Controllers\VecinoAccesoController;
+use App\Http\Controllers\EncuestaController;
 
 
 // ─── AUTH (públicas) ──────────────────────────────────────────────
@@ -71,6 +72,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/avisos', [AvisoController::class, 'store']);
         Route::post('/avisos/{id}', [AvisoController::class, 'update']);
         Route::delete('/avisos/{id}', [AvisoController::class, 'destroy']);
+
+        // Encuestas
+        Route::get('/encuestas/activa', [EncuestaController::class, 'activa']);
+        Route::post('/encuestas/{encuesta}/votar', [EncuestaController::class, 'votar']);
+        Route::get('/encuestas', [EncuestaController::class, 'index']);
+        Route::post('/encuestas', [EncuestaController::class, 'store']);
+        Route::patch('/encuestas/{encuesta}/toggle', [EncuestaController::class, 'toggle']);
+        Route::get('/encuestas/{encuesta}/resultados', [EncuestaController::class, 'resultados']);
 });
 
 // ─── ZKTeco (acceso desde script Python — token separado) ─────────

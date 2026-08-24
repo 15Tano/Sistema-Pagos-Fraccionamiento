@@ -7,6 +7,7 @@ import PanelSeccion from "./components/PanelSeccion";
 import AvisosAdmin from "./components/AvisosAdmin";
 import AuditLogs from "./components/AuditLogs";
 import { formatFechaCorta } from "./helpers/formatFecha";
+import EncuestasAdmin from "./components/EncuestasAdmin";
 
 export default function Dashboard() {
     const [stats, setStats] = useState(null);
@@ -350,6 +351,7 @@ export default function Dashboard() {
 
                 <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <AvisosAdmin />
+                    <EncuestasAdmin />
                     <AuditLogs />
                 </div>
             </div>

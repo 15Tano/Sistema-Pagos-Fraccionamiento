@@ -19,6 +19,10 @@ import ModalRecibo from "./components/ModalRecibo";
 import ModalCamaras from "./components/ModalCamaras";
 import DeveloperBadge from "../../components/DeveloperBadge";
 
+import { getEncuestaActiva, votarEncuesta } from "../../api/encuestas";
+import ModalEncuesta from "./components/ModalEncuesta";
+import BotonEncuesta from "./components/BotonEncuesta";
+
 console.log("VERSION 2.0 - CARGADA");
 
 export default function ResidentDashboard() {
@@ -28,10 +32,15 @@ export default function ResidentDashboard() {
     const [loadingPagos, setLoadingPagos] = useState(true);
     const [lastSync, setLastSync] = useState(null);
     const [pagoSeleccionado, setPagoSeleccionado] = useState(null);
+    const [encuesta, setEncuesta] = useState(null);
+    const [yaVotoEncuesta, setYaVotoEncuesta] = useState(true);
+    const [opcionVotada, setOpcionVotada] = useState(null);
+    const [resultadosEncuesta, setResultadosEncuesta] = useState(null);
 
     const correo = useModal();
     const camaras = useModal();
     const recibo = useModal(() => setPagoSeleccionado(null));
+    const encuestaModal = useModal();
 
     const openRecibo = useCallback(
         (pago) => {
@@ -54,8 +63,17 @@ export default function ResidentDashboard() {
         }
 
         try {
-            const avisosRes = await getAvisos();
-            setAvisos(avisosRes.data || []);
+            const encuestaRes = await getEncuestaActiva();
+            setEncuesta(encuestaRes.data.encuesta || null);
+            setYaVotoEncuesta(encuestaRes.data.ya_voto ?? true);
+            setOpcionVotada(encuestaRes.data.opcion_votada ?? null);
+            setResultadosEncuesta(encuestaRes.data.resultados ?? null);
+        } catch {}
+
+        try {
+            const encuestaRes = await getEncuestaActiva();
+            setEncuesta(encuestaRes.data.encuesta || null);
+            setYaVotoEncuesta(encuestaRes.data.ya_voto ?? true);
         } catch {}
     }, []);
 
@@ -73,6 +91,22 @@ export default function ResidentDashboard() {
             }
         }
     }, [pagos, openRecibo]);
+
+    const handleVotarEncuesta = useCallback(
+        async (opcionIndex) => {
+            const res = await votarEncuesta(encuesta.id, opcionIndex);
+            setYaVotoEncuesta(true);
+            setOpcionVotada(res.data.opcion_votada);
+            setResultadosEncuesta(res.data.resultados);
+        },
+        [encuesta],
+    );
+
+    useEffect(() => {
+        if (encuesta && !yaVotoEncuesta) {
+            encuestaModal.open();
+        }
+    }, [encuesta, yaVotoEncuesta]);
 
     const estado = useMemo(() => calcularEstado(pagos), [pagos]);
 
@@ -166,6 +200,21 @@ export default function ResidentDashboard() {
                     isVisible={camaras.isVisible}
                     onClose={camaras.close}
                 />
+
+                <ModalEncuesta
+                    isOpen={encuestaModal.isOpen}
+                    isVisible={encuestaModal.isVisible}
+                    onClose={encuestaModal.close}
+                    encuesta={encuesta}
+                    yaVoto={yaVotoEncuesta}
+                    opcionVotada={opcionVotada}
+                    resultados={resultadosEncuesta}
+                    onVotar={handleVotarEncuesta}
+                />
+
+                {encuesta && !yaVotoEncuesta && (
+                    <BotonEncuesta onClick={encuestaModal.open} />
+                )}
 
                 <DeveloperBadge />
 
