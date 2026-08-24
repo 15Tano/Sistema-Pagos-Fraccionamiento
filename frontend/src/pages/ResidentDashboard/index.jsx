@@ -63,17 +63,18 @@ export default function ResidentDashboard() {
         }
 
         try {
-            const encuestaRes = await getEncuestaActiva();
-            setEncuesta(encuestaRes.data.encuesta || null);
-            setYaVotoEncuesta(encuestaRes.data.ya_voto ?? true);
-            setOpcionVotada(encuestaRes.data.opcion_votada ?? null);
-            setResultadosEncuesta(encuestaRes.data.resultados ?? null);
-        } catch {}
+            const avisosRes = await getAvisos();
+            setAvisos(avisosRes.data || []);
+        } catch (e) {
+            console.error("Error cargando avisos:", e);
+        }
 
         try {
             const encuestaRes = await getEncuestaActiva();
             setEncuesta(encuestaRes.data.encuesta || null);
             setYaVotoEncuesta(encuestaRes.data.ya_voto ?? true);
+            setOpcionVotada(encuestaRes.data.opcion_votada ?? null);
+            setResultadosEncuesta(encuestaRes.data.resultados ?? null);
         } catch {}
     }, []);
 
