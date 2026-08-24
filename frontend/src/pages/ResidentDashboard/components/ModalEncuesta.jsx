@@ -322,7 +322,7 @@ export default function ModalEncuesta({
             />
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full max-w-sm p-6 z-10 bg-white/55 backdrop-blur-[20px] backdrop-saturate-200 border-t border-l border-white/70 border-r border-b border-white/30 overflow-hidden"
+                className="relative w-full max-w-sm z-10 bg-white/55 backdrop-blur-[20px] backdrop-saturate-200 border-t border-l border-white/70 border-r border-b border-white/30 overflow-hidden flex flex-col max-h-[85vh]"
                 style={{
                     borderRadius: isVisible ? "2rem" : "9999px",
                     transform: isVisible ? "scale(1)" : "scale(0.4)",
@@ -356,57 +356,61 @@ export default function ModalEncuesta({
 
                 {/* ── PASO 1: VOTANDO ── */}
                 {paso === "votando" && (
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-wide text-orange-500 mb-1.5 pr-8">
-                            📊 Encuesta
-                        </p>
-                        <h3 className="text-xl font-extrabold text-stone-800 leading-snug mb-1.5 pr-8">
-                            {encuesta.pregunta}
-                        </h3>
-                        {encuesta.descripcion && (
-                            <p className="text-sm text-stone-600 leading-relaxed mb-4">
-                                {encuesta.descripcion}
+                    <div className="flex flex-col min-h-0">
+                        <div className="overflow-y-auto px-6 pt-6 pb-4">
+                            <p className="text-xs font-bold uppercase tracking-wide text-orange-500 mb-1.5 pr-8">
+                                📊 Encuesta
                             </p>
-                        )}
+                            <h3 className="text-xl font-extrabold text-stone-800 leading-snug mb-1.5 pr-8">
+                                {encuesta.pregunta}
+                            </h3>
+                            {encuesta.descripcion && (
+                                <p className="text-sm text-stone-600 leading-relaxed mb-4 whitespace-pre-line">
+                                    {encuesta.descripcion}
+                                </p>
+                            )}
 
-                        <div
-                            className={`flex flex-col gap-2 ${encuesta.descripcion ? "" : "mt-4"} mb-4`}
-                        >
-                            {encuesta.opciones.map((opcion, i) => (
-                                <OpcionEncuesta
-                                    key={i}
-                                    opcion={opcion}
-                                    index={i}
-                                    seleccionada={seleccion === i}
-                                    algunaSeleccionada={seleccion !== null}
-                                    onSeleccionar={setSeleccion}
-                                />
-                            ))}
+                            <div
+                                className={`flex flex-col gap-2 ${encuesta.descripcion ? "" : "mt-4"}`}
+                            >
+                                {encuesta.opciones.map((opcion, i) => (
+                                    <OpcionEncuesta
+                                        key={i}
+                                        opcion={opcion}
+                                        index={i}
+                                        seleccionada={seleccion === i}
+                                        algunaSeleccionada={seleccion !== null}
+                                        onSeleccionar={setSeleccion}
+                                    />
+                                ))}
+                            </div>
+
+                            {error && (
+                                <p className="text-xs font-medium text-red-500 mt-3">
+                                    {error}
+                                </p>
+                            )}
                         </div>
 
-                        {error && (
-                            <p className="text-xs font-medium text-red-500 mb-3">
-                                {error}
-                            </p>
-                        )}
-
-                        <button
-                            onClick={handleVotar}
-                            disabled={seleccion === null || enviando}
-                            className="w-full py-2.5 rounded-xl text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
-                        >
-                            {enviando
-                                ? "Enviando..."
-                                : opcionSeleccionadaTexto
-                                  ? `Votar por "${opcionSeleccionadaTexto}" →`
-                                  : "Selecciona una opción"}
-                        </button>
+                        <div className="px-6 pb-6 pt-3 border-t border-white/40 bg-white/20 backdrop-blur-sm shrink-0">
+                            <button
+                                onClick={handleVotar}
+                                disabled={seleccion === null || enviando}
+                                className="w-full py-2.5 rounded-xl text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+                            >
+                                {enviando
+                                    ? "Enviando..."
+                                    : opcionSeleccionadaTexto
+                                      ? `Votar por "${opcionSeleccionadaTexto}" →`
+                                      : "Selecciona una opción"}
+                            </button>
+                        </div>
                     </div>
                 )}
 
                 {/* ── PASO 2: CONFIRMANDO ── */}
                 {paso === "confirmando" && (
-                    <div className="relative flex flex-col items-center text-center py-6">
+                    <div className="relative flex flex-col items-center text-center px-6 py-6 overflow-y-auto max-h-[85vh]">
                         <div
                             className="absolute top-14 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-orange-400/25 blur-2xl pointer-events-none"
                             style={{
@@ -530,7 +534,7 @@ export default function ModalEncuesta({
 
                 {/* ── PASO 3: RESULTADOS ── */}
                 {paso === "resultados" && resultados && (
-                    <div>
+                    <div className="px-6 py-6 overflow-y-auto max-h-[85vh]">
                         {!encuesta.activa && (
                             <p
                                 className="text-xs font-bold uppercase tracking-wide text-stone-500 mb-1.5"
