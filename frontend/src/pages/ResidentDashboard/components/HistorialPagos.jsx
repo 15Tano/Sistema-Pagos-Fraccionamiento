@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { formatMonth, formatDate } from "../dashboardHelpers";
-import { useTemporada } from "../../hooks/useTemporada";
-import CenefaDivider from "../decoraciones/CenefaDivider";
+import { useTemporada } from "../../../hooks/useTemporada";
+import CenefaDivider from "../../../components/decoraciones/CenefaDivider";
 
 export default function HistorialPagos({ pagos, loading, onVerRecibo }) {
     const [selectedYear, setSelectedYear] = useState("2026");

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { TIPO_CONFIG } from "../dashboardHelpers";
-import { useTemporada } from "../../hooks/useTemporada";
-import CenefaDivider from "../decoraciones/CenefaDivider";
+import { useTemporada } from "../../../hooks/useTemporada";
+import CenefaDivider from "../../../components/decoraciones/CenefaDivider";
 
 export default function TablonAvisoResidente({ avisos }) {
     const tema = useTemporada();

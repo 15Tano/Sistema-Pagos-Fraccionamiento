@@ -1,4 +1,4 @@
-import { useTemporada } from "../../hooks/useTemporada";
+import { useTemporada } from "../../../hooks/useTemporada";
 const tema = useTemporada();
 {
     tema.saludo && <p className="text-xs text-gray-500 mb-1">{tema.saludo}</p>;
