@@ -1,8 +1,11 @@
 import { useState, useMemo } from "react";
 import { formatMonth, formatDate } from "../dashboardHelpers";
+import { useTemporada } from "../../hooks/useTemporada";
+import CenefaDivider from "../decoraciones/CenefaDivider";
 
 export default function HistorialPagos({ pagos, loading, onVerRecibo }) {
     const [selectedYear, setSelectedYear] = useState("2026");
+    const tema = useTemporada();
 
     const availableYears = useMemo(() => {
         const years = new Set(pagos.map((p) => p.mes.split("-")[0]));
@@ -15,7 +18,7 @@ export default function HistorialPagos({ pagos, loading, onVerRecibo }) {
     }, [pagos, selectedYear]);
 
     return (
-        <div className="relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+        <div className="card-tematizable relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
             <div className="flex items-center justify-between mb-5 relative z-10">
@@ -37,6 +40,10 @@ export default function HistorialPagos({ pagos, loading, onVerRecibo }) {
                         Historial
                     </h3>
                 </div>
+
+                {tema.cenefa && (
+                    <CenefaDivider colores={tema.cenefa.colores} alto={8} />
+                )}
 
                 <div className="flex items-center gap-2">
                     <select
@@ -93,7 +100,10 @@ export default function HistorialPagos({ pagos, loading, onVerRecibo }) {
                             </div>
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-bold text-stone-800">
-                                    ${parseFloat(pago.cantidad).toLocaleString("es-MX")}
+                                    $
+                                    {parseFloat(pago.cantidad).toLocaleString(
+                                        "es-MX",
+                                    )}
                                 </span>
                                 {parseFloat(pago.restante) === 0 ? (
                                     <button
@@ -104,7 +114,8 @@ export default function HistorialPagos({ pagos, loading, onVerRecibo }) {
                                     </button>
                                 ) : (
                                     <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-red-100/60 text-red-700 border border-red-200/60 backdrop-blur-sm shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
-                                        Resta ${parseFloat(pago.restante).toFixed(0)}
+                                        Resta $
+                                        {parseFloat(pago.restante).toFixed(0)}
                                     </span>
                                 )}
                             </div>

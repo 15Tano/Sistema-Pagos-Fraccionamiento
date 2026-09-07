@@ -551,3 +551,148 @@ input[type="date"]::-webkit-clear-button,
 input[type="month"]::-webkit-clear-button {
     display: none;
 }
+
+/* ============================================
+   SISTEMA DE TEMPORADAS — pegar al final de index.css
+   Todo scoped bajo body[data-tema="..."], así que
+   Admin y Vigilancia (que nunca setean ese atributo)
+   quedan completamente intactos.
+   ============================================ */
+
+/* 1. Blobs de fondo (inline en ResidentDashboardIndex.jsx) */
+body[data-tema="septiembre"] .blob-glow-1 {
+    background-color: rgba(0, 99, 65, 0.16) !important; /* verde */
+}
+body[data-tema="septiembre"] .blob-glow-2 {
+    background-color: rgba(206, 17, 38, 0.12) !important; /* rojo */
+}
+
+/* 2. Borde superior tricolor en tarjetas */
+body[data-tema="septiembre"] .card-tematizable {
+    border-top: 3px solid transparent;
+    border-image: linear-gradient(90deg, #006341, #ffffff, #ce1126) 1;
+}
+
+/* 3. Sombrero sobre el círculo del semáforo */
+.semaforo-circulo {
+    position: relative;
+}
+body[data-tema="septiembre"] .semaforo-circulo::before {
+    content: "";
+    position: absolute;
+    top: -60%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140%;
+    height: 60%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50'%3E%3Cellipse cx='50' cy='40' rx='48' ry='8' fill='%23c2884d'/%3E%3Cpath d='M25 40 Q25 10 50 8 Q75 10 75 40 Z' fill='%23d99e5c'/%3E%3Cellipse cx='50' cy='16' rx='10' ry='3' fill='%23006341'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 20;
+}
+
+/* 5. Semáforo con tonos bandera (coincide por texto "green"/"red" en la clase de estado) */
+body[data-tema="septiembre"] .semaforo-circulo[class*="green"] {
+    background-color: #006341 !important;
+}
+body[data-tema="septiembre"] .semaforo-circulo[class*="red"] {
+    background-color: #ce1126 !important;
+}
+
+/* 4. Textura de fondo sutil, estilo textil, casi imperceptible.
+   Va sobre el contenedor raíz del dashboard (el div con min-h-dvh) */
+body[data-tema="septiembre"] .dashboard-root::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    pointer-events: none;
+    background-image:
+        repeating-linear-gradient(
+            45deg,
+            #006341 0px,
+            #006341 2px,
+            transparent 2px,
+            transparent 12px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            #ce1126 0px,
+            #ce1126 2px,
+            transparent 2px,
+            transparent 12px
+        );
+}
+
+/* 6. Confeti de fondo flotante */
+@keyframes flotarConfeti {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-18px) rotate(180deg);
+    }
+}
+.confetti-flotante {
+    animation: flotarConfeti 20s ease-in-out infinite;
+}
+
+/* Destellos de entrada (una sola vez, ~700ms) */
+@keyframes destelloAparece {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    40% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+}
+.destello-entrada {
+    animation: destelloAparece 0.7s ease-out forwards;
+}
+
+/* 8. Glow tricolor en hover del botón de acciones rápidas */
+body[data-tema="septiembre"] .accion-btn:hover {
+    box-shadow: 0 0 16px 2px rgba(0, 99, 65, 0.35);
+}
+
+/* 9. Pulso verde en el contador animado (useCountUp).
+   Aplica esta clase condicionalmente donde uses el hook:
+   className={tema.id === 'septiembre' ? 'pulse-tema' : ''} */
+@keyframes pulseTema {
+    0%,
+    100% {
+        color: inherit;
+    }
+    50% {
+        color: #006341;
+    }
+}
+body[data-tema="septiembre"] .pulse-tema {
+    animation: pulseTema 2s ease-in-out infinite;
+}
+
+/* 11. Destello tricolor al abrir un recibo (easter egg).
+   Aplica esta clase al contenedor del ModalRecibo cuando tema.id === 'septiembre',
+   solo en su animación de entrada (revisa ModalRecibo.jsx para el punto exacto). */
+@keyframes destelloRecibo {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 99, 65, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 40px 10px rgba(206, 17, 38, 0.35);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 99, 65, 0);
+    }
+}
+.destello-recibo-entrada {
+    animation: destelloRecibo 0.6s ease-out;
+}

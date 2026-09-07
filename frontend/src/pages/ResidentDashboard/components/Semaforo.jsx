@@ -12,6 +12,9 @@ export default function Semaforo({ estado }) {
             <div
                 className={`relative flex items-center justify-center w-36 h-36 rounded-full border-[1.5px] ${s.ring} ${s.bg} backdrop-blur-md shadow-[inset_0_4px_10px_rgba(255,255,255,0.7)] ${s.glow} mb-6 hover:scale-105 active:scale-95 transition-all duration-300 ease-out cursor-default`}
             >
+                <div
+                    className={`semaforo-circulo relative flex items-center justify-center w-36 h-36 rounded-full border-[1.5px] ${s.ring} ${s.bg} backdrop-blur-md shadow-[inset_0_4px_10px_rgba(255,255,255,0.7)] ${s.glow} mb-6 hover:scale-105 active:scale-95 transition-all duration-300 ease-out cursor-default`}
+                ></div>
                 {/* Pulso animado */}
                 <span
                     className={`absolute inline-flex w-full h-full rounded-full opacity-20 animate-ping ${s.pulse}`}

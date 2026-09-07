@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { TIPO_CONFIG } from "../dashboardHelpers";
+import { useTemporada } from "../../hooks/useTemporada";
+import CenefaDivider from "../decoraciones/CenefaDivider";
 
 export default function TablonAvisoResidente({ avisos }) {
+    const tema = useTemporada();
     const [imagenAmpliada, setImagenAmpliada] = useState(null);
     const [imagenVisible, setImagenVisible] = useState(false);
 
@@ -28,7 +31,7 @@ export default function TablonAvisoResidente({ avisos }) {
     if (avisos.length === 0) return null;
 
     return (
-        <div className="relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+        <div className="card-tematizable relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
             {/* Brillo superior */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
@@ -51,9 +54,14 @@ export default function TablonAvisoResidente({ avisos }) {
                 </h3>
             </div>
 
+            {tema.cenefa && (
+                <CenefaDivider colores={tema.cenefa.colores} alto={8} />
+            )}
+
             <div className="space-y-3">
                 {avisos.map((aviso) => {
-                    const cfg = TIPO_CONFIG[aviso.tipo] || TIPO_CONFIG.informativo;
+                    const cfg =
+                        TIPO_CONFIG[aviso.tipo] || TIPO_CONFIG.informativo;
                     return (
                         <div
                             key={aviso.id}
@@ -65,7 +73,9 @@ export default function TablonAvisoResidente({ avisos }) {
                                 />
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                        <p className={`text-sm font-bold ${cfg.text}`}>
+                                        <p
+                                            className={`text-sm font-bold ${cfg.text}`}
+                                        >
                                             {aviso.titulo}
                                         </p>
                                         <span
@@ -80,7 +90,11 @@ export default function TablonAvisoResidente({ avisos }) {
 
                                     {aviso.imagen_url && (
                                         <button
-                                            onClick={() => setImagenAmpliada(aviso.imagen_url)}
+                                            onClick={() =>
+                                                setImagenAmpliada(
+                                                    aviso.imagen_url,
+                                                )
+                                            }
                                             className="mt-3 block w-full max-w-xs rounded-xl overflow-hidden border border-white/60 shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:opacity-90 active:scale-[0.98] transition-all"
                                         >
                                             <img
@@ -92,7 +106,9 @@ export default function TablonAvisoResidente({ avisos }) {
                                     )}
 
                                     <p className="text-xs text-stone-400 mt-2 font-medium">
-                                        {new Date(aviso.created_at).toLocaleDateString("es-MX", {
+                                        {new Date(
+                                            aviso.created_at,
+                                        ).toLocaleDateString("es-MX", {
                                             day: "2-digit",
                                             month: "short",
                                             year: "numeric",
@@ -123,9 +139,13 @@ export default function TablonAvisoResidente({ avisos }) {
                             style={{
                                 maxHeight: "90dvh",
                                 borderRadius: imagenVisible ? "2rem" : "9999px",
-                                transform: imagenVisible ? "scale(1)" : "scale(0.35)",
+                                transform: imagenVisible
+                                    ? "scale(1)"
+                                    : "scale(0.35)",
                                 opacity: imagenVisible ? 1 : 0,
-                                filter: imagenVisible ? "blur(0px)" : "blur(4px)",
+                                filter: imagenVisible
+                                    ? "blur(0px)"
+                                    : "blur(4px)",
                                 transformOrigin: "center",
                                 transition:
                                     "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out, filter 0.35s ease-out",

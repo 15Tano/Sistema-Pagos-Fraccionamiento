@@ -4,9 +4,14 @@ export default function AccionesRapidas({ onAbrirCorreo, onAbrirCamaras }) {
             <button
                 onClick={onAbrirCorreo}
                 style={{ touchAction: "manipulation" }}
-                className="flex items-center gap-2.5 flex-1 min-w-0 px-4 py-2.5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 rounded-2xl shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_8px_rgba(0,0,0,0.03)] hover:bg-white/60 active:scale-[0.98] transition-all duration-200 text-left"
+                className="accion-btn flex items-center gap-2.5 flex-1 min-w-0 px-4 py-2.5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 rounded-2xl shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_8px_rgba(0,0,0,0.03)] hover:bg-white/60 active:scale-[0.98] transition-all duration-200 text-left"
             >
-                <svg className="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                    className="w-4 h-4 text-orange-400 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
                     <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -25,7 +30,12 @@ export default function AccionesRapidas({ onAbrirCorreo, onAbrirCamaras }) {
                 style={{ touchAction: "manipulation" }}
                 className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-white/50 backdrop-blur-xl border border-white/80 shadow-[0_4px_14px_rgba(0,0,0,0.05),inset_0_1px_2px_rgba(255,255,255,0.9)] hover:bg-white/75 active:scale-95 transition-all duration-200"
             >
-                <svg className="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                    className="w-5 h-5 text-stone-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
                     <path
                         strokeLinecap="round"
                         strokeLinejoin="round"

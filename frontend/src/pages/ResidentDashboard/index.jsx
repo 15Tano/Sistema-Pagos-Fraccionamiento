@@ -23,6 +23,8 @@ import { getEncuestaActiva, votarEncuesta } from "../../api/encuestas";
 import ModalEncuesta from "./components/ModalEncuesta";
 import BotonEncuesta from "./components/BotonEncuesta";
 
+import TemporadaProvider from "../TemporadaProvider";
+
 console.log("VERSION 2.0 - CARGADA");
 
 export default function ResidentDashboard() {
@@ -154,88 +156,90 @@ export default function ResidentDashboard() {
     }
 
     return (
-        <div className="min-h-dvh p-4 md:p-6 bg-stone-50/50 relative overflow-hidden">
-            <NotificationBanner />
-            {/* Elementos decorativos de fondo opcionales para dar vida al blur */}
-            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-200/30 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-stone-200/50 rounded-full blur-3xl pointer-events-none" />
+        <TemporadaProvider>
+            <div className="dashboard-root min-h-dvh p-4 md:p-6 bg-stone-50/50 relative overflow-hidden">
+                <NotificationBanner />
+                {/* Elementos decorativos de fondo opcionales para dar vida al blur */}
+                <div className="blob-glow-1 absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-200/30 rounded-full blur-3xl pointer-events-none" />
+                <div className="blob-glow-2 absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-stone-200/50 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="max-w-2xl mx-auto flex flex-col gap-5 relative z-10">
-                <DashboardHeader
-                    user={user}
-                    tags={tags}
-                    onLogout={handleLogout}
-                />
+                <div className="max-w-2xl mx-auto flex flex-col gap-5 relative z-10">
+                    <DashboardHeader
+                        user={user}
+                        tags={tags}
+                        onLogout={handleLogout}
+                    />
 
-                <AccionesRapidas
-                    onAbrirCorreo={correo.open}
-                    onAbrirCamaras={camaras.open}
-                />
+                    <AccionesRapidas
+                        onAbrirCorreo={correo.open}
+                        onAbrirCamaras={camaras.open}
+                    />
 
-                <Semaforo estado={estado} />
+                    <Semaforo estado={estado} />
 
-                <TablonAvisoResidente avisos={avisos} />
+                    <TablonAvisoResidente avisos={avisos} />
 
-                <HistorialPagos
-                    pagos={pagos}
-                    loading={loadingPagos}
-                    onVerRecibo={openRecibo}
-                />
+                    <HistorialPagos
+                        pagos={pagos}
+                        loading={loadingPagos}
+                        onVerRecibo={openRecibo}
+                    />
 
-                <ModalContacto
-                    isOpen={correo.isOpen}
-                    isVisible={correo.isVisible}
-                    onClose={correo.close}
-                    email="casetasanisidro088@gmail.com"
-                />
+                    <ModalContacto
+                        isOpen={correo.isOpen}
+                        isVisible={correo.isVisible}
+                        onClose={correo.close}
+                        email="casetasanisidro088@gmail.com"
+                    />
 
-                <ModalRecibo
-                    isOpen={recibo.isOpen}
-                    isVisible={recibo.isVisible}
-                    onClose={recibo.close}
-                    pago={pagoSeleccionado}
-                />
+                    <ModalRecibo
+                        isOpen={recibo.isOpen}
+                        isVisible={recibo.isVisible}
+                        onClose={recibo.close}
+                        pago={pagoSeleccionado}
+                    />
 
-                <ModalCamaras
-                    isOpen={camaras.isOpen}
-                    isVisible={camaras.isVisible}
-                    onClose={camaras.close}
-                />
+                    <ModalCamaras
+                        isOpen={camaras.isOpen}
+                        isVisible={camaras.isVisible}
+                        onClose={camaras.close}
+                    />
 
-                <ModalEncuesta
-                    isOpen={encuestaModal.isOpen}
-                    isVisible={encuestaModal.isVisible}
-                    onClose={encuestaModal.close}
-                    encuesta={encuesta}
-                    yaVoto={yaVotoEncuesta}
-                    opcionVotada={opcionVotada}
-                    resultados={resultadosEncuesta}
-                    onVotar={handleVotarEncuesta}
-                />
+                    <ModalEncuesta
+                        isOpen={encuestaModal.isOpen}
+                        isVisible={encuestaModal.isVisible}
+                        onClose={encuestaModal.close}
+                        encuesta={encuesta}
+                        yaVoto={yaVotoEncuesta}
+                        opcionVotada={opcionVotada}
+                        resultados={resultadosEncuesta}
+                        onVotar={handleVotarEncuesta}
+                    />
 
-                {encuesta?.activa && !yaVotoEncuesta && (
-                    <BotonEncuesta onClick={encuestaModal.open} />
-                )}
+                    {encuesta?.activa && !yaVotoEncuesta && (
+                        <BotonEncuesta onClick={encuestaModal.open} />
+                    )}
 
-                <DeveloperBadge />
+                    <DeveloperBadge />
 
-                {/* Pie: última sincronización */}
-                {lastSync && (
-                    <p className="text-center text-xs font-medium text-stone-400 pb-4 mix-blend-multiply">
-                        Última actualización:{" "}
-                        {lastSync.toLocaleTimeString("es-MX", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        })}{" "}
-                        ·{" "}
-                        {lastSync.toLocaleDateString("es-MX", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                        })}
-                    </p>
-                )}
+                    {/* Pie: última sincronización */}
+                    {lastSync && (
+                        <p className="text-center text-xs font-medium text-stone-400 pb-4 mix-blend-multiply">
+                            Última actualización:{" "}
+                            {lastSync.toLocaleTimeString("es-MX", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}{" "}
+                            ·{" "}
+                            {lastSync.toLocaleDateString("es-MX", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                            })}
+                        </p>
+                    )}
+                </div>
             </div>
-        </div>
+        </TemporadaProvider>
     );
 }
