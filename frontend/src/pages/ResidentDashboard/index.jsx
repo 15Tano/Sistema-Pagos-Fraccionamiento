@@ -23,7 +23,7 @@ import { getEncuestaActiva, votarEncuesta } from "../../api/encuestas";
 import ModalEncuesta from "./components/ModalEncuesta";
 import BotonEncuesta from "./components/BotonEncuesta";
 
-import TemporadaProvider from "../TemporadaProvider";
+import TemporadaProvider from "../../components/TemporadaProvider";
 
 console.log("VERSION 2.0 - CARGADA");
 
