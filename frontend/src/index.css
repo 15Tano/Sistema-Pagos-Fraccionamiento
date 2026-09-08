@@ -643,23 +643,196 @@ body[data-tema="septiembre"] .semaforo-circulo[class*="red"] {
     animation: flotarConfeti 20s ease-in-out infinite;
 }
 
-/* Destellos de entrada (una sola vez, ~700ms) */
-@keyframes destelloAparece {
+/* =========================================
+   DESTELLOS DE ENTRADA
+========================================= */
+
+.destello-flash {
+    background: radial-gradient(
+        circle at 50% 45%,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.55) 8%,
+        rgba(255, 255, 255, 0.12) 22%,
+        transparent 45%
+    );
+
+    opacity: 0;
+    animation: destelloFlash 1.5s ease-out forwards;
+}
+
+/* Núcleo de la explosión */
+
+.destello-core {
+    width: 12px;
+    height: 12px;
+    transform: translate(-50%, -50%);
+
+    border-radius: 999px;
+
+    background: white;
+
+    box-shadow:
+        0 0 10px white,
+        0 0 25px #006341,
+        0 0 45px #ce1126,
+        0 0 80px rgba(255, 255, 255, 0.9);
+
+    animation: destelloCore 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Rayos radiales */
+
+.destello-rays {
+    width: 8px;
+    height: 8px;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    box-shadow:
+        0 -85px 0 -3px rgba(0, 99, 65, 0.8),
+        60px -60px 0 -3px rgba(206, 17, 38, 0.8),
+        85px 0 0 -3px rgba(0, 99, 65, 0.8),
+        60px 60px 0 -3px rgba(206, 17, 38, 0.8),
+        0 85px 0 -3px rgba(255, 255, 255, 0.9),
+        -60px 60px 0 -3px rgba(0, 99, 65, 0.8),
+        -85px 0 0 -3px rgba(206, 17, 38, 0.8),
+        -60px -60px 0 -3px rgba(255, 255, 255, 0.9);
+
+    animation: destelloRays 1.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Partículas */
+
+.destello-particula {
+    opacity: 0;
+
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+
+    animation-name: destelloParticula;
+    animation-timing-function: cubic-bezier(0.15, 0.75, 0.25, 1);
+    animation-fill-mode: forwards;
+
+    will-change: transform, opacity;
+}
+
+/* Formas */
+
+.destello-circle {
+    border-radius: 999px;
+}
+
+.destello-diamond {
+    border-radius: 2px;
+
+    transform: translate(-50%, -50%) rotate(45deg) scale(0);
+}
+
+.destello-star {
+    border-radius: 1px;
+
+    clip-path: polygon(
+        50% 0%,
+        61% 38%,
+        100% 50%,
+        61% 62%,
+        50% 100%,
+        39% 62%,
+        0% 50%,
+        39% 38%
+    );
+}
+
+/* =========================================
+   ANIMACIONES
+========================================= */
+
+@keyframes destelloFlash {
     0% {
         opacity: 0;
-        transform: scale(0);
     }
-    40% {
-        opacity: 0.8;
-        transform: scale(1);
+
+    12% {
+        opacity: 0.9;
     }
+
+    35% {
+        opacity: 0.25;
+    }
+
     100% {
         opacity: 0;
-        transform: scale(0.3);
     }
 }
-.destello-entrada {
-    animation: destelloAparece 0.7s ease-out forwards;
+
+@keyframes destelloCore {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+    }
+
+    12% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    45% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(8);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(15);
+    }
+}
+
+@keyframes destelloRays {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    }
+
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.4) rotate(20deg);
+    }
+
+    55% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.5) rotate(70deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.4) rotate(120deg);
+    }
+}
+
+@keyframes destelloParticula {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    }
+
+    12% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(20deg);
+    }
+
+    65% {
+        opacity: 0.9;
+    }
+
+    100% {
+        opacity: 0;
+
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+            scale(0.35) rotate(var(--rotation));
+    }
 }
 
 /* 8. Glow tricolor en hover del botón de acciones rápidas */

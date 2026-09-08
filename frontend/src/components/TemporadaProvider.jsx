@@ -1,18 +1,38 @@
 // src/components/TemporadaProvider.jsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTemporada } from "../hooks/useTemporada";
 import ConfettiFondo from "./decoraciones/ConfettiFondo";
 import DestellosEntrada from "./decoraciones/DestellosEntrada";
 
+const DESTELLOS_KEY = "destellos_ultima_fecha";
+
+function shouldShowDestellos() {
+    const hoy = new Date().toDateString();
+    const ultimaVez = localStorage.getItem(DESTELLOS_KEY);
+
+    // Detecta si esta carga fue un reload explícito del navegador/PWA
+    // (F5, pull-to-refresh) en vez de una navegación normal o relanzamiento
+    // desde el ícono de home (que la Navigation Timing API marca como "navigate").
+    const [nav] = performance.getEntriesByType("navigation");
+    const esReloadExplicito = nav?.type === "reload";
+
+    if (esReloadExplicito || ultimaVez !== hoy) {
+        localStorage.setItem(DESTELLOS_KEY, hoy);
+        return true;
+    }
+    return false;
+}
+
 export default function TemporadaProvider({ children }) {
     const tema = useTemporada();
 
+    // Se calcula UNA vez al montar el provider (lazy initializer),
+    // no en cada render.
+    const [mostrarDestellos] = useState(shouldShowDestellos);
+
     useEffect(() => {
-        // Marca el body -> permite que CSS global (.app-bg, .card, etc.)
-        // reaccione al tema sin importar en qué parte del árbol vivan esos elementos.
         document.body.dataset.tema = tema.id;
 
-        // Variables CSS para el glow (leídas por el override de .app-bg en index.css)
         if (tema.glow) {
             const root = document.documentElement;
             root.style.setProperty("--glow-1", tema.glow.c1);
@@ -31,14 +51,13 @@ export default function TemporadaProvider({ children }) {
             {tema.decoraciones.includes("confeti") && (
                 <ConfettiFondo colores={tema.cenefa?.colores} />
             )}
-            {tema.decoraciones.includes("destelloEntrada") && (
-                <DestellosEntrada colores={tema.cenefa?.colores} />
-            )}
+            {tema.decoraciones.includes("destelloEntrada") &&
+                mostrarDestellos && (
+                    <DestellosEntrada colores={tema.cenefa?.colores} />
+                )}
             {children}
         </>
     );
 }
 
-// Hook auxiliar para que otros componentes (Semaforo, headers, botones)
-// consulten el tema activo sin recalcularlo cada vez.
 export { useTemporada };
