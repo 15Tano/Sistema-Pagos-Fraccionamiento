@@ -1,7 +1,6 @@
 // src/components/TemporadaProvider.jsx
 import { useEffect } from "react";
 import { useTemporada } from "../hooks/useTemporada";
-import PapelPicado from "./decoraciones/PapelPicado";
 import ConfettiFondo from "./decoraciones/ConfettiFondo";
 import DestellosEntrada from "./decoraciones/DestellosEntrada";
 
@@ -29,7 +28,6 @@ export default function TemporadaProvider({ children }) {
 
     return (
         <>
-            {tema.decoraciones.includes("papelPicado") && <PapelPicado />}
             {tema.decoraciones.includes("confeti") && (
                 <ConfettiFondo colores={tema.cenefa?.colores} />
             )}

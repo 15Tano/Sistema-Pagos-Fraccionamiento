@@ -1,19 +1,25 @@
 // src/components/decoraciones/PapelPicado.jsx
 export default function PapelPicado() {
-  const colores = ['#4d7c62', '#e8e6e1', '#b5544a']; // versiones desaturadas verde/blanco/rojo
+    const colores = ["#4d7c62", "#e8e6e1", "#b5544a", "#e8e6e1"];
+    const flagCount = 12;
 
-  return (
-    <div className="pointer-events-none absolute top-0 left-0 right-0 h-6 overflow-hidden opacity-60 z-10">
-      <svg viewBox="0 0 800 24" className="w-full h-full" preserveAspectRatio="none">
-        {Array.from({ length: 16 }).map((_, i) => (
-          <path
-            key={i}
-            transform={`translate(${i * 50},0)`}
-            d="M0,0 L48,0 L44,12 L38,7 L32,14 L26,7 L20,14 L14,7 L4,12 Z"
-            fill={colores[i % 3]}
-          />
-        ))}
-      </svg>
-    </div>
-  );
+    return (
+        <div className="pointer-events-none absolute top-0 left-0 right-0 h-14 overflow-visible opacity-90 z-20">
+            {/* Cuerda */}
+            <div className="absolute top-3 left-0 right-0 h-px bg-stone-400/40" />
+
+            <div className="flex w-full pt-3">
+                {Array.from({ length: flagCount }).map((_, i) => (
+                    <div
+                        key={i}
+                        className="papel-picado-flag flex-1 mx-[1px]"
+                        style={{
+                            backgroundColor: colores[i % colores.length],
+                            animationDelay: `${(i % 4) * 0.3}s`,
+                        }}
+                    />
+                ))}
+            </div>
+        </div>
+    );
 }

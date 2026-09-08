@@ -24,11 +24,15 @@ import ModalEncuesta from "./components/ModalEncuesta";
 import BotonEncuesta from "./components/BotonEncuesta";
 
 import TemporadaProvider from "../../components/TemporadaProvider";
+import { useTemporada } from "../../hooks/useTemporada";
+import TexturaFondo from "../../components/decoraciones/TexturaFondo";
+import PapelPicado from "../../components/decoraciones/PapelPicado";
 
 console.log("VERSION 2.0 - CARGADA");
 
 export default function ResidentDashboard() {
     const { user, logout: storeLogout } = useAuthStore();
+    const tema = useTemporada();
     const [pagos, setPagos] = useState([]);
     const [avisos, setAvisos] = useState([]);
     const [loadingPagos, setLoadingPagos] = useState(true);
@@ -158,12 +162,16 @@ export default function ResidentDashboard() {
     return (
         <TemporadaProvider>
             <div className="dashboard-root min-h-dvh p-4 md:p-6 bg-stone-50/50 relative overflow-hidden">
-                <NotificationBanner />
-                {/* Elementos decorativos de fondo opcionales para dar vida al blur */}
-                <div className="blob-glow-1 absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-200/30 rounded-full blur-3xl pointer-events-none" />
-                <div className="blob-glow-2 absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-stone-200/50 rounded-full blur-3xl pointer-events-none" />
-
+                {tema.decoraciones.includes("papelPicado") && <PapelPicado />}
                 <div className="max-w-2xl mx-auto flex flex-col gap-5 relative z-10">
+                    {/* Elementos decorativos de fondo — ahora DENTRO del mismo
+                    stacking context que las tarjetas, para que el
+                    backdrop-filter de las cards sí las capture */}
+                    <div className="blob-glow-1 absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-200/30 rounded-full blur-3xl pointer-events-none z-0" />
+                    <div className="blob-glow-2 absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-stone-200/50 rounded-full blur-3xl pointer-events-none z-0" />
+
+                    <NotificationBanner />
+
                     <DashboardHeader
                         user={user}
                         tags={tags}

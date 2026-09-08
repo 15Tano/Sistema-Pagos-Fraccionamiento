@@ -552,7 +552,7 @@ input[type="month"]::-webkit-clear-button {
     display: none;
 }
 
-/* ============================================
+//* ============================================
    SISTEMA DE TEMPORADAS — pegar al final de index.css
    Todo scoped bajo body[data-tema="..."], así que
    Admin y Vigilancia (que nunca setean ese atributo)
@@ -567,29 +567,26 @@ body[data-tema="septiembre"] .blob-glow-2 {
     background-color: rgba(206, 17, 38, 0.12) !important; /* rojo */
 }
 
-/* 2. Borde superior tricolor en tarjetas */
+/* 2. Borde superior tricolor en tarjetas — REEMPLAZAR TODO EL BLOQUE ANTERIOR */
 body[data-tema="septiembre"] .card-tematizable {
-    border-top: 3px solid transparent;
-    border-image: linear-gradient(90deg, #006341, #ffffff, #ce1126) 1;
+    position: relative; /* por si alguna card no lo trae ya */
+}
+
+body[data-tema="septiembre"] .card-tematizable::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #006341, #ffffff, #ce1126);
+    z-index: 1;
+    pointer-events: none;
 }
 
 /* 3. Sombrero sobre el círculo del semáforo */
 .semaforo-circulo {
     position: relative;
-}
-body[data-tema="septiembre"] .semaforo-circulo::before {
-    content: "";
-    position: absolute;
-    top: -60%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 140%;
-    height: 60%;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50'%3E%3Cellipse cx='50' cy='40' rx='48' ry='8' fill='%23c2884d'/%3E%3Cpath d='M25 40 Q25 10 50 8 Q75 10 75 40 Z' fill='%23d99e5c'/%3E%3Cellipse cx='50' cy='16' rx='10' ry='3' fill='%23006341'/%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-    pointer-events: none;
-    z-index: 20;
 }
 
 /* 5. Semáforo con tonos bandera (coincide por texto "green"/"red" en la clase de estado) */
@@ -600,29 +597,36 @@ body[data-tema="septiembre"] .semaforo-circulo[class*="red"] {
     background-color: #ce1126 !important;
 }
 
-/* 4. Textura de fondo sutil, estilo textil, casi imperceptible.
-   Va sobre el contenedor raíz del dashboard (el div con min-h-dvh) */
-body[data-tema="septiembre"] .dashboard-root::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: 0.05;
-    pointer-events: none;
-    background-image:
-        repeating-linear-gradient(
-            45deg,
-            #006341 0px,
-            #006341 2px,
-            transparent 2px,
-            transparent 12px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            #ce1126 0px,
-            #ce1126 2px,
-            transparent 2px,
-            transparent 12px
-        );
+/* 4. Textura de fondo — descartada, no se usa. */
+
+/* Papel picado — banderines festoneados con balanceo tipo viento */
+.papel-picado-flag {
+    height: 34px;
+    clip-path: polygon(
+        0% 0%,
+        100% 0%,
+        100% 68%,
+        85% 82%,
+        70% 68%,
+        55% 84%,
+        40% 68%,
+        25% 84%,
+        10% 68%,
+        0% 82%
+    );
+    box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.08);
+    transform-origin: top center;
+    animation: papelPicadoMece 3s ease-in-out infinite;
+}
+
+@keyframes papelPicadoMece {
+    0%,
+    100% {
+        transform: rotate(-6deg);
+    }
+    50% {
+        transform: rotate(6deg);
+    }
 }
 
 /* 6. Confeti de fondo flotante */
