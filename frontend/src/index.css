@@ -552,7 +552,7 @@ input[type="month"]::-webkit-clear-button {
     display: none;
 }
 
-//* ============================================
+/* ============================================
    SISTEMA DE TEMPORADAS — pegar al final de index.css
    Todo scoped bajo body[data-tema="..."], así que
    Admin y Vigilancia (que nunca setean ese atributo)
