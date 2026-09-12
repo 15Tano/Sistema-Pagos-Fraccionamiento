@@ -8,221 +8,8 @@ import {
     deleteTagSale,
 } from "../api/tags";
 import useAuthStore from "../store/authStore";
-
-// ─── Icono centralizado ───────────────────────────────────────────────────────
-const Icon = {
-    tag: (cls = "w-5 h-5") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-            />
-        </svg>
-    ),
-    cart: (cls = "w-5 h-5") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-        </svg>
-    ),
-    plus: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-            />
-        </svg>
-    ),
-    lock: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-        </svg>
-    ),
-    unlock: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
-            />
-        </svg>
-    ),
-    trash: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-        </svg>
-    ),
-    search: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-        </svg>
-    ),
-    check: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-            />
-        </svg>
-    ),
-    x: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-            />
-        </svg>
-    ),
-    trendUp: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-            />
-        </svg>
-    ),
-    trendDown: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
-            />
-        </svg>
-    ),
-    user: (cls = "w-4 h-4") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-        </svg>
-    ),
-    inventory: (cls = "w-5 h-5") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            />
-        </svg>
-    ),
-    chart: (cls = "w-5 h-5") => (
-        <svg
-            className={cls}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            />
-        </svg>
-    ),
-};
-
+import { Icon } from "../lib/icons";
+import { createPortal } from "react-dom";
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatSoldAt(soldAt) {
     if (!soldAt) return "Sin fecha";
@@ -382,27 +169,123 @@ function StockInjectionPanel({ onDone, onError }) {
     );
 }
 
+// ─── Hook: posición de un elemento anclado, para dropdowns que escapan overflow ───
+function useAnchorRect(anchorRef, active) {
+    const [rect, setRect] = useState(null);
+
+    useEffect(() => {
+        if (!active || !anchorRef.current) {
+            setRect(null);
+            return;
+        }
+        const update = () => setRect(anchorRef.current.getBoundingClientRect());
+        update();
+        // capture:true -> detecta scroll de cualquier ancestro (incluido SmartScroll)
+        window.addEventListener("scroll", update, true);
+        window.addEventListener("resize", update);
+        return () => {
+            window.removeEventListener("scroll", update, true);
+            window.removeEventListener("resize", update);
+        };
+    }, [active, anchorRef]);
+
+    return rect;
+}
+
+// ─── Dropdown que se renderiza en document.body, fuera del overflow del cajón ───
+function PortalDropdown({ anchorRef, open, children, offset = 6 }) {
+    const rect = useAnchorRect(anchorRef, open);
+
+    if (!open || !rect) return null;
+
+    return createPortal(
+        <div
+            style={{
+                position: "fixed",
+                top: rect.bottom + offset,
+                left: rect.left,
+                width: rect.width,
+                zIndex: 9999,
+            }}
+        >
+            {children}
+        </div>,
+        document.body,
+    );
+}
+
+// ─── Hook: navegación por teclado sobre una lista ↑ ↓ Enter Esc ───
+function useListNav(length, onSelect) {
+    const [activeIndex, setActiveIndex] = useState(-1);
+
+    useEffect(() => setActiveIndex(-1), [length]);
+
+    const handleKeyDown = useCallback(
+        (e) => {
+            if (length === 0) return;
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActiveIndex((i) => (i + 1) % length);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActiveIndex((i) => (i - 1 + length) % length);
+            } else if (e.key === "Enter") {
+                if (activeIndex >= 0) {
+                    e.preventDefault();
+                    onSelect(activeIndex);
+                }
+            } else if (e.key === "Escape") {
+                setActiveIndex(-1);
+            }
+        },
+        [length, activeIndex, onSelect],
+    );
+
+    return { activeIndex, setActiveIndex, handleKeyDown };
+}
+
+const TAG_SEARCH_THRESHOLD = 8;
+
 // ─── Panel: Buscador de vecinos + venta ───────────────────────────────────────
-function SellTagPanel({ unsoldTags, onSold, onError }) {
+export function SellTagPanel({ unsoldTags, onSold, onError }) {
     const [query, setQuery] = useState("");
     const [resultados, setResultados] = useState([]);
     const [selected, setSelected] = useState(null);
     const [tagId, setTagId] = useState("");
     const [loadingSearch, setLoadingSearch] = useState(false);
     const [selling, setSelling] = useState(false);
+    const [confirming, setConfirming] = useState(false);
     const debounceRef = useRef(null);
+
+    const searchInputRef = useRef(null);
+    const inputWrapperRef = useRef(null);
+
+    // Foco automático al montar (el panel se remonta cada vez que se abre el cajón)
+    useEffect(() => {
+        const t = setTimeout(() => searchInputRef.current?.focus(), 50);
+        return () => clearTimeout(t);
+    }, []);
+
+    // Confirmación de venta se resetea si cambia la selección
+    useEffect(() => setConfirming(false), [selected, tagId]);
 
     const handleQuery = useCallback((val) => {
         setQuery(val);
         setSelected(null);
         setTagId("");
         clearTimeout(debounceRef.current);
+
         if (!val.trim()) {
             setResultados([]);
+            setLoadingSearch(false);
             return;
         }
+
+        // loading se activa YA (no dentro del timeout) para que no haya
+        // un frame donde "no hay resultados" aparezca mientras se escribe.
+        setLoadingSearch(true);
+
         debounceRef.current = setTimeout(async () => {
-            setLoadingSearch(true);
             try {
                 const res = await api.get(
                     `/vecinos?search=${encodeURIComponent(val)}&per_page=7`,
@@ -423,11 +306,18 @@ function SellTagPanel({ unsoldTags, onSold, onError }) {
         setTagId("");
     }, []);
 
+    const showNoResults =
+        query.trim() && !loadingSearch && resultados.length === 0 && !selected;
+    const showResultsDropdown = resultados.length > 0 || showNoResults;
+
+    const resultsNav = useListNav(resultados.length, (i) =>
+        handleSelect(resultados[i]),
+    );
+
     const handleSell = useCallback(async () => {
         if (!tagId || !selected) return;
         setSelling(true);
         try {
-            // CORRECCIÓN BUGS: Aquí se envía el tagId Y el vecino_id (selected.id)
             await createTagSale(Number(tagId), selected.id);
             onSold(`Tag vendido a ${selected.nombre} — $150`);
             setSelected(null);
@@ -440,8 +330,17 @@ function SellTagPanel({ unsoldTags, onSold, onError }) {
         }
     }, [tagId, selected, onSold, onError]);
 
+    const handleConfirmClick = () => {
+        if (!tagId || !selected) return;
+        if (!confirming) {
+            setConfirming(true);
+            return;
+        }
+        handleSell();
+    };
+
     return (
-        <div className="relative overflow-visible p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+        <div className="relative overflow-visible p-5 bg-white/30 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
             <div className="flex items-center gap-2 mb-5 relative z-10">
@@ -449,14 +348,14 @@ function SellTagPanel({ unsoldTags, onSold, onError }) {
                 <h3 className="text-sm font-semibold text-stone-800">
                     Vender Tag
                 </h3>
-                <span className="ml-auto px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wide bg-orange-100/60 border border-orange-200/60 text-orange-700 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
+                <span className="ml-200 px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wide bg-orange-100/60 border border-orange-200/60 text-orange-700 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
                     {unsoldTags.length} disponibles · $150 c/u
                 </span>
             </div>
 
             <div className="relative z-10">
-                {/* Buscador */}
-                <div className="relative mb-4">
+                {/* Buscador de vecino */}
+                <div className="relative mb-4" ref={inputWrapperRef}>
                     <label className="block text-xs font-medium text-stone-500 mb-1.5 ml-1">
                         Buscar vecino por nombre o casa
                     </label>
@@ -465,10 +364,20 @@ function SellTagPanel({ unsoldTags, onSold, onError }) {
                             {Icon.search()}
                         </span>
                         <input
+                            ref={searchInputRef}
                             type="text"
                             placeholder="Ej: García o Casa 14..."
                             value={query}
                             onChange={(e) => handleQuery(e.target.value)}
+                            onKeyDown={resultsNav.handleKeyDown}
+                            role="combobox"
+                            aria-expanded={showResultsDropdown}
+                            aria-controls="vecino-resultados-listbox"
+                            aria-activedescendant={
+                                resultsNav.activeIndex >= 0
+                                    ? `vecino-opt-${resultsNav.activeIndex}`
+                                    : undefined
+                            }
                             className="w-full pl-9 pr-10 py-2.5 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-700 placeholder-stone-400 transition-all"
                         />
                         {loadingSearch && (
@@ -496,37 +405,72 @@ function SellTagPanel({ unsoldTags, onSold, onError }) {
                         )}
                     </div>
 
-                    {/* Dropdown resultados */}
-                    {resultados.length > 0 && (
-                        <ul className="absolute z-30 w-full mt-1.5 bg-white/90 backdrop-blur-xl border border-white/80 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] overflow-hidden max-h-60 overflow-y-auto">
-                            {resultados.map((v) => (
-                                <li key={v.uuid}>
-                                    <button
-                                        onClick={() => handleSelect(v)}
-                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50/80 transition-colors text-left border-b border-black/5 last:border-0"
-                                    >
-                                        <span className="text-stone-400/70">
-                                            {Icon.user()}
-                                        </span>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-semibold text-stone-800 truncate">
-                                                {v.nombre}
-                                            </p>
-                                            <p className="text-xs font-medium text-stone-500 mt-0.5">
-                                                {v.calle} #{v.numero_casa}
-                                            </p>
-                                        </div>
-                                        {v.tags?.length > 0 && (
-                                            <span className="text-[10px] font-semibold uppercase tracking-wide text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-md shrink-0">
-                                                {v.tags.length} tag
-                                                {v.tags.length > 1 ? "s" : ""}
-                                            </span>
-                                        )}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    {/* Dropdown vía portal: escapa el overflow del cajón */}
+                    <PortalDropdown
+                        anchorRef={inputWrapperRef}
+                        open={showResultsDropdown}
+                    >
+                        <div
+                            className="transition-[opacity,transform] duration-150 ease-out opacity-100 translate-y-0
+                                bg-white/90 backdrop-blur-xl border border-white/80 rounded-xl
+                                shadow-[0_10px_40px_rgba(0,0,0,0.1)] overflow-hidden max-h-60 overflow-y-auto"
+                        >
+                            {resultados.length > 0 ? (
+                                <ul
+                                    id="vecino-resultados-listbox"
+                                    role="listbox"
+                                >
+                                    {resultados.map((v, i) => (
+                                        <li
+                                            key={v.uuid}
+                                            role="option"
+                                            id={`vecino-opt-${i}`}
+                                            aria-selected={
+                                                i === resultsNav.activeIndex
+                                            }
+                                        >
+                                            <button
+                                                onClick={() => handleSelect(v)}
+                                                onMouseEnter={() =>
+                                                    resultsNav.setActiveIndex(i)
+                                                }
+                                                className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-b border-black/5 last:border-0 ${
+                                                    i === resultsNav.activeIndex
+                                                        ? "bg-orange-50/80"
+                                                        : "hover:bg-orange-50/80"
+                                                }`}
+                                            >
+                                                <span className="text-stone-400/70">
+                                                    {Icon.user()}
+                                                </span>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-semibold text-stone-800 truncate">
+                                                        {v.nombre}
+                                                    </p>
+                                                    <p className="text-xs font-medium text-stone-500 mt-0.5">
+                                                        {v.calle} #
+                                                        {v.numero_casa}
+                                                    </p>
+                                                </div>
+                                                {v.tags?.length > 0 && (
+                                                    <span className="text-[10px] font-semibold uppercase tracking-wide text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-md shrink-0">
+                                                        {v.tags.length} tag
+                                                        {v.tags.length > 1
+                                                            ? "s"
+                                                            : ""}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="px-4 py-3 text-sm text-stone-400">
+                                    Sin resultados para "{query}"
+                                </div>
+                            )}
+                        </div>
+                    </PortalDropdown>
                 </div>
 
                 {/* Vecino seleccionado */}
@@ -552,7 +496,6 @@ function SellTagPanel({ unsoldTags, onSold, onError }) {
                             </button>
                         </div>
 
-                        {/* Tags actuales */}
                         {selected.tags?.length > 0 && (
                             <div>
                                 <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-wide mb-2">
@@ -575,37 +518,143 @@ function SellTagPanel({ unsoldTags, onSold, onError }) {
                             </div>
                         )}
 
-                        {/* Selector de tag */}
-                        <div>
-                            <select
-                                value={tagId}
-                                onChange={(e) => setTagId(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-white/60 backdrop-blur-md border border-white/80 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-700 transition-all cursor-pointer"
-                            >
-                                <option value="">
-                                    Seleccionar un tag del inventario...
-                                </option>
-                                {unsoldTags.map((t) => (
-                                    <option key={t.id} value={t.id}>
-                                        {t.codigo}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        {/* Selector de tag: nativo o buscable según volumen */}
+                        <TagPicker
+                            unsoldTags={unsoldTags}
+                            tagId={tagId}
+                            onChange={setTagId}
+                        />
 
-                        <button
-                            onClick={handleSell}
-                            disabled={!tagId || selling}
-                            className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-400 hover:to-orange-500 disabled:opacity-50 disabled:shadow-none text-white text-sm font-semibold rounded-xl shadow-[0_4px_10px_rgba(249,115,22,0.3),inset_0_1px_2px_rgba(255,255,255,0.4)] transition-all flex items-center justify-center gap-2 active:scale-95"
-                        >
-                            {Icon.cart()}
-                            {selling
-                                ? "Registrando Venta..."
-                                : "Confirmar venta — $150"}
-                        </button>
+                        {/* Confirmación en dos pasos antes de vender */}
+                        {confirming ? (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setConfirming(false)}
+                                    disabled={selling}
+                                    className="flex-1 py-3 bg-white/60 border border-stone-200/70 text-stone-600 text-sm font-semibold rounded-xl hover:bg-white/90 transition-all"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleConfirmClick}
+                                    disabled={selling}
+                                    className="flex-1 py-3 bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-400 hover:to-orange-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl shadow-[0_4px_10px_rgba(249,115,22,0.3)] transition-all active:scale-95"
+                                >
+                                    {selling
+                                        ? "Registrando..."
+                                        : `Sí, vender a ${selected.nombre.split(" ")[0]}`}
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={handleConfirmClick}
+                                disabled={!tagId || selling}
+                                className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-400 hover:to-orange-500 disabled:opacity-50 disabled:shadow-none text-white text-sm font-semibold rounded-xl shadow-[0_4px_10px_rgba(249,115,22,0.3),inset_0_1px_2px_rgba(255,255,255,0.4)] transition-all flex items-center justify-center gap-2 active:scale-95"
+                            >
+                                {Icon.cart()}
+                                Confirmar venta — $150
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+// ─── Selector de tag: <select> nativo si son pocos, buscable si son muchos ───
+function TagPicker({ unsoldTags, tagId, onChange }) {
+    if (unsoldTags.length <= TAG_SEARCH_THRESHOLD) {
+        return (
+            <select
+                value={tagId}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full px-4 py-2.5 bg-white/60 backdrop-blur-md border border-white/80 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-700 transition-all cursor-pointer"
+            >
+                <option value="">Seleccionar un tag del inventario...</option>
+                {unsoldTags.map((t) => (
+                    <option key={t.id} value={t.id}>
+                        {t.codigo}
+                    </option>
+                ))}
+            </select>
+        );
+    }
+
+    return (
+        <TagCombobox
+            unsoldTags={unsoldTags}
+            tagId={tagId}
+            onChange={onChange}
+        />
+    );
+}
+
+function TagCombobox({ unsoldTags, tagId, onChange }) {
+    const [tagQuery, setTagQuery] = useState("");
+    const [open, setOpen] = useState(false);
+    const anchorRef = useRef(null);
+
+    const selectedTag = useMemo(
+        () => unsoldTags.find((t) => String(t.id) === String(tagId)) || null,
+        [unsoldTags, tagId],
+    );
+
+    const filtered = useMemo(() => {
+        if (!tagQuery.trim()) return unsoldTags;
+        const q = tagQuery.toLowerCase();
+        return unsoldTags.filter((t) => t.codigo.toLowerCase().includes(q));
+    }, [unsoldTags, tagQuery]);
+
+    const nav = useListNav(filtered.length, (i) => {
+        onChange(String(filtered[i].id));
+        setTagQuery(filtered[i].codigo);
+        setOpen(false);
+    });
+
+    return (
+        <div className="relative" ref={anchorRef}>
+            <input
+                type="text"
+                placeholder="Buscar tag por código..."
+                value={open ? tagQuery : selectedTag?.codigo || ""}
+                onFocus={() => {
+                    setOpen(true);
+                    setTagQuery("");
+                }}
+                onChange={(e) => setTagQuery(e.target.value)}
+                onKeyDown={nav.handleKeyDown}
+                onBlur={() => setTimeout(() => setOpen(false), 120)}
+                className="w-full px-4 py-2.5 bg-white/60 backdrop-blur-md border border-white/80 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-700 transition-all"
+            />
+            <PortalDropdown anchorRef={anchorRef} open={open}>
+                <div className="bg-white/90 backdrop-blur-xl border border-white/80 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] overflow-hidden max-h-60 overflow-y-auto">
+                    {filtered.length === 0 ? (
+                        <div className="px-4 py-3 text-sm text-stone-400">
+                            Sin tags que coincidan
+                        </div>
+                    ) : (
+                        filtered.map((t, i) => (
+                            <button
+                                key={t.id}
+                                onMouseDown={(e) => e.preventDefault()} // evita perder foco antes del click
+                                onClick={() => {
+                                    onChange(String(t.id));
+                                    setTagQuery(t.codigo);
+                                    setOpen(false);
+                                }}
+                                className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors border-b border-black/5 last:border-0 ${
+                                    i === nav.activeIndex
+                                        ? "bg-orange-50/80 text-stone-800"
+                                        : "text-stone-700 hover:bg-orange-50/80"
+                                }`}
+                            >
+                                {t.codigo}
+                            </button>
+                        ))
+                    )}
+                </div>
+            </PortalDropdown>
         </div>
     );
 }

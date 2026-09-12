@@ -6,6 +6,7 @@ import TablaPagos from "./components/TablaPagos";
 import Paginacion from "./components/Paginacion";
 import ModalConfirmarEliminar from "./components/ModalConfirmarEliminar";
 import { formatMes, formatDate } from "./fechas";
+import VenderTagButton from "./components/VenderTagButton";
 
 const PER_PAGE = 20;
 
@@ -76,13 +77,14 @@ export default function Pagos() {
     return (
         <div className="flex flex-col gap-6 h-full pb-20 md:pb-0">
             {/* Header */}
-            <div className="px-2">
+            <div className="relative px-2">
                 <h1 className="text-3xl font-semibold text-stone-800 mb-1">
                     Gestión de Pagos
                 </h1>
                 <p className="text-sm font-medium text-stone-500">
                     {total} recibos registrados en el sistema
                 </p>
+                <VenderTagButton />
             </div>
 
             {/* Formulario */}
