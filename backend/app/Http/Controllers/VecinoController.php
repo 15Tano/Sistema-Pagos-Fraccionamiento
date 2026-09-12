@@ -16,11 +16,11 @@ class VecinoController extends Controller
 
     $query = Vecino::with(['tags']);
 
-
     if ($search) {
-        $query->where(function ($q) use ($search) {
-            // Búsqueda simultánea en nombre, calle, numero_casa y tag
-            $terms = explode(' ', trim($search));
+        $terms = array_filter(explode(' ', trim($search)));
+
+        // WHERE: cada término debe matchear en algún campo (igual que antes)
+        $query->where(function ($q) use ($terms) {
             foreach ($terms as $term) {
                 $q->where(function ($inner) use ($term) {
                     $inner->where('nombre', 'like', "%{$term}%")
@@ -32,9 +32,36 @@ class VecinoController extends Controller
                 });
             }
         });
+
+        // RELEVANCIA: puntaje por término, sumado entre todos los términos.
+        // numero_casa exacto pesa más que contener, nombre pesa más que calle.
+        $caseSql = [];
+        $bindings = [];
+        foreach ($terms as $term) {
+            $caseSql[] = "
+                (CASE WHEN numero_casa = ? THEN 8
+                      WHEN numero_casa LIKE ? THEN 5
+                      WHEN nombre LIKE ? THEN 4
+                      WHEN nombre LIKE ? THEN 3
+                      WHEN calle LIKE ? THEN 2
+                      ELSE 0 END)
+            ";
+            $bindings[] = $term;          // numero_casa exacto
+            $bindings[] = "%{$term}%";    // numero_casa contiene
+            $bindings[] = "{$term}%";     // nombre empieza con
+            $bindings[] = "%{$term}%";    // nombre contiene
+            $bindings[] = "%{$term}%";    // calle contiene
+        }
+        $relevanciaSql = implode(' + ', $caseSql);
+
+        $query->selectRaw("vecinos.*, ({$relevanciaSql}) as relevancia", $bindings)
+            ->orderByDesc('relevancia')
+            ->orderBy('nombre');
+    } else {
+        $query->orderBy('nombre');
     }
 
-    $vecinos = $query->orderBy('nombre')->paginate($perPage);
+    $vecinos = $query->paginate($perPage);
     return response()->json($vecinos);
 }
 

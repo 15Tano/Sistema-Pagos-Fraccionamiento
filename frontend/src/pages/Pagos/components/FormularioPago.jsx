@@ -5,6 +5,26 @@ import { CUOTAS, RECARGO_EXTRA } from "../constantes";
 import PagoRegistradoModal from "./PagoRegistradoModal";
 import { getLocalToday, getLocalMonth } from "../fechas";
 
+function resaltar(texto, busqueda) {
+    if (!busqueda?.trim()) return texto;
+    const terminos = busqueda
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    if (!terminos.length) return texto;
+    const regex = new RegExp(`(${terminos.join("|")})`, "gi");
+    return texto.split(regex).map((parte, i) =>
+        terminos.some((t) => parte.toLowerCase() === t.toLowerCase()) ? (
+            <b key={i} className="text-orange-600">
+                {parte}
+            </b>
+        ) : (
+            parte
+        ),
+    );
+}
+
 // ── FORMULARIO DE PAGO ──
 export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
     const isEdit = !!editingPago;
@@ -119,12 +139,14 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                 setTotalEncontrados(
                     res.data.total ?? (res.data.data || []).length,
                 );
+                setHighlightedIndex(res.data.data?.length > 0 ? 0 : -1);
             } catch (err) {
                 // Una búsqueda cancelada (porque llegó una más nueva) no debe
                 // borrar resultados que ya se están mostrando de la búsqueda actual.
                 if (err.code !== "ERR_CANCELED") {
                     setVecinoResults([]);
                     setTotalEncontrados(0);
+                    setHighlightedIndex(-1);
                 }
             } finally {
                 if (abortRef.current === controller) setSearching(false);
@@ -317,11 +339,16 @@ export default function FormularioPago({ onSaved, editingPago, onCancelEdit }) {
                                                     }`}
                                                 >
                                                     <p className="text-sm font-semibold text-stone-800">
-                                                        {v.nombre}
+                                                        {resaltar(
+                                                            v.nombre,
+                                                            vecinoSearch,
+                                                        )}
                                                     </p>
                                                     <p className="text-xs font-medium text-stone-500 mt-0.5">
-                                                        {v.calle} #
-                                                        {v.numero_casa}
+                                                        {resaltar(
+                                                            `${v.calle} #${v.numero_casa}`,
+                                                            vecinoSearch,
+                                                        )}
                                                     </p>
                                                 </button>
                                             ))}
