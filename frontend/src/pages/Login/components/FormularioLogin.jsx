@@ -48,8 +48,8 @@ function FormularioLogin({ onLogin }) {
 
             {/* Encabezado */}
             <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-white/60 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-[inset_0_2px_4px_rgba(255,255,255,1),0_4px_10px_rgba(0,0,0,0.03)] border border-white/80">
-                    <YourLogoIcon className="w-8 h-8" />
+                <div className="w-20 h-20 bg-white/60 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-[inset_0_2px_4px_rgba(255,255,255,1),0_4px_10px_rgba(0,0,0,0.03)] border border-white/80 overflow-hidden">
+                    <YourLogoIcon className="w-full h-full" />
                 </div>
                 <h2 className="text-2xl font-bold text-stone-800 mb-2 drop-shadow-sm">
                     Bienvenido

@@ -106,6 +106,6 @@ export const YourLogoIcon = ({ className }) => (
     <img
         src="/arcos.png"
         alt="Logo de San Isidro"
-        className="max-w-[320px] lg:max-w-[1300]"
+        className={`${className} object-contain`}
     />
 );
