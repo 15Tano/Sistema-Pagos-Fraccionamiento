@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     // Reemplaza el Authenticate por el nuestro
     $middleware->alias([
         'auth' => \App\Http\Middleware\Authenticate::class,
+        'corte.bloqueo' => \App\Http\Middleware\BloquearSiCorteActivo::class,
     ]);
 
     $middleware->api(prepend: [

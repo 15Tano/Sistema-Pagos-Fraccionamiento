@@ -23,7 +23,7 @@ Route::post('/vecinos/registro-acceso', [VecinoAccesoController::class, 'store']
 Route::post('/vecinos/eliminar-acceso', [VecinoAccesoController::class, 'destroy']);
 
 // ─── RUTAS PROTEGIDAS ─────────────────────────────────────────────
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'corte.bloqueo'])->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
