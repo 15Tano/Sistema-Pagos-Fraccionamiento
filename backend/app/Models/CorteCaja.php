@@ -10,6 +10,8 @@ class CorteCaja extends Model
 {
     use HasFactory;
 
+    protected $table = 'cortes_caja';
+
     protected $fillable = [
         'fecha',
         'monto_sistema',

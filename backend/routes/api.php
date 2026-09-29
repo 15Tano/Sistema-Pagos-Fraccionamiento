@@ -14,6 +14,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CapturistaController;
 use App\Http\Controllers\VecinoAccesoController;
 use App\Http\Controllers\EncuestaController;
+use App\Http\Controllers\CorteCajaController;
 
 
 // ─── AUTH (públicas) ──────────────────────────────────────────────
@@ -50,7 +51,17 @@ Route::middleware(['auth:sanctum', 'corte.bloqueo'])->group(function () {
     // Tag Sales
     Route::delete('tag_sales/reset', [TagSaleController::class, 'reset']);
     Route::resource('tag_sales', TagSaleController::class); // <--- Este es el bueno que usaremos
-    // Pagos — rutas específicas ANTES del resource
+
+    // Corte de Caja
+    Route::get('corte-caja/hoy', [CorteCajaController::class, 'hoy']);
+    Route::post('corte-caja/intentar', [CorteCajaController::class, 'intentar']);
+    Route::post('corte-caja/cerrar', [CorteCajaController::class, 'cerrar']);
+    Route::post('corte-caja/cerrar-con-diferencia', [CorteCajaController::class, 'cerrarConDiferencia']);
+    Route::get('/corte-caja/hoy/plazas', [CorteCajaController::class, 'plazasDelDia']);
+    Route::get('corte-caja', [CorteCajaController::class, 'index']);
+    Route::get('corte-caja/{corte}', [CorteCajaController::class, 'show']);
+    Route::post('corte-caja/{corte}/reabrir', [CorteCajaController::class, 'reabrir']);
+
     // Pagos — rutas específicas ANTES del resource
     Route::get('pagos/historico', [PagoController::class, 'getHistorico']);
     Route::get('pagos/mis-pagos', [PagoController::class, 'misPagos']);

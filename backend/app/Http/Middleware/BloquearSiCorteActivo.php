@@ -13,11 +13,10 @@ class BloquearSiCorteActivo
      * Rutas que el capturista debe poder seguir usando aunque el corte esté bloqueando todo lo demás.
      */
     protected array $rutasExentas = [
-        'corte-caja/*',
-        'logout',
-        'me',
+        'api/corte-caja/*',
+        'api/logout',
+        'api/me',
     ];
-
     public function handle(Request $request, Closure $next)
     {
 

@@ -28,7 +28,7 @@ class AuthController extends Controller
         }
 
         // 3.5 Validación de horario para equipos de cobro
-        $asignacion = null;
+        /*$asignacion = null;
         if ($user->role === 'capturista') {
             $asignacion = \App\Models\AsignacionCobro::where('user_id', $user->id)
                 ->whereDate('fecha', today())
@@ -48,7 +48,7 @@ class AuthController extends Controller
                     'message' => 'Fuera del horario permitido de cobro.'
                 ], 403);
             }
-        }
+        }*/
 
         // 3. Lógica según el Rol
         $responseData = [
@@ -74,8 +74,9 @@ class AuthController extends Controller
             ]);
         }
         // 4. Generar Token y responder
-        $expiracion = $asignacion ? $fin : null;
-        $token = $user->createToken('auth-token', ['*'], $expiracion)->plainTextToken;
+        //$expiracion = $asignacion ? $fin : null;
+        //$token = $user->createToken('auth-token', ['*'], $expiracion)->plainTextToken;
+        $token = $user->createToken('auth-token', ['*'])->plainTextToken;
         return response()->json([
             'token' => $token,
             'user'  => $responseData,

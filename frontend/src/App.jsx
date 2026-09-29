@@ -13,6 +13,7 @@ import ResidentDashboard from "./pages/ResidentDashboard";
 import GuestView from "./pages/GuestView.jsx";
 import RegistroAccesoVecino from "./pages/RegistroAccesoVecino";
 import VistaVigilancia from "./pages/VistaVigilancia";
+import Cortes from "./pages/Cortes";
 
 const PrivateRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, user } = useAuthStore();
@@ -28,10 +29,18 @@ const AdminRoute = ({ children }) => (
     </PrivateRoute>
 );
 
+const SoloAdminRoute = ({ children }) => {
+    const { user } = useAuthStore();
+    if (user?.role !== "admin") return <Navigate to="/" replace />;
+    return children;
+};
+
 const RootRoute = () => {
     const { isAuthenticated, user } = useAuthStore();
     if (!isAuthenticated) return <Navigate to="/login" replace />;
     if (user?.role === "residente") return <Navigate to="/residente" replace />;
+    if (user?.role === "capturista") return <Navigate to="/pagos" replace />;
+
     return (
         <AdminRoute>
             <Dashboard />
@@ -84,10 +93,24 @@ function App() {
                     path="/historico"
                     element={
                         <AdminRoute>
-                            <Historico />
+                            <SoloAdminRoute>
+                                <Historico />
+                            </SoloAdminRoute>
                         </AdminRoute>
                     }
                 />
+
+                <Route
+                    path="/cortes"
+                    element={
+                        <AdminRoute>
+                            <SoloAdminRoute>
+                                <Cortes />
+                            </SoloAdminRoute>
+                        </AdminRoute>
+                    }
+                />
+
                 <Route
                     path="/residente"
                     element={

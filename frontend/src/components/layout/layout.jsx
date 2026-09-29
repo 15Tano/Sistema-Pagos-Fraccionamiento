@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
+import CorteCajaGuard from "../CorteCaja/CorteCajaGuard";
 
 const NAV_ITEMS = [
     {
@@ -98,6 +99,27 @@ const NAV_ITEMS = [
             </svg>
         ),
     },
+
+    {
+        to: "/cortes",
+        label: "Cortes",
+        soloAdmin: true,
+        icon: (
+            <svg
+                className="nav-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+            </svg>
+        ),
+    },
 ];
 
 export default function Layout({ children }) {
@@ -105,6 +127,13 @@ export default function Layout({ children }) {
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
     const isDashboard = location.pathname === "/";
+    const RUTAS_CAPTURISTA = ["/pagos", "/vecinos", "/tags"];
+
+    const navItems = NAV_ITEMS.filter((item) =>
+        user?.role === "capturista"
+            ? RUTAS_CAPTURISTA.includes(item.to)
+            : !item.soloAdmin || user?.role === "admin",
+    );
 
     // ── Lógica de PC (Escritorio) ──
     const [sidebarHovered, setSidebarHovered] = useState(false);
@@ -129,6 +158,7 @@ export default function Layout({ children }) {
 
     return (
         <div className="app-shell">
+            <CorteCajaGuard />
             {/* ── FONDO ── */}
             <div className="app-bg" />
 
@@ -201,7 +231,7 @@ export default function Layout({ children }) {
 
                 {/* Nav */}
                 <nav className="sidebar-nav">
-                    {NAV_ITEMS.map((item) => (
+                    {navItems.map((item) => (
                         <NavLink
                             key={item.to}
                             to={item.to}
@@ -327,7 +357,7 @@ export default function Layout({ children }) {
                             </svg>
                         </button>
                         <span className="topbar-title">
-                            {NAV_ITEMS.find((n) => n.to === location.pathname)
+                            {navItems.find((n) => n.to === location.pathname)
                                 ?.label || "Dashboard"}
                         </span>
                     </div>
@@ -374,7 +404,7 @@ export default function Layout({ children }) {
             <nav className="md:hidden fixed bottom-4 inset-x-4 z-20 flex items-center justify-around px-2 py-2.5 bg-white/5 backdrop-blur-sm border-t border-l border-white/80 border-r border-b border-white/30 shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-[2rem]">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
-                {NAV_ITEMS.map((item) => (
+                {navItems.map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}
