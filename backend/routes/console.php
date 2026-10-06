@@ -9,5 +9,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('cortes-caja:abrir')
-    ->dailyAt('20:15')
+    ->dailyAt('20:10')
     ->timezone('America/Mexico_City');
