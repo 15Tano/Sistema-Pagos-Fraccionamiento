@@ -32,7 +32,15 @@ class CapturistaController extends Controller
             ->firstOrFail();
 
         // Revocar tokens anteriores para no acumular basura
-        $capturista->tokens()->where('name', 'capturista-pin-token')->delete();
+        $capturista->tokens()
+    ->where('name', 'capturista-pin-token')
+    ->where(function ($q) {
+        $q->where('last_used_at', '<', now()->subDay())
+          ->orWhere(function ($q2) {
+              $q2->whereNull('last_used_at')->where('created_at', '<', now()->subDay());
+          });
+    })
+    ->delete();
 
         // Crear token con expiración de 2 horas
         $token = $capturista->createToken(
