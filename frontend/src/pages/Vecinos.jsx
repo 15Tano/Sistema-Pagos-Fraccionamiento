@@ -100,7 +100,7 @@ const TagIcon = () => (
 );
 
 // ── MODAL ──
-function VecinoModal({ open, onClose, onSaved, editingVecino, availableTags }) {
+function VecinoModal({ open, onClose, onSaved, editingVecino, availableTags, plazas }) {
     const isEdit = !!editingVecino;
     const [form, setForm] = useState({
         nombre: "",
@@ -280,11 +280,11 @@ function VecinoModal({ open, onClose, onSaved, editingVecino, availableTags }) {
                         {/* Plaza + Número */}
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-600 text-stone-600 mb-1.5">
+                                <label htmlFor="vecino-plaza" className="block text-xs font-600 text-stone-600 mb-1.5">
                                     Plaza *
                                 </label>
-                                <input
-                                    type="text"
+                                <select
+                                    id="vecino-plaza"
                                     value={form.calle}
                                     onChange={(e) =>
                                         setForm((f) => ({
@@ -292,10 +292,24 @@ function VecinoModal({ open, onClose, onSaved, editingVecino, availableTags }) {
                                             calle: e.target.value,
                                         }))
                                     }
-                                    placeholder="Ej. Plaza Roble"
                                     className="vecino-input"
                                     disabled={loading}
-                                />
+                                    required
+                                >
+                                    <option value="" disabled>
+                                        Selecciona una plaza
+                                    </option>
+                                    {editingVecino?.calle && !plazas.includes(editingVecino.calle) && (
+                                        <option value={editingVecino.calle}>
+                                            {editingVecino.calle}
+                                        </option>
+                                    )}
+                                    {plazas.map((plaza) => (
+                                        <option key={plaza} value={plaza}>
+                                            {plaza}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label className="block text-xs font-600 text-stone-600 mb-1.5">
@@ -878,6 +892,7 @@ export default function Vecinos() {
                 onSaved={handleSaved}
                 editingVecino={editingVecino}
                 availableTags={tagsForModal}
+                plazas={plazas}
             />
 
             {deleteConfirm && (
