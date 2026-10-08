@@ -15,9 +15,15 @@ class TagController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-    'codigo' => 'required|unique:tags',
-    ]);
+        $request->merge(['codigo' => trim((string) $request->input('codigo', ''))]);
+        $request->validate(['codigo' => 'required|string|max:255']);
+
+        $existing = Tag::where('codigo', $request->codigo)->first();
+        if ($existing) {
+            return response()->json(['message' => $existing->tagSale()->exists()
+                ? 'Este TAG ya existe y tiene una venta registrada. No se puede agregar como inventario nuevo.'
+                : 'Este TAG ya está registrado en el inventario.'], 422);
+        }
 
         $tag = Tag::create([
     'codigo' => $request->codigo,

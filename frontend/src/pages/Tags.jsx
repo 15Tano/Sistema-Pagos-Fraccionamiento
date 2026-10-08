@@ -44,35 +44,35 @@ function StockInjectionPanel({ onDone, onError }) {
     };
 
     const handleInject = useCallback(async () => {
-        const list = codes
+        if (saving) return;
+        const list = [...new Set(codes
             .split(/[\n,]+/)
             .map((c) => c.trim())
-            .filter(Boolean);
+            .filter(Boolean))];
         if (!list.length) return;
         setSaving(true);
         setResults([]);
 
-        const settled = await Promise.allSettled(
-            list.map((codigo) =>
-                createTag(codigo).then(() => ({ codigo, ok: true })),
-            ),
-        );
-
-        setResults(
-            settled.map((r, i) => ({
-                codigo: list[i],
-                ok: r.status === "fulfilled",
-                msg:
-                    r.status === "rejected"
-                        ? r.reason?.response?.data?.message ||
-                          "Ya existe o error"
-                        : "Registrado",
-            })),
-        );
-        setSaving(false);
-        setCodes("");
-        onDone();
-    }, [codes, onDone]);
+        const nextResults = [];
+        try {
+            for (const codigo of list) {
+                try {
+                    await createTag(codigo);
+                    nextResults.push({ codigo, ok: true, msg: "Agregado al inventario" });
+                } catch (error) {
+                    const data = error.response?.data;
+                    nextResults.push({ codigo, ok: false, msg: data?.errors?.codigo?.[0] || data?.message || "No se pudo conectar. Verifica tu conexión y vuelve a intentar." });
+                }
+                setResults([...nextResults]);
+            }
+            setCodes(nextResults.filter((r) => !r.ok).map((r) => r.codigo).join("\n"));
+            const added = nextResults.filter((r) => r.ok).length;
+            if (added) onDone(added, nextResults.length - added);
+            else onError("No se agregó ningún TAG. Revisa el detalle de cada código.");
+        } finally {
+            setSaving(false);
+        }
+    }, [codes, saving, onDone, onError]);
 
     return (
         <div className="relative overflow-hidden p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
@@ -95,10 +95,12 @@ function StockInjectionPanel({ onDone, onError }) {
             </div>
 
             <div className="relative z-10">
+                {pinErr && <p role="alert" className="mb-2 text-xs font-medium text-red-600">PIN incorrecto. Revisa la clave e intenta de nuevo.</p>}
                 {!unlocked ? (
                     <div className="flex gap-2">
                         <input
                             type="password"
+                            aria-label="PIN de administrador"
                             placeholder="PIN de administrador"
                             value={pin}
                             onChange={(e) => {
@@ -120,16 +122,22 @@ function StockInjectionPanel({ onDone, onError }) {
                 ) : (
                     <div className="space-y-3">
                         <p className="text-xs text-stone-500 font-medium">
-                            Un código por línea o separados por coma. Se
-                            registran como disponibles (sin vender).
+                            Pega los códigos, uno por línea o separados por coma.
+                            Los repetidos se procesan una sola vez. Cada TAG nuevo queda disponible para venta.
                         </p>
                         <textarea
                             rows={3}
+                            aria-label="Códigos de TAGS para agregar al inventario"
+                            disabled={saving}
                             placeholder={"TAG001\nTAG002\nTAG003"}
                             value={codes}
                             onChange={(e) => setCodes(e.target.value)}
                             className="w-full px-4 py-3 bg-white/50 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 text-sm font-medium text-stone-600 font-mono resize-none transition-all"
                         />
+                        <div className="flex items-center justify-between text-xs text-stone-500">
+                            <span>{new Set(codes.split(/[\n,]+/).map((c) => c.trim()).filter(Boolean)).size} códigos únicos</span>
+                            <button type="button" disabled={saving} onClick={() => { setUnlocked(false); setPinErr(false); }} className="font-semibold text-orange-600 disabled:opacity-50">Bloquear panel</button>
+                        </div>
                         <button
                             onClick={handleInject}
                             disabled={saving || !codes.trim()}
@@ -137,12 +145,14 @@ function StockInjectionPanel({ onDone, onError }) {
                         >
                             {Icon.plus()}
                             {saving
-                                ? "Registrando..."
-                                : "Registrar en inventario"}
+                                ? "Registrando códigos…"
+                                : "Agregar TAGS al inventario"}
                         </button>
 
                         {results.length > 0 && (
-                            <div className="space-y-1.5 pt-4 mt-2 border-t border-white/40">
+                            <div aria-live="polite" className="space-y-1.5 pt-4 mt-2 border-t border-white/40">
+                                <p className="text-xs font-semibold text-stone-700">{results.filter((r) => r.ok).length} agregados · {results.filter((r) => !r.ok).length} sin agregar</p>
+                                {!saving && results.some((r) => !r.ok) && <p className="text-xs text-stone-500">Conservamos los códigos sin agregar para que puedas revisarlos y reintentarlos.</p>}
                                 {results.map((r) => (
                                     <div
                                         key={r.codigo}
@@ -825,7 +835,6 @@ export default function Tags() {
     }, []);
 
     const fetchData = useCallback(async () => {
-        setLoading(true);
         try {
             const [tagsRes, salesRes] = await Promise.all([
                 getTags(),
@@ -1032,9 +1041,9 @@ export default function Tags() {
                 {/* Columna izquierda: inventario + venta */}
                 <div className="flex flex-col gap-4">
                     <StockInjectionPanel
-                        onDone={() => {
+                        onDone={(added, failed) => {
                             fetchData();
-                            showToast("Tags registrados en inventario");
+                            showToast(`${added} TAGS agregados${failed ? ` · ${failed} sin agregar` : ""}`, failed ? "error" : "success");
                         }}
                         onError={(msg) => showToast(msg, "error")}
                     />
