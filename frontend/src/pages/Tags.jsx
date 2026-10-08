@@ -5,7 +5,6 @@ import {
     createTag,
     getTagSales,
     createTagSale,
-    deleteTagSale,
 } from "../api/tags";
 import useAuthStore from "../store/authStore";
 import { Icon } from "../lib/icons";
@@ -672,19 +671,22 @@ function TagCombobox({ unsoldTags, tagId, onChange }) {
 // ─── Panel: Ventas recientes ──────────────────────────────────────────────────
 const ITEMS_PER_PAGE = 15;
 
-function RecentSalesPanel({ sales, onDelete }) {
-    const [page, setPage] = useState(1);
+function RecentSalesPanel({ sales }) {
+    const [requestedPage, setPage] = useState(1);
+    const [query, setQuery] = useState("");
 
     // CORRECCIÓN BUGS: Se ordena el arreglo de más reciente a más viejo antes de paginar.
     const sortedSales = useMemo(() => {
-        return [...sales].sort((a, b) => {
+        const code = query.trim().toLowerCase();
+        return sales.filter((sale) => String(sale.tag?.codigo ?? "").toLowerCase().includes(code)).sort((a, b) => {
             const dateA = new Date(a.sold_at || a.created_at);
             const dateB = new Date(b.sold_at || b.created_at);
             return dateB - dateA;
         });
-    }, [sales]);
+    }, [sales, query]);
 
     const totalPages = Math.ceil(sortedSales.length / ITEMS_PER_PAGE);
+    const page = Math.min(requestedPage, Math.max(1, totalPages));
 
     const slice = useMemo(
         () =>
@@ -694,8 +696,6 @@ function RecentSalesPanel({ sales, onDelete }) {
             ),
         [sortedSales, page],
     );
-
-    useEffect(() => setPage(1), [sortedSales.length]);
 
     const getPageNumbers = () => {
         if (totalPages <= 5)
@@ -731,10 +731,21 @@ function RecentSalesPanel({ sales, onDelete }) {
                 </span>
             </div>
 
+            <div className="relative z-10 mb-4 space-y-2">
+                <label htmlFor="sales-tag-search" className="text-xs font-semibold text-stone-600">Consultar por código de TAG</label>
+                <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-orange-400 pointer-events-none">{Icon.search()}</span>
+                    <input id="sales-tag-search" type="search" autoComplete="off" placeholder="Escribe el código completo o una parte…" value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} className="w-full pl-10 pr-16 py-3 bg-white/70 border border-white/80 rounded-xl text-sm text-stone-700 shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-orange-400/25 focus:border-orange-400 transition-all" />
+                    {query && <button type="button" aria-label="Limpiar búsqueda de TAG" onClick={() => { setQuery(""); setPage(1); }} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-stone-500 hover:bg-orange-50 hover:text-orange-600 focus-visible:outline-orange-400">{Icon.x()}</button>}
+                </div>
+                <p aria-live="polite" className="text-xs text-stone-500">{query.trim() ? `${sortedSales.length} ventas encontradas de ${sales.length}` : "Consulta el TAG, su comprador y la fecha de venta."}</p>
+            </div>
             <div className="flex flex-col gap-2 flex-1 relative z-10 overflow-y-auto">
                 {slice.length === 0 ? (
-                    <div className="flex items-center justify-center h-20 text-sm font-medium text-stone-400">
-                        No hay ventas registradas aún.
+                    <div className="flex flex-col items-center justify-center gap-2 py-10 px-4 text-center rounded-2xl bg-white/40 border border-dashed border-stone-200">
+                        <span className="text-orange-300">{Icon.search("w-7 h-7")}</span>
+                        <p className="text-sm font-semibold text-stone-600">{query.trim() ? "No encontramos ventas con ese código" : "No hay ventas registradas aún"}</p>
+                        {query.trim() && <p className="text-xs text-stone-500">Revisa el código o busca solo sus últimos dígitos.</p>}
                     </div>
                 ) : (
                     slice.map((sale) => (
@@ -742,25 +753,26 @@ function RecentSalesPanel({ sales, onDelete }) {
                             key={sale.id}
                             className="flex items-center justify-between p-3 bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_4px_rgba(0,0,0,0.02)] hover:bg-white/70 transition-colors"
                         >
-                            <div>
-                                <p className="text-sm font-semibold text-stone-800">
+                            <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold font-mono text-stone-800 break-all">
                                     {sale.tag?.codigo ?? `Tag #${sale.tag_id}`}
                                 </p>
+                                <div className="flex items-start gap-1.5 mt-1.5 text-sm text-stone-700">
+                                    <span className="text-orange-400 shrink-0 mt-0.5">{Icon.user()}</span>
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] uppercase tracking-wide text-stone-400 font-semibold">Vendido a</p>
+                                        <p className="font-medium break-words">{sale.tag?.vecinos?.map((v) => v.nombre).filter(Boolean).join(", ") || "Sin vecino vinculado"}</p>
+                                        {sale.tag?.vecinos?.map((v) => <p key={v.id} className="text-xs text-stone-500 break-words">{[v.calle, v.numero_casa ? `#${v.numero_casa}` : null].filter(Boolean).join(" · ")}</p>)}
+                                    </div>
+                                </div>
                                 <p className="text-xs font-medium text-stone-500 mt-0.5">
-                                    {formatSoldAt(sale.sold_at)}
+                                    {formatSoldAt(sale.sold_at || sale.created_at)}
                                 </p>
                             </div>
                             <div className="flex items-center gap-3">
                                 <span className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide rounded-lg border bg-stone-100/50 border-stone-200/60 text-stone-600 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
                                     ${parseFloat(sale.price || 150).toFixed(0)}
                                 </span>
-                                <button
-                                    onClick={() => onDelete(sale.id)}
-                                    className="p-1.5 text-stone-400 hover:text-red-500 bg-white/50 border border-stone-200/50 hover:border-red-200 hover:bg-red-50 rounded-xl transition-all"
-                                    title="Eliminar venta"
-                                >
-                                    {Icon.trash()}
-                                </button>
                             </div>
                         </div>
                     ))
@@ -920,24 +932,6 @@ export default function Tags() {
         };
     }, [sales]);
 
-    const handleDeleteSale = useCallback(
-        async (saleId) => {
-            if (!window.confirm("¿Eliminar esta venta?")) return;
-            try {
-                await deleteTagSale(saleId);
-                showToast("Venta eliminada");
-                fetchData();
-            } catch (error) {
-                // Aquí le decimos a React que muestre el error del backend, no el texto genérico
-                showToast(
-                    error.response?.data?.error || "Error al eliminar la venta",
-                    "error",
-                );
-            }
-        },
-        [showToast, fetchData],
-    );
-
     if (loading)
         return (
             <div className="flex items-center justify-center h-64">
@@ -1058,7 +1052,7 @@ export default function Tags() {
                 </div>
 
                 {/* Columna derecha: historial de ventas */}
-                <RecentSalesPanel sales={sales} onDelete={handleDeleteSale} />
+                <RecentSalesPanel sales={sales} />
             </div>
         </div>
     );

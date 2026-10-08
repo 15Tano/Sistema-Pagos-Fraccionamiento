@@ -11,7 +11,7 @@ class TagSaleController extends Controller
 {
     public function index()
     {
-        return response()->json(TagSale::with('tag')->get());
+        return response()->json(TagSale::with('tag.vecinos')->get());
     }
 
     public function store(Request $request)
