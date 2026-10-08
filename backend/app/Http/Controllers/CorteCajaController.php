@@ -314,7 +314,7 @@ public function plazasDelDia(Request $request)
     $hoy = $this->corteParaOperacion($request)->fecha->toDateString();
 
     $pagos = Pago::whereDate('fecha_de_cobro', $hoy)
-        ->with('vecino:id,nombre,calle')
+        ->with('vecino:id,nombre,calle,numero_casa')
         ->get();
 
     $plazas = $pagos
@@ -327,6 +327,7 @@ public function plazasDelDia(Request $request)
                 'pagos'          => $pagosDeLaCalle->map(fn ($p) => [
                     'id'       => $p->id,
                     'vecino'   => $p->vecino->nombre ?? 'Desconocido',
+                    'numero_casa' => $p->vecino?->numero_casa,
                     'cantidad' => (float) $p->cantidad,
                     'tipo'     => $p->tipo,
                 ])->values(),

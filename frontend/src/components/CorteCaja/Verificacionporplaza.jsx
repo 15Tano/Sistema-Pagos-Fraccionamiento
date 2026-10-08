@@ -299,6 +299,9 @@ export default function VerificacionPorPlaza({ onCerrar, fecha }) {
                                                     >
                                                         <span className="text-sm text-stone-600 truncate">
                                                             {pago.vecino}
+                                                            {pago.numero_casa != null && String(pago.numero_casa).trim() !== ""
+                                                                ? ` - ${pago.numero_casa}`
+                                                                : ""}
                                                         </span>
                                                         <span className="text-sm font-semibold tabular-nums text-stone-800 shrink-0">
                                                             {formatCurrency(
