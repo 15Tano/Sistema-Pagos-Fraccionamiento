@@ -861,7 +861,20 @@ export default function Tags() {
                 : salesRes.data?.data || [];
 
             setTags(tagsData);
-            setSales(salesData);
+            // /tags ya incluye los vecinos. Completar ventas también cuando
+            // el servidor todavía responde solo con el TAG en /tag_sales.
+            const tagsById = new Map(tagsData.map((tag) => [String(tag.id), tag]));
+            setSales(salesData.map((sale) => {
+                const inventoryTag = tagsById.get(String(sale.tag_id));
+                return {
+                    ...sale,
+                    tag: {
+                        ...inventoryTag,
+                        ...sale.tag,
+                        vecinos: sale.tag?.vecinos ?? inventoryTag?.vecinos ?? [],
+                    },
+                };
+            }));
         } catch {
             showToast("Error al cargar los datos", "error");
         } finally {
