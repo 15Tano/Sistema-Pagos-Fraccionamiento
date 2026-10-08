@@ -6,11 +6,13 @@ use App\Models\CorteCaja;
 use App\Models\Pago;
 use App\Models\TagSale;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class CorteCajaController extends Controller
 {
     protected const MONTO_CUOTA_ORDINARIA = 280;
+    protected const FECHA_INICIO_TAGS_HORARIO_MEXICO = '2026-10-07';
 
     // ─────────────────────────────────────────
     // HOY — estado actual del corte
@@ -253,10 +255,26 @@ class CorteCajaController extends Controller
         return $corte;
     }
 
+    protected function ventasTagsDelDia(string $fecha): Builder
+    {
+        // Conservar el criterio original en los cortes históricos.
+        if ($fecha < self::FECHA_INICIO_TAGS_HORARIO_MEXICO) {
+            return TagSale::whereDate('sold_at', $fecha);
+        }
+
+        // sold_at se guarda en UTC; la jornada se define en horario de México.
+        $inicioLocal = Carbon::parse($fecha, 'America/Mexico_City')->startOfDay();
+        $inicioUtc = $inicioLocal->copy()->utc()->toDateTimeString();
+        $finUtc = $inicioLocal->copy()->addDay()->utc()->toDateTimeString();
+
+        return TagSale::where('sold_at', '>=', $inicioUtc)
+            ->where('sold_at', '<', $finUtc);
+    }
+
     protected function montoSistemaDelDia(string $fecha): float
     {
         $pagos = (float) Pago::whereDate('fecha_de_cobro', $fecha)->sum('cantidad');
-        $tags  = (float) TagSale::whereDate('sold_at', $fecha)->sum('price');
+        $tags  = (float) $this->ventasTagsDelDia($fecha)->sum('price');
 
         return round($pagos + $tags, 2);
     }
@@ -267,7 +285,7 @@ class CorteCajaController extends Controller
     protected function desgloseDelDia(string $fecha): array
     {
         $pagosDelDia = Pago::whereDate('fecha_de_cobro', $fecha)->get();
-        $tagsDelDia  = TagSale::whereDate('sold_at', $fecha)->get();
+        $tagsDelDia  = $this->ventasTagsDelDia($fecha)->get();
 
         $ordinarios = $pagosDelDia->where('tipo', 'ordinario');
 
@@ -317,7 +335,7 @@ public function plazasDelDia(Request $request)
         ->sortBy('calle')
         ->values();
 
-    $tagsDelDia = TagSale::whereDate('sold_at', $hoy)->get();
+    $tagsDelDia = $this->ventasTagsDelDia($hoy)->get();
 
     return response()->json([
         'plazas'      => $plazas,
