@@ -19,6 +19,7 @@ export default function useCorteCaja(activo) {
     // montaje (o sea, una vez por refresh/reconexión). Después de eso, el
     // polling subsecuente ya no debe pisar la fase interactiva en curso.
     const inicializadoRef = useRef(false);
+    const fechaRef = useRef(null);
 
     const evaluarCorte = useCallback((data) => {
         if (!data.existe) {
@@ -28,6 +29,9 @@ export default function useCorteCaja(activo) {
             return;
         }
 
+        const fecha = data.corte.fecha.slice(0, 10);
+        if (fechaRef.current !== fecha) inicializadoRef.current = false;
+        fechaRef.current = fecha;
         setCorte(data.corte);
         setDesglose(data.desglose);
 
@@ -117,7 +121,7 @@ export default function useCorteCaja(activo) {
 
         // delay artificial de la spec (600-900ms) para que la transición se sienta intencional
         const [resultado] = await Promise.all([
-            intentarCorte(montoDeclarado),
+            intentarCorte(montoDeclarado, fechaRef.current),
             new Promise((r) => setTimeout(r, 750)),
         ]);
 
@@ -129,14 +133,14 @@ export default function useCorteCaja(activo) {
     const reintentar = useCallback(() => setFase("declarando"), []);
 
     const cerrar = useCallback(async (firma) => {
-        const data = await cerrarCorte(firma);
+        const data = await cerrarCorte(firma, fechaRef.current);
         setCorte(data.corte);
         setDesglose(data.desglose);
         setFase("sellado");
     }, []);
 
-    const cerrarConDiferencia = useCallback(async (nota, firma) => {
-        const data = await cerrarCorteConDiferencia(nota, firma);
+    const cerrarConDiferencia = useCallback(async (firma) => {
+        const data = await cerrarCorteConDiferencia(firma, fechaRef.current);
         setCorte(data.corte);
         setDesglose(data.desglose);
         setFase("sellado");

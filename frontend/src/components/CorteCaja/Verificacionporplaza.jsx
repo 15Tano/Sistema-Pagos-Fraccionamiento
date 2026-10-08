@@ -24,7 +24,7 @@ import { getPlazasDelDia } from "../../lib/corteCaja";
 //
 // Props:
 //   onCerrar — cierra el modal (ej. setMostrarPlazas(false) en el padre)
-export default function VerificacionPorPlaza({ onCerrar }) {
+export default function VerificacionPorPlaza({ onCerrar, fecha }) {
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(false);
     const [plazas, setPlazas] = useState([]);
@@ -37,7 +37,7 @@ export default function VerificacionPorPlaza({ onCerrar }) {
     useEffect(() => {
         let cancelado = false;
 
-        getPlazasDelDia()
+        getPlazasDelDia(fecha)
             .then((data) => {
                 if (cancelado) return;
                 setPlazas(data.plazas ?? []);
@@ -53,7 +53,7 @@ export default function VerificacionPorPlaza({ onCerrar }) {
         return () => {
             cancelado = true;
         };
-    }, []);
+    }, [fecha]);
 
     const formatCurrency = (valor) =>
         new Intl.NumberFormat("es-MX", {

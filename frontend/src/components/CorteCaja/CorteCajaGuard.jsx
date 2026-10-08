@@ -32,6 +32,9 @@ export default function CorteCajaGuard() {
             <div className="absolute inset-0 backdrop-blur-sm bg-white/30" />
 
             <div className="relative w-full max-w-md mx-4">
+                <p className="relative z-10 mb-2 text-center text-sm font-semibold text-stone-700">
+                    Corte de caja · {corte?.fecha?.slice(0, 10)}
+                </p>
                 {fase === "interrupcion" && (
                     <InterrupcionAviso onContinuar={avanzarConteo} />
                 )}

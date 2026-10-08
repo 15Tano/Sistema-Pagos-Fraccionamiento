@@ -17,8 +17,7 @@ class CorteCajaController extends Controller
     // ─────────────────────────────────────────
     public function hoy()
     {
-        $hoy = Carbon::now('America/Mexico_City')->toDateString();
-        $corte = CorteCaja::where('fecha', $hoy)->first();
+        $corte = CorteCaja::activo();
 
         if (!$corte) {
             return response()->json(['existe' => false]);
@@ -27,7 +26,7 @@ class CorteCajaController extends Controller
         return response()->json([
             'existe'    => true,
             'corte'     => $corte,
-            'desglose'  => $this->desgloseDelDia($corte->fecha),
+            'desglose'  => $this->desgloseDelDia($corte->fecha->toDateString()),
         ]);
     }
 
@@ -40,14 +39,13 @@ class CorteCajaController extends Controller
             'monto_declarado' => 'required|numeric|min:0',
         ]);
 
-        $hoy   = Carbon::now('America/Mexico_City')->toDateString();
-        $corte = CorteCaja::where('fecha', $hoy)->firstOrFail();
+        $corte = $this->corteParaOperacion($request);
 
         if ($corte->estado !== 'en_proceso') {
             return response()->json(['message' => 'Este corte ya fue cerrado.'], 409);
         }
 
-        $montoSistema = $this->montoSistemaDelDia($corte->fecha);
+        $montoSistema = $this->montoSistemaDelDia($corte->fecha->toDateString());
         $declarado    = (float) $request->monto_declarado;
         $diferencia   = round($declarado - $montoSistema, 2);
 
@@ -68,7 +66,7 @@ class CorteCajaController extends Controller
             'numero_intento'              => $numero,
             'diferencia'                  => $diferencia,
             'monto_sistema'               => $montoSistema,
-            'desglose'                    => $this->desgloseDelDia($corte->fecha),
+            'desglose'                    => $this->desgloseDelDia($corte->fecha->toDateString()),
             'puede_cerrar_con_diferencia' => $numero >= 3 && $diferencia !== 0.0,
         ]);
     }
@@ -82,8 +80,7 @@ class CorteCajaController extends Controller
             'firma' => 'required|string|max:255',
         ]);
 
-        $hoy   = Carbon::now('America/Mexico_City')->toDateString();
-        $corte = CorteCaja::where('fecha', $hoy)->firstOrFail();
+        $corte = $this->corteParaOperacion($request);
 
         if ($corte->estado !== 'en_proceso') {
             return response()->json(['message' => 'Este corte ya fue cerrado.'], 409);
@@ -91,7 +88,8 @@ class CorteCajaController extends Controller
 
         $ultimoIntento = collect($corte->intentos ?? [])->last();
 
-        if (!$ultimoIntento || $ultimoIntento['diferencia'] !== 0) {
+        if (!$ultimoIntento || (float) $ultimoIntento['diferencia'] !== 0.0
+            || round((float) $ultimoIntento['declarado'] - $this->montoSistemaDelDia($corte->fecha->toDateString()), 2) !== 0.0) {
             return response()->json(['message' => 'El último intento no coincide, no se puede cerrar.'], 422);
         }
 
@@ -104,7 +102,7 @@ class CorteCajaController extends Controller
 
         return response()->json([
             'corte'    => $corte,
-            'desglose' => $this->desgloseDelDia($corte->fecha),
+            'desglose' => $this->desgloseDelDia($corte->fecha->toDateString()),
         ]);
     }
 
@@ -117,8 +115,7 @@ class CorteCajaController extends Controller
             'firma' => 'required|string|max:255',
         ]);
 
-        $hoy   = Carbon::now('America/Mexico_City')->toDateString();
-        $corte = CorteCaja::where('fecha', $hoy)->firstOrFail();
+        $corte = $this->corteParaOperacion($request);
 
         if ($corte->estado !== 'en_proceso') {
             return response()->json(['message' => 'Este corte ya fue cerrado.'], 409);
@@ -132,14 +129,14 @@ class CorteCajaController extends Controller
 
         $corte->update([
             'estado'            => 'cerrado_con_diferencia',
-            'monto_sistema'     => $this->montoSistemaDelDia($corte->fecha),
+            'monto_sistema'     => $this->montoSistemaDelDia($corte->fecha->toDateString()),
             'firma_capturista'  => $request->firma,
             'cerrado_at'        => now(),
         ]);
 
         return response()->json([
             'corte'    => $corte,
-            'desglose' => $this->desgloseDelDia($corte->fecha),
+            'desglose' => $this->desgloseDelDia($corte->fecha->toDateString()),
         ]);
     }
 
@@ -245,6 +242,17 @@ class CorteCajaController extends Controller
     // ─────────────────────────────────────────
     // Total real de efectivo del día (pagos + venta de tags)
     // ─────────────────────────────────────────
+    protected function corteParaOperacion(Request $request): CorteCaja
+    {
+        $request->validate(['fecha' => 'nullable|date_format:Y-m-d']);
+        $corte = CorteCaja::activo();
+        abort_if(!$corte, 404, 'No hay un corte pendiente.');
+        abort_if($request->filled('fecha') && $request->fecha !== $corte->fecha->toDateString(),
+            409, 'El corte activo cambió. Actualiza la pantalla antes de continuar.');
+
+        return $corte;
+    }
+
     protected function montoSistemaDelDia(string $fecha): float
     {
         $pagos = (float) Pago::whereDate('fecha_de_cobro', $fecha)->sum('cantidad');
@@ -283,9 +291,9 @@ class CorteCajaController extends Controller
 // PLAZAS DEL DÍA — pagos agrupados por calle, para revisión cruzada
 // contra la hoja física de conteo
 // ─────────────────────────────────────────
-public function plazasDelDia()
+public function plazasDelDia(Request $request)
 {
-    $hoy = Carbon::now('America/Mexico_City')->toDateString();
+    $hoy = $this->corteParaOperacion($request)->fecha->toDateString();
 
     $pagos = Pago::whereDate('fecha_de_cobro', $hoy)
         ->with('vecino:id,nombre,calle')

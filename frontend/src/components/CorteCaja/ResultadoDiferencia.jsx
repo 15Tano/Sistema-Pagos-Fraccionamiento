@@ -5,8 +5,7 @@ import VerificacionPorPlaza from "./Verificacionporplaza";
 // Fase "diferencia" del conteo ciego: el conteo del capturista NO coincidió
 // con monto_sistema. Muestra tu conteo vs total registrado vs diferencia,
 // permite consultar el desglose (solo lectura), reintentar sin límite, y
-// desde el 3er intento ofrece la válvula "cerrar con diferencia" (nota +
-// firma obligatorias).
+// desde el 3er intento ofrece la válvula "cerrar con diferencia" con firma.
 //
 // Props:
 //   desglose               — objeto { ordinario, especiales, extraordinario, ventasTags, total, ... }
@@ -16,7 +15,7 @@ import VerificacionPorPlaza from "./Verificacionporplaza";
 //   corte                  — objeto corte del hook (opcional; si trae
 //                             corte.intentos, se muestra la bitácora completa)
 //   onReintentar           — reintentar() del hook useCorteCaja
-//   onCerrarConDiferencia  — cerrarConDiferencia(nota, firma) del hook
+//   onCerrarConDiferencia  — cerrarConDiferencia(firma) del hook
 //
 // Layout: 3 tarjetas flotantes independientes en vez de una sola tarjeta
 // contenedora.
@@ -215,7 +214,6 @@ export default function ResultadoDiferencia({
 }) {
     const [mostrarValvula, setMostrarValvula] = useState(false);
     const [mostrarPlazas, setMostrarPlazas] = useState(false);
-    const [nota, setNota] = useState("");
     const [firma, setFirma] = useState("");
     const [enviando, setEnviando] = useState(false);
 
@@ -249,12 +247,11 @@ export default function ResultadoDiferencia({
         `${valor > 0 ? "+" : valor < 0 ? "-" : ""}${formatCurrency(Math.abs(valor))}`;
 
     const handleConfirmarValvula = async () => {
-        const notaLimpia = nota.trim();
         const firmaLimpia = firma.trim();
-        if (!notaLimpia || !firmaLimpia || enviando) return;
+        if (!firmaLimpia || enviando) return;
         setEnviando(true);
         try {
-            await onCerrarConDiferencia(notaLimpia, firmaLimpia);
+            await onCerrarConDiferencia(firmaLimpia);
         } catch {
             setEnviando(false);
         }
@@ -608,6 +605,7 @@ export default function ResultadoDiferencia({
 
                     {mostrarPlazas && (
                         <VerificacionPorPlaza
+                            fecha={corte?.fecha?.slice(0, 10)}
                             onCerrar={() => setMostrarPlazas(false)}
                         />
                     )}
@@ -631,8 +629,7 @@ export default function ResultadoDiferencia({
                                     </p>
                                 </div>
                                 <p className="mb-4 text-[13px] leading-relaxed text-stone-500">
-                                    Este cierre requiere una justificación y una
-                                    firma.
+                                    Este cierre requiere tu firma.
                                 </p>
 
                                 <div className="md:grid md:grid-cols-1 md:gap-x-6">
@@ -666,7 +663,6 @@ export default function ResultadoDiferencia({
                                         type="button"
                                         onClick={handleConfirmarValvula}
                                         disabled={
-                                            !nota.trim() ||
                                             !firma.trim() ||
                                             enviando
                                         }

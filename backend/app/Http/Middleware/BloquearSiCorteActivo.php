@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Models\CorteCaja;
-use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -32,8 +31,7 @@ class BloquearSiCorteActivo
             return $next($request);
         }
 
-        $hoy = Carbon::now('America/Mexico_City')->toDateString();
-        $corte = CorteCaja::where('fecha', $hoy)->first();
+        $corte = CorteCaja::activo();
 
         if (!$corte) {
             return $next($request);
@@ -44,7 +42,7 @@ class BloquearSiCorteActivo
 
         if ($bloqueado) {
             return response()->json([
-                'message'    => 'La caja de hoy está cerrada. Solicita al admin que la reabra para continuar.',
+                'message'    => 'Hay un corte pendiente o una caja cerrada. Solicita al administrador que revise el corte.',
                 'corte_uuid' => $corte->uuid,
             ], 423);
         }
