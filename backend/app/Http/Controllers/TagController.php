@@ -69,7 +69,7 @@ class TagController extends Controller
     // New method to get stock (unsold tags count)
     public function stock()
     {
-        $stockCount = Tag::whereDoesntHave('tagSale')->count();
+        $stockCount = Tag::whereDoesntHave('tagSale')->whereDoesntHave('vecinos')->count();
         return response()->json(['stock' => $stockCount]);
     }
 

@@ -24,6 +24,9 @@ class TagSaleController extends Controller
         if (TagSale::where('tag_id', $request->tag_id)->exists()) {
             return response()->json(['error' => 'Este tag ya ha sido vendido'], 400);
         }
+        if (Tag::findOrFail($request->tag_id)->vecinos()->exists()) {
+            return response()->json(['error' => 'Este TAG ya está asignado a un vecino y no está disponible para venta.'], 422);
+        }
 
         try {
             $sale = DB::transaction(function () use ($request) {

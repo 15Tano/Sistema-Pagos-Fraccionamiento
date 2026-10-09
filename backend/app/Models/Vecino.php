@@ -32,7 +32,7 @@ class Vecino extends Model
     }
     public function tags()
     {
-        return $this->belongsToMany(Tag::class, 'tag_vecino')->sold();
+        return $this->belongsToMany(Tag::class, 'tag_vecino');
     }
     public function user()
     {

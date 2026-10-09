@@ -893,7 +893,7 @@ export default function Tags() {
 
     const unsoldTags = useMemo(() => {
         const soldIds = new Set(sales.map((s) => s.tag_id));
-        return tags.filter((t) => !soldIds.has(t.id));
+        return tags.filter((t) => !soldIds.has(t.id) && !t.vecinos?.length);
     }, [tags, sales]);
 
     const kpi = useMemo(() => {
