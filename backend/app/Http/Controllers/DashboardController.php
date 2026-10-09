@@ -26,9 +26,8 @@ class DashboardController extends Controller
             ->pluck('vecino_id');
         // ── Total vecinos ──
         $totalVecinos = Vecino::count();
-        // ── Morosos: vecinos con al menos un tag vendido que no pagaron el mes actual ──
+        // ── Morosos: todos los vecinos que no pagaron el mes actual, tengan o no tags ──
         $morosos = Vecino::with(['tags' => fn($q) => $q->whereHas('tagSale')])
-            ->whereHas('tags', fn($q) => $q->whereHas('tagSale'))
             ->whereNotIn('id', $vecinosPagaron)
             ->select('id', 'nombre', 'calle', 'numero_casa')
             ->orderBy('calle')
