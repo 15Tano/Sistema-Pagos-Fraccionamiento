@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { TIPO_CONFIG } from "../dashboardHelpers";
 import { useTemporada } from "../../../hooks/useTemporada";
 import CenefaDivider from "../../../components/decoraciones/CenefaDivider";
+import { AranaHalloween } from "../../../components/decoraciones/DetallesHalloween";
 
 export default function TablonAvisoResidente({ avisos }) {
     const tema = useTemporada();
@@ -33,6 +34,7 @@ export default function TablonAvisoResidente({ avisos }) {
     return (
         <div className="card-tematizable relative overflow-hidden p-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
             {/* Brillo superior */}
+            {tema.id === "halloween" && <AranaHalloween />}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
             <div className="flex items-center gap-2 mb-5">
@@ -65,7 +67,7 @@ export default function TablonAvisoResidente({ avisos }) {
                     return (
                         <div
                             key={aviso.id}
-                            className={`relative overflow-hidden rounded-2xl border p-4 bg-white/50 backdrop-blur-md shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_2px_8px_rgba(0,0,0,0.02)] ${cfg.border} hover:bg-white/60 transition-colors duration-300`}
+                            className={`aviso-item relative overflow-hidden rounded-2xl border p-4 bg-white/50 backdrop-blur-md shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_2px_8px_rgba(0,0,0,0.02)] ${cfg.border} hover:bg-white/60 transition-colors duration-300`}
                         >
                             <div className="flex items-start gap-3 relative z-10">
                                 <span
@@ -91,9 +93,10 @@ export default function TablonAvisoResidente({ avisos }) {
                                     {aviso.imagen_url && (
                                         <button
                                             onClick={() =>
-                                                setImagenAmpliada(
-                                                    aviso.imagen_url,
-                                                )
+                                                setImagenAmpliada({
+                                                    url: aviso.imagen_url,
+                                                    titulo: aviso.titulo,
+                                                })
                                             }
                                             className="mt-3 block w-full max-w-xs rounded-xl overflow-hidden border border-white/60 shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:opacity-90 active:scale-[0.98] transition-all"
                                         >
@@ -153,10 +156,14 @@ export default function TablonAvisoResidente({ avisos }) {
                                     "0 25px 70px rgba(0,0,0,0.15), inset 0 2px 10px rgba(255,255,255,0.6)",
                             }}
                         >
-                            <div className="flex items-center justify-end p-4 border-b border-white/30 shrink-0">
+                            <div className="flex items-start justify-between gap-3 p-4 border-b border-white/30 shrink-0">
+                                <h3 className="min-w-0 pt-1.5 text-base font-bold text-stone-800 break-words">
+                                    {imagenAmpliada.titulo}
+                                </h3>
                                 <button
                                     onClick={closeImagen}
-                                    className="p-2 text-stone-500 hover:text-stone-800 bg-white/40 hover:bg-white/70 rounded-full transition-all active:scale-95"
+                                    aria-label="Cerrar imagen del aviso"
+                                    className="shrink-0 p-2 text-stone-500 hover:text-stone-800 bg-white/40 hover:bg-white/70 rounded-full transition-all active:scale-95"
                                 >
                                     <svg
                                         className="w-5 h-5"
@@ -176,8 +183,8 @@ export default function TablonAvisoResidente({ avisos }) {
 
                             <div className="p-5 overflow-y-auto flex items-center justify-center">
                                 <img
-                                    src={imagenAmpliada}
-                                    alt="Aviso ampliado"
+                                    src={imagenAmpliada.url}
+                                    alt={imagenAmpliada.titulo}
                                     className="w-full h-auto object-contain rounded-xl border border-white/60"
                                     style={{
                                         touchAction: "manipulation",

@@ -25,7 +25,7 @@ import BotonEncuesta from "./components/BotonEncuesta";
 
 import TemporadaProvider from "../../components/TemporadaProvider";
 import { useTemporada } from "../../hooks/useTemporada";
-import TexturaFondo from "../../components/decoraciones/TexturaFondo";
+import EscenaHalloween from "../../components/decoraciones/EscenaHalloween";
 import PapelPicado from "../../components/decoraciones/PapelPicado";
 
 console.log("VERSION 2.0 - CARGADA");
@@ -59,8 +59,21 @@ export default function ResidentDashboard() {
     const fetchData = useCallback(async () => {
         setLoadingPagos(true);
         try {
-            const pagosRes = await api.get("/pagos/mis-pagos");
-            setPagos(pagosRes.data.data || pagosRes.data || []);
+            // Incluye todo el historial: los pagos adelantados pueden ocupar
+            // la primera página y dejar fuera el mes que determina el acceso.
+            const todosLosPagos = [];
+            let pagina = 1;
+            let ultimaPagina = 1;
+            do {
+                const pagosRes = await api.get("/pagos/mis-pagos", {
+                    params: { page: pagina },
+                });
+                const resultado = pagosRes.data;
+                todosLosPagos.push(...(resultado.data || resultado || []));
+                ultimaPagina = resultado.last_page || 1;
+                pagina += 1;
+            } while (pagina <= ultimaPagina);
+            setPagos(todosLosPagos);
             setLastSync(new Date());
         } catch (e) {
             console.error("Error cargando pagos:", e);
@@ -162,8 +175,9 @@ export default function ResidentDashboard() {
     return (
         <TemporadaProvider>
             <div className="dashboard-root min-h-dvh p-4 md:p-6 bg-stone-50/50 relative overflow-hidden">
+                {tema.decoraciones.includes("escenaHalloween") && <EscenaHalloween />}
                 {tema.decoraciones.includes("papelPicado") && <PapelPicado />}
-                <div className="max-w-2xl mx-auto flex flex-col gap-5 relative z-10">
+                <div className="dashboard-contenido max-w-2xl mx-auto flex flex-col gap-5 relative z-10">
                     {/* Elementos decorativos de fondo — ahora DENTRO del mismo
                     stacking context que las tarjetas, para que el
                     backdrop-filter de las cards sí las capture */}

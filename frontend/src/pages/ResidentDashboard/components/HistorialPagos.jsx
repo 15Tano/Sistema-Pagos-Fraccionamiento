@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { formatMonth, formatDate } from "../dashboardHelpers";
 import { useTemporada } from "../../../hooks/useTemporada";
 import CenefaDivider from "../../../components/decoraciones/CenefaDivider";
+import { SeparadorHalloween } from "../../../components/decoraciones/DetallesHalloween";
 
 export default function HistorialPagos({ pagos, loading, onVerRecibo }) {
     const [selectedYear, setSelectedYear] = useState("2026");
@@ -69,6 +70,8 @@ export default function HistorialPagos({ pagos, loading, onVerRecibo }) {
                     </span>
                 </div>
             </div>
+
+            {tema.id === "halloween" && <SeparadorHalloween />}
 
             {loading ? (
                 <div className="flex items-center justify-center py-8">

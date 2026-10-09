@@ -1,18 +1,21 @@
 import { SEMAFORO_STYLES } from "../dashboardHelpers";
 import { useTemporada } from "../../../hooks/useTemporada";
 import SombreroSemaforo from "../../../components/decoraciones/SombreroSemaforo";
+import CalabazaSemaforo from "../../../components/decoraciones/CalabazaSemaforo";
+import ParticulasSemaforo from "../../../components/decoraciones/ParticulasSemaforo";
 
 export default function Semaforo({ estado }) {
     const tema = useTemporada();
     const s = SEMAFORO_STYLES[estado.color];
 
     return (
-        <div className="card-tematizable relative overflow-hidden flex flex-col items-center py-10 px-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
+        <div className="semaforo-card card-tematizable relative overflow-hidden flex flex-col items-center py-10 px-6 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
             {/* Brillo curvo superior */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
             {/* Círculo principal con Plop y Liquid Glass */}
             <div
+                data-estado={estado.color}
                 className={`semaforo-circulo relative flex items-center justify-center w-36 h-36 rounded-full border-[1.5px] ${s.ring} ${s.bg} backdrop-blur-md shadow-[inset_0_4px_10px_rgba(255,255,255,0.7)] ${s.glow} mb-6 hover:scale-105 active:scale-95 transition-all duration-300 ease-out cursor-default`}
             >
                 {tema.sombreroSemaforo && (
@@ -40,6 +43,8 @@ export default function Semaforo({ estado }) {
                         />
                     </svg>
                 </span>
+                {tema.adornoSemaforo === "calabaza" && <CalabazaSemaforo />}
+                {tema.adornoSemaforo === "calabaza" && estado.color === "verde" && <ParticulasSemaforo />}
             </div>
 
             <p className={`text-2xl font-bold ${s.titulo} drop-shadow-sm`}>

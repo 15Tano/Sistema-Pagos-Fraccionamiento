@@ -1,14 +1,18 @@
 import { useTemporada } from "../../../hooks/useTemporada";
+import { LunaHalloween } from "../../../components/decoraciones/DetallesHalloween";
 
 export default function DashboardHeader({ user, tags, onLogout }) {
     const tema = useTemporada();
 
     return (
-        <div className="flex items-start justify-between p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-3xl relative overflow-hidden">
+        <div className="dashboard-header flex items-start justify-between p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-3xl relative overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
             <div>
                 {tema.saludo && (
-                    <p className="text-xs text-stone-500 mb-1">{tema.saludo}</p>
+                    <p className="temporada-saludo text-xs text-stone-500 mb-1">
+                        {tema.id === "halloween" && <LunaHalloween />}
+                        {tema.saludo}
+                    </p>
                 )}
                 <h1 className="text-2xl font-bold text-stone-800 drop-shadow-sm">
                     Bienvenido, {user?.name || "Residente"}

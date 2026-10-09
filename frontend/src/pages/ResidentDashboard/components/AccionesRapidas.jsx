@@ -1,6 +1,6 @@
 export default function AccionesRapidas({ onAbrirCorreo, onAbrirCamaras }) {
     return (
-        <div className="flex items-center gap-3">
+        <div className="acciones-rapidas flex items-center gap-3">
             <button
                 onClick={onAbrirCorreo}
                 style={{ touchAction: "manipulation" }}

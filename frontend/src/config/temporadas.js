@@ -63,6 +63,18 @@ export const TEMAS = {
         sombreroSemaforo: true,
     },
 
+    halloween: {
+        id: "halloween",
+        rango: { inicioMes: 10, inicioDia: 1, finMes: 10, finDia: 31 },
+        glow: null,
+        semaforo: null,
+        cenefa: null,
+        saludo: "Halloween en San Isidro",
+        decoraciones: ["escenaHalloween"],
+        sombreroSemaforo: false,
+        adornoSemaforo: "calabaza",
+    },
+
     // noviembre: {
     //   id: 'noviembre',
     //   rango: { inicioMes: 11, inicioDia: 1, finMes: 11, finDia: 2 },
@@ -76,4 +88,4 @@ export const TEMAS = {
 };
 
 // Prioridad si algún día se solapan rangos de fecha
-export const ORDEN_TEMAS = ["septiembre"];
+export const ORDEN_TEMAS = ["halloween", "septiembre"];
