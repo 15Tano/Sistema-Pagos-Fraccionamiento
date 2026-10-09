@@ -9,7 +9,7 @@ try {
         $tag = App\Models\Tag::where('id', 878)->lockForUpdate()->firstOrFail();
         $vecino = App\Models\Vecino::where('id', 208)->lockForUpdate()->firstOrFail();
         $nombre = preg_replace('/\s+/u', ' ', trim($vecino->nombre));
-        if ((string) $tag->codigo !== '5311861' || strcasecmp($nombre, 'CAROL CRUALES') !== 0) {
+        if ((string) $tag->codigo !== '5311861' || strcasecmp($nombre, 'CAROL CRAULES') !== 0) {
             throw new RuntimeException('El código del TAG o el nombre del vecino no coincide. No se modificó nada.');
         }
         if ($tag->tagSale()->exists()) {
@@ -31,7 +31,7 @@ try {
         if ($tag->tagSale()->exists() || !$vecino->tags()->where('tags.id', 878)->exists()) {
             throw new RuntimeException('Falló la verificación. Operación revertida.');
         }
-        echo "TAG 5311861 asignado y activo para CAROL CRUALES (208), sin venta ni ingresos. Respaldo: {$backup}\n";
+        echo "TAG 5311861 asignado y activo para CAROL CRAULES (208), sin venta ni ingresos. Respaldo: {$backup}\n";
     });
 } catch (Throwable $error) {
     fwrite(STDERR, $error->getMessage().PHP_EOL);
