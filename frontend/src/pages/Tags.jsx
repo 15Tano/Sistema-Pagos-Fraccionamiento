@@ -5,6 +5,7 @@ import {
     createTag,
     getTagSales,
     createTagSale,
+    deleteTagSale,
 } from "../api/tags";
 import useAuthStore from "../store/authStore";
 import { Icon } from "../lib/icons";
@@ -671,7 +672,7 @@ function TagCombobox({ unsoldTags, tagId, onChange }) {
 // ─── Panel: Ventas recientes ──────────────────────────────────────────────────
 const ITEMS_PER_PAGE = 15;
 
-function RecentSalesPanel({ sales }) {
+function RecentSalesPanel({ sales, onDelete, deletingId }) {
     const [requestedPage, setPage] = useState(1);
     const [query, setQuery] = useState("");
 
@@ -773,6 +774,9 @@ function RecentSalesPanel({ sales }) {
                                 <span className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide rounded-lg border bg-stone-100/50 border-stone-200/60 text-stone-600 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
                                     ${parseFloat(sale.price || 150).toFixed(0)}
                                 </span>
+                                <button type="button" onClick={() => onDelete(sale)} disabled={deletingId !== null} aria-label={`Eliminar venta del TAG ${sale.tag?.codigo ?? sale.tag_id}`} title="Eliminar venta" className="p-2 text-stone-400 hover:text-red-500 bg-white/50 border border-stone-200/50 hover:border-red-200 hover:bg-red-50 rounded-xl disabled:opacity-40 transition-all">
+                                    {deletingId === sale.id ? <span className="text-xs">…</span> : Icon.trash()}
+                                </button>
                             </div>
                         </div>
                     ))
@@ -838,6 +842,7 @@ export default function Tags() {
     const [sales, setSales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
     const { user } = useAuthStore();
     const esCapturista = user?.role === "capturista";
 
@@ -944,6 +949,20 @@ export default function Tags() {
             tendencia,
         };
     }, [sales]);
+
+    const handleDeleteSale = async (sale) => {
+        if (deletingId !== null || !window.confirm(`¿Eliminar la venta del TAG ${sale.tag?.codigo ?? sale.tag_id}? El TAG se desactivará, se desvinculará del vecino y regresará al inventario.`)) return;
+        setDeletingId(sale.id);
+        try {
+            await deleteTagSale(sale.id);
+            await fetchData();
+            showToast("Venta eliminada. TAG devuelto al inventario.");
+        } catch (error) {
+            showToast(error.response?.data?.error || error.response?.data?.message || "No se pudo eliminar la venta", "error");
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     if (loading)
         return (
@@ -1065,7 +1084,7 @@ export default function Tags() {
                 </div>
 
                 {/* Columna derecha: historial de ventas */}
-                <RecentSalesPanel sales={sales} />
+                <RecentSalesPanel sales={sales} onDelete={handleDeleteSale} deletingId={deletingId} />
             </div>
         </div>
     );
