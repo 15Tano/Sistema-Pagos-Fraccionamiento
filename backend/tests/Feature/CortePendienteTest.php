@@ -37,6 +37,43 @@ class CortePendienteTest extends TestCase
         parent::tearDown();
     }
 
+    public function test_extraordinary_payments_alone_do_not_open_a_corte(): void
+    {
+        DB::table('pagos')->insert(['fecha_de_cobro' => '2026-10-08', 'cantidad' => 330, 'tipo' => 'extraordinario']);
+        $this->artisan('cortes-caja:abrir')->assertExitCode(0);
+        $this->assertSame(0, CorteCaja::count());
+
+        DB::table('pagos')->insert(['fecha_de_cobro' => '2026-10-08', 'cantidad' => 280, 'tipo' => 'ordinario']);
+        $this->artisan('cortes-caja:abrir')->assertExitCode(0);
+        $this->artisan('cortes-caja:abrir')->assertExitCode(0);
+        $this->assertSame(1, CorteCaja::count());
+    }
+
+    public function test_existing_extraordinary_only_pending_is_ignored_without_deleting_it(): void
+    {
+        $ayer = CorteCaja::create(['fecha' => '2026-10-07']);
+        DB::table('pagos')->insert(['fecha_de_cobro' => '2026-10-07', 'cantidad' => 330, 'tipo' => 'extraordinario']);
+        $controller = new CorteCajaController();
+        $this->assertFalse($controller->hoy()->getData()->existe);
+        $request = Request::create('/', 'GET');
+        $request->setUserResolver(fn () => (object) ['role' => 'admin']);
+        $this->assertSame(0, $controller->index($request)->getData()->total);
+        $this->assertNotNull($ayer->fresh());
+
+        // Una venta de tags de esa jornada sí requiere conservar el corte.
+        DB::table('tag_sales')->insert(['sold_at' => '2026-10-08 01:00:00', 'price' => 150]);
+        $this->assertSame($ayer->uuid, CorteCaja::activo()->uuid);
+    }
+
+    public function test_extraordinary_only_corte_with_attempts_is_preserved(): void
+    {
+        $corte = CorteCaja::create(['fecha' => '2026-10-07', 'intentos' => [
+            ['numero' => 1, 'declarado' => 330, 'diferencia' => 0],
+        ]]);
+        DB::table('pagos')->insert(['fecha_de_cobro' => '2026-10-07', 'cantidad' => 330, 'tipo' => 'extraordinario']);
+        $this->assertSame($corte->uuid, CorteCaja::activo()->uuid);
+    }
+
     public function test_recovers_yesterday_and_closes_with_corrected_payment_and_tag(): void
     {
         $ayer = CorteCaja::create(['fecha' => '2026-10-07']);

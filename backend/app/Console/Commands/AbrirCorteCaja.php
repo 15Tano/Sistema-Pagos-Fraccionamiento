@@ -16,14 +16,15 @@ class AbrirCorteCaja extends Command
     {
         $hoy = Carbon::now('America/Mexico_City')->toDateString();
 
-        $huboPagosHoy = Pago::whereDate('fecha_de_cobro', $hoy)->exists();
+        $huboPagosHoy = Pago::whereDate('fecha_de_cobro', $hoy)
+            ->where('tipo', 'ordinario')->exists();
 
         if (!$huboPagosHoy) {
-            $this->info("Sin pagos registrados el {$hoy}, no se abre corte.");
+            $this->info("Sin pagos ordinarios registrados el {$hoy}, no se abre corte.");
             return;
         }
 
-        $yaExiste = CorteCaja::where('fecha', $hoy)->exists();
+        $yaExiste = CorteCaja::whereDate('fecha', $hoy)->exists();
 
         if ($yaExiste) {
             $this->info("Ya existe un corte para el {$hoy}, no se duplica.");

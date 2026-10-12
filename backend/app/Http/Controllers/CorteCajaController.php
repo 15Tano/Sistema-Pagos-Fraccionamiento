@@ -168,7 +168,11 @@ class CorteCajaController extends Controller
             'firma'  => 'nullable|string|max:255',
         ]);
 
+        $aperturasIndebidas = CorteCaja::where('estado', 'en_proceso')->get()
+            ->filter(fn ($corte) => $corte->pendienteSoloExtraordinarios())->pluck('id');
+
         $cortes = CorteCaja::query()
+            ->whereNotIn('id', $aperturasIndebidas)
             ->when($request->desde,  fn ($q, $v) => $q->whereDate('fecha', '>=', $v))
             ->when($request->hasta,  fn ($q, $v) => $q->whereDate('fecha', '<=', $v))
             ->when($request->estado, fn ($q, $v) => $q->where('estado', $v))
