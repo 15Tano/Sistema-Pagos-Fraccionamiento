@@ -33,6 +33,7 @@ Frontend architecture pattern
 Complex pages use pages/[PageName]/index.jsx orchestrator + hooks/ + components/ subdirectory; this pattern is established and must be followed for all new pages
 API calls use an api/[resource].js Axios wrapper pattern
 Current state
+Registro de Actividad — verificado localmente el 2026-10-12: AuditController ignoraba search y accion. Se corrigió la búsqueda antes de paginar en todos los campos de audit_logs y vecinos/pagos/tags relacionados, incluyendo el vecino de pagos eliminados conservado en JSON. Decisión confirmada del usuario: buscar el historial existente, sin ampliar las actividades registradas. AuditLogs incorpora espera breve, cancelación, errores visibles, limpieza de filtros y consulta de datos anteriores/nuevos. Pruebas con SQLite en memoria; despliegue y validación en MySQL de producción pendientes.
 Deploy pipeline: git reconciliation fully complete on refactor-headless, commit ccab4c0
 Droplet syncs via rsync from /root/repo-sanisidro (cloned outside docroot) to /home/sanisidro-back/htdocs/api.sanisidro.info/
 Abandoned .git in docroot moved to .git.OLD-abandonado-abril

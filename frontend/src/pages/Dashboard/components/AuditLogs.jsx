@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../../../lib/axios";
 import { ACCION_CONFIG } from "../config/auditLogConfig";
 import { formatFechaHora } from "../helpers/formatFecha";
@@ -10,6 +10,9 @@ export default function AuditLogs() {
     const [lastPage, setLastPage] = useState(1);
     const [total, setTotal] = useState(0);
 
+    const requestRef = useRef(null);
+    const [error, setError] = useState("");
+
     // --- ESTADOS PARA FILTRO Y BUSCADOR ---
     const [searchTerm, setSearchTerm] = useState("");
     const [accionFilter, setAccionFilter] = useState("");
@@ -17,27 +20,39 @@ export default function AuditLogs() {
 
     const fetchLogs = useCallback(
         async (p = 1, search = searchTerm, accion = accionFilter) => {
+            requestRef.current?.abort();
+            const controller = new AbortController();
+            requestRef.current = controller;
             setLoading(true);
+            setError("");
             try {
-                // Se agregan los parámetros a la URL
-                const res = await api.get(
-                    `/audit-logs?page=${p}&search=${search}&accion=${accion}`,
-                );
+                const res = await api.get("/audit-logs", {
+                    params: { page: p, search: search.trim(), accion },
+                    signal: controller.signal,
+                });
+                if (controller.signal.aborted) return;
                 setLogs(res.data.data || []);
                 setLastPage(res.data.last_page || 1);
                 setTotal(res.data.total || 0);
-                setPage(p);
+                setPage(res.data.current_page || p);
             } catch {
+                if (!controller.signal.aborted) {
+                    setError("No se pudo cargar el registro. Intenta actualizarlo.");
+                }
             } finally {
-                setLoading(false);
+                if (!controller.signal.aborted) setLoading(false);
             }
         },
         [searchTerm, accionFilter],
     ); // Dependencias del useCallback
 
     useEffect(() => {
-        fetchLogs(1, searchTerm, accionFilter);
-    }, [fetchLogs, searchTerm, accionFilter]);
+        const timer = setTimeout(() => fetchLogs(1), 300);
+        return () => {
+            clearTimeout(timer);
+            requestRef.current?.abort();
+        };
+    }, [fetchLogs]);
 
     return (
         <div className="relative overflow-hidden flex flex-col min-h-0 p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
@@ -54,6 +69,8 @@ export default function AuditLogs() {
                     </span>
                     <button
                         onClick={() => fetchLogs(page)}
+                        disabled={loading}
+                        aria-label="Actualizar registro"
                         className="p-1.5 text-stone-400 hover:text-orange-500 hover:bg-orange-50/50 rounded-xl transition-all active:scale-95"
                         title="Actualizar"
                     >
@@ -80,9 +97,11 @@ export default function AuditLogs() {
                 <div className="relative flex-1">
                     <input
                         type="text"
-                        placeholder="Buscar por usuario o acción..."
+                        placeholder="Nombre, acción, tag, mes, importe, fecha…"
+                        aria-label="Buscar en todo el historial"
+                        maxLength={300}
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => { setLoading(true); setSearchTerm(e.target.value); }}
                         className="w-full pl-9 pr-4 py-2.5 bg-white/40 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:bg-white/60 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition-all text-sm font-medium text-stone-700 placeholder-stone-400"
                     />
                     <svg
@@ -104,7 +123,8 @@ export default function AuditLogs() {
                 <div className="relative shrink-0 sm:w-40">
                     <select
                         value={accionFilter}
-                        onChange={(e) => setAccionFilter(e.target.value)}
+                        onChange={(e) => { setLoading(true); setAccionFilter(e.target.value); }}
+                        aria-label="Filtrar por acción"
                         className="w-full pl-4 pr-8 py-2.5 bg-white/40 backdrop-blur-md border border-white/60 rounded-xl shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:bg-white/60 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition-all text-sm font-bold text-stone-600 appearance-none cursor-pointer"
                     >
                         <option value="">Todas las acciones</option>
@@ -133,9 +153,24 @@ export default function AuditLogs() {
                 </div>
             </div>
 
+            <div className="flex items-center justify-between gap-3 mb-3 text-[11px] text-stone-500 relative z-10">
+                <p>Busca en todo el historial. Combina palabras; fechas: AAAA-MM-DD.</p>
+                {(searchTerm || accionFilter) && (
+                    <button type="button" onClick={() => {
+                        setLoading(true);
+                        setSearchTerm("");
+                        setAccionFilter("");
+                    }} className="shrink-0 font-bold text-orange-600 hover:text-orange-700">
+                        Limpiar filtros
+                    </button>
+                )}
+            </div>
+
             {/* Lista */}
             <div className="flex flex-col gap-2 relative z-10 overflow-y-auto flex-1">
-                {loading ? (
+                {error && !loading ? (
+                    <div role="alert" className="py-4 text-xs font-medium text-red-600">{error}</div>
+                ) : loading ? (
                     <div className="flex items-center justify-center h-16">
                         <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
                     </div>
@@ -163,7 +198,7 @@ export default function AuditLogs() {
                                             {log.modelo}
                                         </span>
                                     </div>
-                                    <p className="text-xs font-bold text-stone-700 truncate">
+                                    <p className="text-xs font-bold text-stone-700 break-words">
                                         <span className="text-orange-600">
                                             {log.user_name || "Sistema"}
                                         </span>
@@ -179,6 +214,24 @@ export default function AuditLogs() {
                                         {formatFechaHora(log.created_at)}
                                         {log.ip ? ` · ${log.ip}` : ""}
                                     </p>
+                                    {(log.datos_anteriores || log.datos_nuevos) && (
+                                        <details className="mt-1 text-xs text-stone-600">
+                                            <summary className="cursor-pointer font-semibold text-orange-600">
+                                                Ver datos del movimiento · #{log.modelo_id}
+                                            </summary>
+                                            {[
+                                                ["Antes", log.datos_anteriores],
+                                                ["Después", log.datos_nuevos],
+                                            ].map(([label, data]) => data && (
+                                                <div key={label} className="mt-2">
+                                                    <p className="font-bold">{label}</p>
+                                                    <pre className="mt-1 whitespace-pre-wrap break-all rounded-lg bg-white/50 p-2 text-[11px]">
+                                                        {JSON.stringify(data, null, 2)}
+                                                    </pre>
+                                                </div>
+                                            ))}
+                                        </details>
+                                    )}
                                 </div>
                             </div>
                         );
@@ -187,7 +240,7 @@ export default function AuditLogs() {
             </div>
 
             {/* Paginación */}
-            {lastPage > 1 && (
+            {!loading && !error && lastPage > 1 && (
                 <div className="flex items-center justify-between pt-3 mt-3 border-t border-white/40 relative z-10">
                     <span className="text-xs font-semibold text-stone-500">
                         Pág. {page} de {lastPage}
@@ -195,14 +248,16 @@ export default function AuditLogs() {
                     <div className="flex gap-1.5">
                         <button
                             onClick={() => fetchLogs(page - 1)}
-                            disabled={page === 1}
+                            disabled={loading || page === 1}
+                            aria-label="Página anterior"
                             className="w-7 h-7 rounded-lg border border-white/60 bg-white/40 backdrop-blur-sm text-stone-600 text-sm font-bold flex items-center justify-center hover:bg-white/60 active:scale-95 disabled:opacity-30 transition-all"
                         >
                             ‹
                         </button>
                         <button
                             onClick={() => fetchLogs(page + 1)}
-                            disabled={page === lastPage}
+                            disabled={loading || page === lastPage}
+                            aria-label="Página siguiente"
                             className="w-7 h-7 rounded-lg border border-white/60 bg-white/40 backdrop-blur-sm text-stone-600 text-sm font-bold flex items-center justify-center hover:bg-white/60 active:scale-95 disabled:opacity-30 transition-all"
                         >
                             ›
