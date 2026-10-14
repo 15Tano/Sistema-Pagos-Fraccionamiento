@@ -55,7 +55,7 @@ export default function VenderTagButton() {
 
     const unsoldTags = useMemo(() => {
         const soldIds = new Set(sales.map((sale) => sale.tag_id));
-        return tags.filter((tag) => !soldIds.has(tag.id));
+        return tags.filter((tag) => !tag.asignable_sin_venta && !soldIds.has(tag.id) && !tag.vecinos?.length);
     }, [tags, sales]);
 
     const soldToday = useMemo(

@@ -542,7 +542,7 @@ export default function Vecinos() {
                 setAvailableTags(
                     allTags.filter(
                         (t) =>
-                            soldTagIds.has(t.id) && !assignedTagIds.has(t.id),
+                            (soldTagIds.has(t.id) || t.asignable_sin_venta) && !assignedTagIds.has(t.id),
                     ),
                 );
             } catch (err) {

@@ -16,7 +16,13 @@ class TagController extends Controller
     public function store(Request $request)
     {
         $request->merge(['codigo' => trim((string) $request->input('codigo', ''))]);
-        $request->validate(['codigo' => 'required|string|max:255']);
+        $request->validate([
+            'codigo' => 'required|string|max:255',
+            'asignable_sin_venta' => 'sometimes|boolean',
+        ]);
+        if ($request->boolean('asignable_sin_venta') && $request->user()?->role !== 'admin') {
+            abort(403, 'Solo un administrador puede registrar TAGS para asignar sin venta.');
+        }
 
         $existing = Tag::where('codigo', $request->codigo)->first();
         if ($existing) {
@@ -28,6 +34,7 @@ class TagController extends Controller
         $tag = Tag::create([
     'codigo' => $request->codigo,
     'activo' => false,
+    'asignable_sin_venta' => $request->boolean('asignable_sin_venta'),
     ]);
 
         return response()->json($tag);
@@ -69,7 +76,7 @@ class TagController extends Controller
     // New method to get stock (unsold tags count)
     public function stock()
     {
-        $stockCount = Tag::whereDoesntHave('tagSale')->whereDoesntHave('vecinos')->count();
+        $stockCount = Tag::where('asignable_sin_venta', false)->whereDoesntHave('tagSale')->whereDoesntHave('vecinos')->count();
         return response()->json(['stock' => $stockCount]);
     }
 

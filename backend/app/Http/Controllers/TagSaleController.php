@@ -21,6 +21,9 @@ class TagSaleController extends Controller
             'vecino_id' => 'required|exists:vecinos,id',
         ]);
 
+        if (Tag::findOrFail($request->tag_id)->asignable_sin_venta) {
+            return response()->json(['error' => 'Este TAG está reservado para asignación sin venta.'], 422);
+        }
         if (TagSale::where('tag_id', $request->tag_id)->exists()) {
             return response()->json(['error' => 'Este tag ya ha sido vendido'], 400);
         }

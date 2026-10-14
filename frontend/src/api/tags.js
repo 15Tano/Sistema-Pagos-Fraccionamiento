@@ -6,7 +6,8 @@ import api from "../lib/axios";
 export const getTags = () => api.get("/tags");
 
 /** Crea un tag nuevo en inventario (solo código, sin asignar ni vender) */
-export const createTag = (codigo) => api.post("/tags", { codigo });
+export const createTag = (codigo, asignableSinVenta = false) =>
+    api.post("/tags", { codigo, asignable_sin_venta: asignableSinVenta });
 
 /** Toggle activo/inactivo — usa ID entero (no UUID), igual que el backend */
 export const toggleTag = (id) => api.patch(`/tags/${id}/toggle`);

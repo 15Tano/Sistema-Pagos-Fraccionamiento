@@ -33,6 +33,7 @@ class DashboardPendientesTest extends TestCase
             Schema::create('tags', function (Blueprint $table) {
                 $table->id();
                 $table->string('codigo');
+                $table->boolean('asignable_sin_venta')->default(false);
             });
             Schema::create('tag_vecino', function (Blueprint $table) {
                 $table->unsignedBigInteger('vecino_id');

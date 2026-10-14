@@ -6,7 +6,14 @@ use Illuminate\Support\Str;
 class Tag extends Model
 {
     use HasFactory;
-    protected $fillable = ['codigo', 'activo'];
+    protected $fillable = ['codigo', 'activo', 'asignable_sin_venta'];
+    protected $casts = ['asignable_sin_venta' => 'boolean'];
+    public function scopeAssignable($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereHas('tagSale')->orWhere('asignable_sin_venta', true);
+        });
+    }
     public function getRouteKeyName(): string
     {
         return 'uuid';

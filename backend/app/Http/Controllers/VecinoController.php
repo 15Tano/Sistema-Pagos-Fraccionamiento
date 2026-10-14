@@ -79,7 +79,7 @@ class VecinoController extends Controller
 
         if (!empty($request->tags)) {
             $soldTagIds = Tag::whereIn('id', $request->tags)
-                ->whereHas('tagSale')
+                ->assignable()
                 ->pluck('id')
                 ->toArray();
             $vecino->tags()->sync($soldTagIds);
@@ -114,7 +114,7 @@ class VecinoController extends Controller
         $tagIds = [];
         if (!empty($request->tags)) {
             $tagIds = Tag::whereIn('id', $request->tags)
-                ->whereHas('tagSale')
+                ->assignable()
                 ->pluck('id')
                 ->toArray();
         }

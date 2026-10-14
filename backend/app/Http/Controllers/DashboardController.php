@@ -27,7 +27,7 @@ class DashboardController extends Controller
         // ── Total vecinos ──
         $totalVecinos = Vecino::count();
         // ── Morosos: todos los vecinos que no pagaron el mes actual, tengan o no tags ──
-        $morosos = Vecino::with(['tags' => fn($q) => $q->whereHas('tagSale')])
+        $morosos = Vecino::with(['tags' => fn($q) => $q->assignable()])
             ->whereNotIn('id', $vecinosPagaron)
             ->select('id', 'nombre', 'calle', 'numero_casa')
             ->orderBy('calle')
@@ -35,7 +35,7 @@ class DashboardController extends Controller
         // ── Tags vendidos y stock ──
         $tagsVendidos = DB::table('tag_sales')->count();
         $totalTags    = Tag::count();
-        $tagsEnStock  = max(0, $totalTags - $tagsVendidos);
+        $tagsEnStock  = Tag::where('asignable_sin_venta', false)->whereDoesntHave('tagSale')->whereDoesntHave('vecinos')->count();
 
         // ── Ranking de adopción por plaza (% de vecinos con cuenta de residente) ──
 $vecinosPlaza = Vecino::select('id', 'nombre', 'calle', 'numero_casa', 'user_id')->get();

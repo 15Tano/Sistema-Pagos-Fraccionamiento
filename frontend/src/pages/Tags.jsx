@@ -32,6 +32,7 @@ function StockInjectionPanel({ onDone, onError }) {
     const [pin, setPin] = useState("");
     const [pinErr, setPinErr] = useState(false);
     const [codes, setCodes] = useState("");
+    const [destination, setDestination] = useState("venta");
     const [saving, setSaving] = useState(false);
     const [results, setResults] = useState([]);
 
@@ -57,8 +58,8 @@ function StockInjectionPanel({ onDone, onError }) {
         try {
             for (const codigo of list) {
                 try {
-                    await createTag(codigo);
-                    nextResults.push({ codigo, ok: true, msg: "Agregado al inventario" });
+                    await createTag(codigo, destination === "asignacion");
+                    nextResults.push({ codigo, ok: true, msg: destination === "asignacion" ? "Disponible para asignar sin venta" : "Agregado al inventario" });
                 } catch (error) {
                     const data = error.response?.data;
                     nextResults.push({ codigo, ok: false, msg: data?.errors?.codigo?.[0] || data?.message || "No se pudo conectar. Verifica tu conexión y vuelve a intentar." });
@@ -72,7 +73,7 @@ function StockInjectionPanel({ onDone, onError }) {
         } finally {
             setSaving(false);
         }
-    }, [codes, saving, onDone, onError]);
+    }, [codes, destination, saving, onDone, onError]);
 
     return (
         <div className="relative overflow-hidden p-5 bg-white/40 backdrop-blur-xl border-t border-l border-white/80 border-r border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2rem]">
@@ -121,9 +122,23 @@ function StockInjectionPanel({ onDone, onError }) {
                     </div>
                 ) : (
                     <div className="space-y-3">
+                        <label className="block text-xs font-semibold text-stone-700">
+                            Destino de los TAGS
+                            <select
+                                value={destination}
+                                onChange={(e) => setDestination(e.target.value)}
+                                disabled={saving}
+                                className="mt-2 w-full px-4 py-2.5 bg-white/50 border border-white/60 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                            >
+                                <option value="venta">Para venta</option>
+                                <option value="asignacion">Para asignar sin venta</option>
+                            </select>
+                        </label>
                         <p className="text-xs text-stone-500 font-medium">
                             Pega los códigos, uno por línea o separados por coma.
-                            Los repetidos se procesan una sola vez. Cada TAG nuevo queda disponible para venta.
+                            Los repetidos se procesan una sola vez. {destination === "asignacion"
+                                ? "Quedan desactivados y disponibles en Vecinos para asignar, sin registrar venta ni ingresos."
+                                : "Cada TAG nuevo queda disponible para venta."}
                         </p>
                         <textarea
                             rows={3}
@@ -146,7 +161,7 @@ function StockInjectionPanel({ onDone, onError }) {
                             {Icon.plus()}
                             {saving
                                 ? "Registrando códigos…"
-                                : "Agregar TAGS al inventario"}
+                                : destination === "asignacion" ? "Agregar TAGS para asignar" : "Agregar TAGS al inventario"}
                         </button>
 
                         {results.length > 0 && (
@@ -893,7 +908,7 @@ export default function Tags() {
 
     const unsoldTags = useMemo(() => {
         const soldIds = new Set(sales.map((s) => s.tag_id));
-        return tags.filter((t) => !soldIds.has(t.id) && !t.vecinos?.length);
+        return tags.filter((t) => !t.asignable_sin_venta && !soldIds.has(t.id) && !t.vecinos?.length);
     }, [tags, sales]);
 
     const kpi = useMemo(() => {

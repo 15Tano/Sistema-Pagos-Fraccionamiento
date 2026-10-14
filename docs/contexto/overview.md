@@ -6,6 +6,7 @@ Summary
 San Isidro 2.0 PWA — purpose, stack, architecture, design system, and current state of active work
 
 Details
+Tags — decisión confirmada el 2026-10-14: Inyección de Inventario tendrá selector Para venta / Para asignar sin venta. La segunda opción registra códigos nuevos desactivados, disponibles para asignar desde Vecinos sin tag_sale, ingresos ni stock comercial. Códigos existentes se rechazan sin modificar su estado. Implementación local: campo tags.asignable_sin_venta con valor predeterminado false, filtro de asignación en VecinoController y exclusión de venta en TagSaleController, Tags, Pagos y stock del dashboard. Requiere migración 2026_10_14_120000; despliegue pendiente.
 Purpose & context
 Kanye (Sebastián Espinoza Díaz, eltano193@gmail.com) is a freelance software engineering student in Hidalgo, México
 San Isidro 2.0 is a formally contracted, paid PWA for a gated residential community of ~350 residents
