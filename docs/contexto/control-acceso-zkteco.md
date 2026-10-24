@@ -499,3 +499,17 @@ conflicto 409 y DPAPI real con secreto ficticio. Servidores temporales detenidos
 No cambios al backend, caseta, tareas ni vigencias. Disponibilidad SQLite/DPAPI en
 Dell y prueba remota controlada pendientes. Detalle, limites y repeticion en
 [control-acceso-emisor-local.md](control-acceso-emisor-local.md).
+
+## Compatibilidad inicial del emisor en Dell — 2026-10-23
+
+Usuario comparte ejecucion de Python32: Python 3.13.13, SQLite 3.50.4,
+Consulta SQLite: 1 con una base en memoria. Importacion y consulta basica
+confirmadas; SQLite en disco/WAL y DPAPI aun pendientes en esa computadora.
+
+Paquete aislado Preflight_Emisor_2026.10.23-1.zip preparado en tools/agente_acceso,
+SHA256 de69437863757601c3fdcaddc80be12b07e1356936153f8a37f669086a750159.
+No importa SDK, usa red, modifica tareas ni solicita credenciales reales. Comprueba
+WAL/FULL/FK, original y lote tras reapertura, leases, ACK simulado, integridad y
+DPAPI del usuario actual en carpeta temporal propia; conserva resumen sin secretos.
+13 comprobaciones aprobadas localmente en Python 3.12.5 x64, temporales retirados.
+Ejecucion Dell pendiente. No se necesita Preparar mantenimiento para este paquete.

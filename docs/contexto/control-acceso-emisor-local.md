@@ -83,7 +83,16 @@ Repetición y CLI en [LEEME del emisor](../../tools/agente_acceso/LEEME.md).
 
 ## Pendientes
 
-Comprobar SQLite y DPAPI con el Python/usuario Dell reales, preparar servidor y
+Usuario confirma en Dell Python32 3.13.13, SQLite 3.50.4 y SELECT 1 en memoria
+correcto. Esto confirma importación/consulta básica, no WAL en disco ni DPAPI.
+Preparado `tools/agente_acceso/Preflight_Emisor_2026.10.23-1.zip`: fuentes actuales
+de outbox/protocolo/credencial, diagnóstico local, instrucciones y manifiesto.
+SHA256 ZIP: `de69437863757601c3fdcaddc80be12b07e1356936153f8a37f669086a750159`.
+Diagnóstico local aprobado en Python 3.12.5 x64: 13 comprobaciones verdaderas y
+temporales retirados. Ejecución en Dell pendiente. Sin SDK, red ni credencial real;
+ACK simulado no certifica entrega HTTP. No pausar polling para esta comprobación.
+
+Comprobar WAL en disco y DPAPI con el Python/usuario Dell reales, preparar servidor y
 credencial de ensayo para una prueba remota controlada. No enviar tokens por chat.
 Después: coordinador SDK en carpeta separada, parada/mantenimiento cooperativos,
 prioridad de vigencias, watchdog y transición autorizada. La lectura real todavía

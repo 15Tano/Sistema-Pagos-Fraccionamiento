@@ -1,4 +1,5 @@
 datos/
+registros/
 __pycache__/
 tests/__pycache__/
 *.sqlite*

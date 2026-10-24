@@ -1,0 +1,29 @@
+{
+  "release": "2026.10.23-1",
+  "files": [
+    {
+      "name": "preflight_dell.py",
+      "sha256": "f44ccc9a9614f10a47961e8b3717aa24f81f7efe0519c6fcc6e1922755ca6f37"
+    },
+    {
+      "name": "outbox.py",
+      "sha256": "f00112ac88f1b3268aac628bc4987c3f9ca7e723c22f98aadc05cb71fba012ad"
+    },
+    {
+      "name": "protocolo.py",
+      "sha256": "5f43b055d0a11a2afe3e3f9cf86ec3ac2682f6c3704ee8c27c1ec69a20c266fb"
+    },
+    {
+      "name": "credencial.py",
+      "sha256": "06d9e15b02a58fe0b8cc3fd10f2b3e1df531f1e753df82e2b7b75fdcb998744a"
+    },
+    {
+      "name": "LEEME_PREFLIGHT.md",
+      "sha256": "edd8d08bf7166ba8b24419a8f491dc36c7c184d75fb71bc696f1106d435e7679"
+    },
+    {
+      "name": "verificar_preflight.ps1",
+      "sha256": "49775c64422d593fd5ada7701433b9148c1b44aa618fe6a0ecc9ee43fa76377f"
+    }
+  ]
+}

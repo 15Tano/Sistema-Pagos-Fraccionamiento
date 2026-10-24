@@ -6,6 +6,9 @@ y DPAPI de Windows. No depende de los módulos del polling.
 
 Manual, evidencia y límites: [emisor local](../../docs/contexto/control-acceso-emisor-local.md).
 
+Para comprobar Dell sin SDK ni red: paquete `Preflight_Emisor_2026.10.23-1.zip`,
+con instrucciones en [LEEME_PREFLIGHT.md](LEEME_PREFLIGHT.md). No requiere pausa.
+
 ## Probar
 
 Desde la raíz del repositorio, en PowerShell:
