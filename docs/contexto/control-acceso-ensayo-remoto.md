@@ -11,7 +11,7 @@ Estado informado: `/root/repo-sanisidro` limpio en refactor-headless siguiendo
 origin/refactor-headless; no se recibió hash remoto ni se hizo fetch/pull/despliegue.
 PHP CLI 8.4.20, PDO mysql y sqlite. No certifica PHP-FPM ni versión de MySQL.
 
-## Preparación local completada, ejecución remota pendiente
+## Paquete y preparación aislada
 
 Fuentes de `backend/app`, config, rutas y entradas necesarias se toman del commit
 9beb4f04c3952d6fecb662edfb7b0f2c3049c839. Solo se incluye la migración nueva de acceso;
@@ -40,15 +40,27 @@ Emisor apuntará al HTTP loopback 18881 con opción explícita de ensayo; tráfi
 entre computadoras cifrado por SSH, no HTTP público.
 
 Validaciones locales: sintaxis Bash y PHP correctas; manifiesto completo y contenido
-del paquete por SHA256. Esto no certifica instalación o arranque en Linux remoto:
-faltan salidas del usuario de preparación, arranque y envío desde Dell.
+del paquete por SHA256. Preparación en Linux remoto posteriormente confirmada por
+salida del usuario (ver evidencia siguiente); arranque y envío desde Dell pendientes.
 No se hizo push; las fuentes nuevas no están en origin. El paquete permite probar
 la copia confirmada localmente antes del push/despliegue final autorizado.
 No usar credenciales de producción ni enviar secretos por chat.
 
+## Preparación remota confirmada — 2026-10-24
+
+Usuario confirma archivo de 82 KiB en /root, SHA256 del paquete OK y FUENTES
+VERIFICADAS. package:discover termina correctamente; se crea tabla de migraciones
+y solo se aplica 2026_10_23_210000_create_control_acceso_ingestion_tables.
+Salida ENSAYO PREPARADO, serial TEST-C3-001,
+agent_id=6b293548-0312-4d06-9c1d-3a7e79c9c5a0 (identificador, no secreto).
+SQLite exclusiva en la carpeta de ensayo; el preparador informa credencial en
+datos/credencial-ensayo.json, acceso solo root. No se recibió ni registró su secreto.
+La salida concuerda con las guardas, copia de dependencias y configuración separada
+del paquete revisado. No se ejecutó deploy ni se inició aún el servidor temporal.
+
 ## Siguiente evidencia requerida
 
-Transferencia del paquete, verificación, preparación aislada y respuesta /salud.
-Después configurar emisor de ensayo en Dell, guardar credencial en DPAPI mediante
+Arrancar mediante bash iniciar_ensayo.sh en primer plano y verificar GET /salud
+desde otra conexión SSH. Después configurar emisor de ensayo en Dell, guardar credencial en DPAPI mediante
 SSH y enviar únicamente fixtures. Confirmar ACK real, reintento y conteos antes
 de integrar SDK o ejecutar el deploy habitual. El polling real sigue operativo.

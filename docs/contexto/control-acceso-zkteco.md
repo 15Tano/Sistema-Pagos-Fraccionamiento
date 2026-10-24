@@ -543,3 +543,18 @@ Usuario confirma SSH root@api.sanisidro.info. Preparado paquete de ensayo con
 fuentes locales confirmadas y guardas de ruta/manifiesto/espacio/dependencias;
 SQLite propia y servicio solo loopback mediante tunel SSH. Instalacion y envio
 remotos aun pendientes. Ver [ensayo remoto](control-acceso-ensayo-remoto.md).
+
+## Backend de ensayo preparado en servidor — 2026-10-24
+
+Usuario comparte ejecucion correcta del paquete desde SSH: archivo presente de
+82 KiB en /root, SHA256 OK, FUENTES VERIFICADAS y package:discover correcto.
+Se crea tabla de migraciones y se aplica unicamente
+2026_10_23_210000_create_control_acceso_ingestion_tables. ENSAYO PREPARADO,
+serial TEST-C3-001 y agent_id=6b293548-0312-4d06-9c1d-3a7e79c9c5a0.
+Configuracion/SQLite propias de /root/sanisidro-ensayos/acceso-20261023-1;
+credencial informada en datos/credencial-ensayo.json, solo root, secreto no compartido.
+La preparacion previa pegada por error en PowerShell no llego a ejecutarse;
+la salida posterior desde root@san-isidro-back confirma esta preparacion real.
+Siguiente: iniciar_ensayo.sh en primer plano y comprobar /salud por otra conexion
+SSH. Arranque, tunel y entrega autenticada desde Dell pendientes. No se ejecuto
+deploy, no se cambio la API de vigencias ni se contacto C3.

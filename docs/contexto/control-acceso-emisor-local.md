@@ -107,8 +107,11 @@ docroot con rsync, Composer, migraciones y recarga PHP-FPM. Repositorio remoto
 informado limpio en refactor-headless, siguiendo origin/refactor-headless.
 SSH confirmado como `root@api.sanisidro.info`. Paquete de backend de ensayo
 preparado; [alcance y límites](control-acceso-ensayo-remoto.md).
-Esto no certifica PHP-FPM ni la versión del servidor MySQL. No se ha preparado
-una instancia remota ni publicado un endpoint de ensayo. No enviar tokens por chat.
+Esto no certifica PHP-FPM ni la versión del servidor MySQL. Preparación remota
+posteriormente confirmada el 2026-10-24: paquete/hash y fuentes verificados,
+migración exclusiva aplicada, ENSAYO PREPARADO y agente TEST-C3-001 con UUID
+6b293548-0312-4d06-9c1d-3a7e79c9c5a0. Arranque de servicio, /salud y entrega
+real desde Dell pendientes. No se publicó un endpoint público. No enviar tokens por chat.
 Después: coordinador SDK en carpeta separada, parada/mantenimiento cooperativos,
 prioridad de vigencias, watchdog y transición autorizada. La lectura real todavía
 no llama `Outbox.capture()`; no dar por instalado un recolector permanente.
