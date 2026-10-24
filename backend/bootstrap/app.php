@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->alias([
         'auth' => \App\Http\Middleware\Authenticate::class,
         'corte.bloqueo' => \App\Http\Middleware\BloquearSiCorteActivo::class,
+        'control-acceso.agente' => \App\Http\Middleware\AuthenticateControlAccessAgent::class,
     ]);
 
     $middleware->api(prepend: [

@@ -97,6 +97,12 @@ Route::middleware(['auth:sanctum', 'corte.bloqueo'])->group(function () {
 // ─── ZKTeco (acceso desde script Python — token separado) ─────────
 Route::get('/vencimientos', [ZkApiController::class, 'index']);
 
+// Ingesta del agente: credencial propia; no utiliza cuentas humanas ni corte.bloqueo.
+Route::prefix('control-acceso/agente')->middleware(['control-acceso.agente', 'throttle:120,1'])->group(function () {
+    Route::post('estado', [\App\Http\Controllers\Api\ControlAccessAgentController::class, 'state']);
+    Route::post('lotes', [\App\Http\Controllers\Api\ControlAccessAgentController::class, 'batch']);
+});
+
 Route::get('/ping', function () {
     return response()->json([
         'status' => 'ok',
