@@ -98,10 +98,17 @@ WAL/FULL/FK, reapertura, leases, ACK simulado e integridad/DPAPI verificados en 
 Python y usuario. Sin SDK, red ni credencial real; ACK simulado no certifica entrega
 HTTP ni inicio mediante tarea. No se requirió pausa del polling.
 
-Preparar servidor y credencial de ensayo para una prueba remota controlada; consulta
-pendiente al usuario sobre disponibilidad de terminal SSH del servidor o alternativa
-de pruebas. No se ha preparado una instancia remota ni se ha publicado un endpoint
-de ensayo. No enviar tokens por chat.
+Preparar servidor y credencial de ensayo para una prueba remota controlada. Usuario
+confirma acceso SSH y comparte PHP CLI 8.4.20, PDO mysql/sqlite; terminal en
+`/home/sanisidro-back/htdocs/api.sanisidro.info` como root. Script de despliegue
+confirmado por usuario: `/root/deploy-sanisidro.sh`; `type -t deploy` no produjo
+salida. Script posteriormente recibido y revisado: despliega directamente al
+docroot con rsync, Composer, migraciones y recarga PHP-FPM. Repositorio remoto
+informado limpio en refactor-headless, siguiendo origin/refactor-headless.
+SSH confirmado como `root@api.sanisidro.info`. Paquete de backend de ensayo
+preparado; [alcance y límites](control-acceso-ensayo-remoto.md).
+Esto no certifica PHP-FPM ni la versión del servidor MySQL. No se ha preparado
+una instancia remota ni publicado un endpoint de ensayo. No enviar tokens por chat.
 Después: coordinador SDK en carpeta separada, parada/mantenimiento cooperativos,
 prioridad de vigencias, watchdog y transición autorizada. La lectura real todavía
 no llama `Outbox.capture()`; no dar por instalado un recolector permanente.

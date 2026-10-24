@@ -16,6 +16,7 @@ La documentación permanente de este proyecto está en `docs/contexto/`. Al come
 | [API de control de acceso v1](docs/contexto/control-acceso-api-v1.md) | 2026-10-23 | Contrato implementado localmente: autenticación del agente, estado, lotes, ACK, límites, pruebas y pendientes de ensayo. |
 | [Ensayo MySQL de acceso](docs/contexto/control-acceso-ensayo-mysql.md) | 2026-10-23 | MySQL 8.4.13 aislado: migración, concurrencia InnoDB, 24 pruebas aprobadas, repetición y cierre de la instancia temporal. |
 | [Emisor local de acceso](docs/contexto/control-acceso-emisor-local.md) | 2026-10-23 | Outbox SQLite, entrega con ACK, DPAPI, 23 pruebas y límites; preparación local sin SDK ni instalación en caseta. |
+| [Ensayo remoto de acceso](docs/contexto/control-acceso-ensayo-remoto.md) | 2026-10-23 | Deploy revisado, paquete de backend aislado y túnel SSH propuesto; ejecución remota y entrega desde Dell pendientes. |
 
 Estos documentos contienen contexto histórico, no una certificación del estado actual del código o de producción. Verifica archivos, configuración y pruebas pertinentes antes de afirmar que algo está implementado, desplegado o pendiente. Una instrucción actual del usuario actualiza las preferencias históricas. Para decisiones documentadas que se contradigan, usa la decisión explícita más reciente; si la fecha o el alcance no resuelven la contradicción, expón la duda antes de implementar lo que dependa de ella.
 

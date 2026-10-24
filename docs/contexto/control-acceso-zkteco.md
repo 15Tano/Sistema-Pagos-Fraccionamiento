@@ -526,3 +526,20 @@ Sin SDK, red, tareas, cambios de reloj ni credenciales reales. No se requirio pa
 Esto no certifica entrega HTTP, otro usuario/Python ni arranque como tarea.
 Siguiente pendiente: servidor/credencial de ensayo para enviar desde Dell; se
 consulta disponibilidad de terminal SSH o alternativa, sin desplegar produccion.
+
+Servidor: usuario confirma acceso SSH y comparte PHP CLI 8.4.20 (NTS, OPcache),
+PDO mysql/sqlite. Prompt root@san-isidro-back en
+/home/sanisidro-back/htdocs/api.sanisidro.info. El nombre deploy no produjo salida
+en type -t; usuario identifica /root/deploy-sanisidro.sh como su comando real.
+Contenido de ese script y estado de /root/repo-sanisidro pendientes de lectura.
+No se ejecuto deploy ni se preparo instancia remota. Preservar ese flujo para el
+despliegue final autorizado; ensayo en carpeta/base separadas antes de aplicarlo.
+
+Script de deploy recibido posteriormente: fetch/pull en /root/repo-sanisidro,
+backup de codigo, rsync --delete al docroot, Composer, cache, migraciones con
+confirmacion y reload PHP-FPM. Solo apunta a produccion. Estado remoto informado
+limpio: refactor-headless...origin/refactor-headless; hash remoto no aportado.
+Usuario confirma SSH root@api.sanisidro.info. Preparado paquete de ensayo con
+fuentes locales confirmadas y guardas de ruta/manifiesto/espacio/dependencias;
+SQLite propia y servicio solo loopback mediante tunel SSH. Instalacion y envio
+remotos aun pendientes. Ver [ensayo remoto](control-acceso-ensayo-remoto.md).
