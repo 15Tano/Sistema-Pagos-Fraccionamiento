@@ -1,0 +1,21 @@
+{
+  "files": [
+    {
+      "name": "lector_eventos.py",
+      "sha256": "8e92df0ebd7de0645d53ffdcfeccaa4444418744ddc3e5c3ae5f65a9a4275eee"
+    },
+    {
+      "name": "LEEME.md",
+      "sha256": "75b8907e399c09d790fcc185d4bcf77b00a009dff87235b01295db3e2da50541"
+    },
+    {
+      "name": "test_lector.py",
+      "sha256": "18946afa57808622c2e41b2addba979562e53b5a3bed6cd3224e02aca9aaff4c"
+    },
+    {
+      "name": "verificar_paquete.ps1",
+      "sha256": "f4cefa3b35b4efc98ca2a0b97c5e9a74b716460cbfc0fc1f0d10d1bd3051c795"
+    }
+  ],
+  "release": "2026.10.23-5"
+}
