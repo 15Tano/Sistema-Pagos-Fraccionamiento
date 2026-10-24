@@ -558,3 +558,13 @@ la salida posterior desde root@san-isidro-back confirma esta preparacion real.
 Siguiente: iniciar_ensayo.sh en primer plano y comprobar /salud por otra conexion
 SSH. Arranque, tunel y entrega autenticada desde Dell pendientes. No se ejecuto
 deploy, no se cambio la API de vigencias ni se contacto C3.
+
+## Salud del ensayo remoto comprobada — 2026-10-24
+
+Usuario arranca PHP de ensayo en 127.0.0.1:18880 y obtiene desde Dell por SSH/curl
+/salud = ensayo_listo, device_serial TEST-C3-001. Luego Ctrl+C detiene PHP;
+reiniciar y mantener terminal abierta para enviar. Esta evidencia no certifica
+autenticacion del agente ni entrega de lotes. Cliente manual de fixtures preparado
+en ensayo_dell.py, con identidad/destino limitados e importacion SSH directa a
+DPAPI. No lee C3 ni estado real de ZKSync; no requiere mantenimiento. Importacion
+real, tunel 18881, ACK y conteos pendientes. Ver ensayo-remoto para pasos/evidencia.

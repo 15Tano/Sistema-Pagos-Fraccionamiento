@@ -56,11 +56,46 @@ agent_id=6b293548-0312-4d06-9c1d-3a7e79c9c5a0 (identificador, no secreto).
 SQLite exclusiva en la carpeta de ensayo; el preparador informa credencial en
 datos/credencial-ensayo.json, acceso solo root. No se recibió ni registró su secreto.
 La salida concuerda con las guardas, copia de dependencias y configuración separada
-del paquete revisado. No se ejecutó deploy ni se inició aún el servidor temporal.
+del paquete revisado. No se ejecutó deploy. El arranque posterior se documenta abajo.
 
 ## Siguiente evidencia requerida
 
-Arrancar mediante bash iniciar_ensayo.sh en primer plano y verificar GET /salud
-desde otra conexión SSH. Después configurar emisor de ensayo en Dell, guardar credencial en DPAPI mediante
+Configurar emisor de ensayo en Dell, guardar credencial en DPAPI mediante
 SSH y enviar únicamente fixtures. Confirmar ACK real, reintento y conteos antes
-de integrar SDK o ejecutar el deploy habitual. El polling real sigue operativo.
+de integrar SDK o ejecutar el deploy habitual. Este ensayo no modifica el polling.
+
+## Arranque y salud comprobados — 2026-10-24
+
+Usuario comparte inicio mediante bash iniciar_ensayo.sh, PHP 8.4.20 en
+127.0.0.1:18880. Desde PowerShell en Dell ejecuta SSH con curl --fail a /salud;
+obtiene {"status":"ensayo_listo","device_serial":"TEST-C3-001"}.
+Log del servidor: inicio 2026-10-24 20:19:51, conexión 20:20:04 (zona de ese log
+no comprobada). Después pulsa Ctrl+C y vuelve al prompt: proceso detenido.
+La prueba confirma acceso SSH y salud del servicio de ensayo durante esa ventana;
+no certifica túnel local 18881, autenticación del agente ni entrega de lotes.
+Reiniciar PHP y mantener esa terminal abierta para probar el envío.
+
+Cliente manual preparado en tools/agente_acceso/ensayo_dell.py: exige UUID de este
+ensayo y serial TEST-C3-001, importa JSON de SSH directamente a DPAPI de Dell,
+sin archivo de secreto en texto claro ni impresión del token. Solo destino
+127.0.0.1:18881/api/control-acceso/agente. Outbox exclusiva en
+datos/ensayo_remoto. Prepara tres originales ficticios (evento, estado 255, error
+binario -2) y un estado ficticio, dos mensajes en total. UUID/horas fijos permiten
+repetir preparar secuencialmente sin duplicar; no ejecutar preparadores paralelos.
+Enviar conserva reintentos, originales, hashes y ACK del emisor existente.
+No carga DLL, no lee el estado real del polling, no instala tareas y no requiere
+pausa del gestor. Instrucciones en LEEME_ENSAYO_DELL.md dentro del paquete cliente.
+Importación/entrega real desde Dell siguen pendientes de evidencia del usuario.
+
+Paquete cliente: tools/agente_acceso/Ensayo_Emisor_Dell_2026.10.24-1.zip,
+8 archivos, SHA256 f7a4c4525a3204a4dce24f4d2d5e6da12df40aba04a45b4d034a728666625c12.
+Manifiesto, fuentes dentro del ZIP y verificador Windows PowerShell correctos.
+Suite local completa: 26 pruebas aprobadas (23 anteriores y 3 del cliente),
+11.517 s, Python 3.12.5. Nuevas: identidad/campos/entrada limitada; importación
+a DPAPI real sin eco ni JSON claro; fixtures repetibles y ACK Laravel real,
+conservación byte a byte en servidor y sin duplicación por repetir preparar/enviar.
+ACK esperado del lote: 3 respuestas, 2 filas, 1 evento, 1 estado y 1 respuesta
+sin interpretar (el error SDK ficticio conservado como sdk_error).
+La primera corrida fue bloqueada por WinError 10013 del sandbox; se repitió con
+acceso HTTP local permitido. Otra repetición agotó el inicio PHP en una prueba
+anterior; la última corrida completa pasó. No se cambió el backend ni sus límites.

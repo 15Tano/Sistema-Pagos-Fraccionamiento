@@ -1,0 +1,33 @@
+{
+  "release": "2026.10.24-1",
+  "files": [
+    {
+      "name": "ensayo_dell.py",
+      "sha256": "4581262a027e726e3ed6f8c1fac67bb1e7e7318588141c0ec36f9b047c669131"
+    },
+    {
+      "name": "outbox.py",
+      "sha256": "f00112ac88f1b3268aac628bc4987c3f9ca7e723c22f98aadc05cb71fba012ad"
+    },
+    {
+      "name": "protocolo.py",
+      "sha256": "5f43b055d0a11a2afe3e3f9cf86ec3ac2682f6c3704ee8c27c1ec69a20c266fb"
+    },
+    {
+      "name": "credencial.py",
+      "sha256": "06d9e15b02a58fe0b8cc3fd10f2b3e1df531f1e753df82e2b7b75fdcb998744a"
+    },
+    {
+      "name": "emisor.py",
+      "sha256": "0e7cef854b88c739274a1b2d82408bcb2c2a2629ec7cc7e10b015fabcc78359a"
+    },
+    {
+      "name": "LEEME_ENSAYO_DELL.md",
+      "sha256": "ec7be1c749d7a6da668c0fe282b0a8a21777bfbc7ec1e8254c45ac561cd7c34f"
+    },
+    {
+      "name": "verificar_ensayo_dell.ps1",
+      "sha256": "6c917a4bf22a36ec68967e77522c4082df1c864f0dcb51df577d81cb5c79a02e"
+    }
+  ]
+}

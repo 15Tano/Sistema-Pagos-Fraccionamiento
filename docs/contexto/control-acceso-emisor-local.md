@@ -110,8 +110,12 @@ preparado; [alcance y límites](control-acceso-ensayo-remoto.md).
 Esto no certifica PHP-FPM ni la versión del servidor MySQL. Preparación remota
 posteriormente confirmada el 2026-10-24: paquete/hash y fuentes verificados,
 migración exclusiva aplicada, ENSAYO PREPARADO y agente TEST-C3-001 con UUID
-6b293548-0312-4d06-9c1d-3a7e79c9c5a0. Arranque de servicio, /salud y entrega
-real desde Dell pendientes. No se publicó un endpoint público. No enviar tokens por chat.
+6b293548-0312-4d06-9c1d-3a7e79c9c5a0. Arranque de servicio y /salud confirmados
+posteriormente por usuario: curl mediante SSH devolvió ensayo_listo/TEST-C3-001.
+Luego detuvo PHP con Ctrl+C; reiniciar antes del envío. Cliente de fixtures con
+importación SSH directa a DPAPI preparado (ensayo_dell.py), sin leer SDK/polling.
+Entrega autenticada y túnel desde Dell pendientes. No se publicó un endpoint
+público. No enviar tokens por chat.
 Después: coordinador SDK en carpeta separada, parada/mantenimiento cooperativos,
 prioridad de vigencias, watchdog y transición autorizada. La lectura real todavía
 no llama `Outbox.capture()`; no dar por instalado un recolector permanente.
