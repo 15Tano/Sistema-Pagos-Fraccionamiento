@@ -201,7 +201,9 @@ no cambiar el acceso del polling instalado durante esta primera entrega.
 2. **Emisor y almacen local.** Implementado y probado localmente: 23 pruebas,
    incluidas tres contra Laravel real de ensayo, Internet interrumpido, salida
    abrupta, ACK perdido y falta de disco. Recibe snapshots explicitos; recoleccion
-   automatica de archivos actuales sin SDK y validacion en Dell pendientes.
+   automatica de archivos actuales sin SDK pendiente. Compatibilidad de SQLite
+   en disco y DPAPI verificada en Dell/Python32 mediante 13 comprobaciones;
+   entrega por red desde Dell al servidor de ensayo aun pendiente.
 3. **Coordinador en carpeta separada.** Simular la secuencia sin escrituras; probar
    cierre SDK antes de cycle(), parada del gestor, watchdog y persistencia. Consulta
    real solo con mantenimiento; aplicacion de fechas con paquete nuevo requiere

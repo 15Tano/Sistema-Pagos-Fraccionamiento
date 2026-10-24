@@ -14,8 +14,9 @@ Estado actual: lectura real y correlacion RT/historial verificadas en caseta;
 backend de ingesta implementado y validado localmente en SQLite y MySQL aislado.
 Emisor/outbox preparado y probado localmente (23 pruebas), sin instalar en caseta.
 Pantalla, coordinador SDK y cola de operaciones siguen pendientes. No hay autorizacion
-de despliegue de esta ampliacion. Proxima validacion: entorno Dell y servidor de
-ensayo remoto antes de integrar lectura SDK con el coordinador.
+de despliegue de esta ampliacion. Entorno Dell compatible con SQLite en disco y
+DPAPI segun preflight; proxima validacion: entrega al servidor de ensayo remoto
+antes de integrar lectura SDK con el coordinador.
 
 Las secciones siguientes conservan la secuencia historica de decisiones y pruebas;
 consultar los cierres al final para distinguir pendientes anteriores ya resueltos.
@@ -513,3 +514,15 @@ WAL/FULL/FK, original y lote tras reapertura, leases, ACK simulado, integridad y
 DPAPI del usuario actual en carpeta temporal propia; conserva resumen sin secretos.
 13 comprobaciones aprobadas localmente en Python 3.12.5 x64, temporales retirados.
 Ejecucion Dell pendiente. No se necesita Preparar mantenimiento para este paquete.
+
+Resultado Dell confirmado posteriormente por salida del usuario:
+PAQUETE VERIFICADO, status=compatible_local, Python 3.13.13 x86,
+SQLite 3.50.4 y windows_user=Dell. Las 13 comprobaciones son true, incluidos
+WAL/FULL/FK, originales/lotes recuperados, leases, ACK simulado, integridad SQLite
+y cifrado/recuperacion DPAPI. temporary_files_removed=true. Inicio UTC
+2026-10-24T05:14:22.225259+00:00; fin 05:14:22.616747+00:00 (=23:14:22 Mexico).
+Evidencia C:\SanIsidro\PreflightEmisor_20261023\registros\20261023_231422_bb300c43.
+Sin SDK, red, tareas, cambios de reloj ni credenciales reales. No se requirio pausa.
+Esto no certifica entrega HTTP, otro usuario/Python ni arranque como tarea.
+Siguiente pendiente: servidor/credencial de ensayo para enviar desde Dell; se
+consulta disponibilidad de terminal SSH o alternativa, sin desplegar produccion.

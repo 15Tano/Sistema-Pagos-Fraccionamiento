@@ -89,11 +89,19 @@ Preparado `tools/agente_acceso/Preflight_Emisor_2026.10.23-1.zip`: fuentes actua
 de outbox/protocolo/credencial, diagnóstico local, instrucciones y manifiesto.
 SHA256 ZIP: `de69437863757601c3fdcaddc80be12b07e1356936153f8a37f669086a750159`.
 Diagnóstico local aprobado en Python 3.12.5 x64: 13 comprobaciones verdaderas y
-temporales retirados. Ejecución en Dell pendiente. Sin SDK, red ni credencial real;
-ACK simulado no certifica entrega HTTP. No pausar polling para esta comprobación.
+temporales retirados. Ejecución Dell posteriormente aprobada por salida del usuario:
+Python 3.13.13 x86, SQLite 3.50.4, usuario Dell, status compatible_local y las 13
+comprobaciones en true, temporary_files_removed=true. Inicio UTC
+2026-10-24T05:14:22.225259+00:00; fin 05:14:22.616747+00:00. Evidencia remota:
+`C:\SanIsidro\PreflightEmisor_20261023\registros\20261023_231422_bb300c43`.
+WAL/FULL/FK, reapertura, leases, ACK simulado e integridad/DPAPI verificados en ese
+Python y usuario. Sin SDK, red ni credencial real; ACK simulado no certifica entrega
+HTTP ni inicio mediante tarea. No se requirió pausa del polling.
 
-Comprobar WAL en disco y DPAPI con el Python/usuario Dell reales, preparar servidor y
-credencial de ensayo para una prueba remota controlada. No enviar tokens por chat.
+Preparar servidor y credencial de ensayo para una prueba remota controlada; consulta
+pendiente al usuario sobre disponibilidad de terminal SSH del servidor o alternativa
+de pruebas. No se ha preparado una instancia remota ni se ha publicado un endpoint
+de ensayo. No enviar tokens por chat.
 Después: coordinador SDK en carpeta separada, parada/mantenimiento cooperativos,
 prioridad de vigencias, watchdog y transición autorizada. La lectura real todavía
 no llama `Outbox.capture()`; no dar por instalado un recolector permanente.
