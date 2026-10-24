@@ -12,9 +12,10 @@ Se explico y el usuario acepto conceptualmente ampliar el backend Laravel actual
 no hace falta otra API desplegada ni otro servidor para esta arquitectura.
 Estado actual: lectura real y correlacion RT/historial verificadas en caseta;
 backend de ingesta implementado y validado localmente en SQLite y MySQL aislado.
-Pantalla, emisor/outbox, coordinador SDK y cola de operaciones siguen pendientes.
-No hay autorizacion de despliegue de esta ampliacion. Siguiente etapa: emisor con
-persistencia local y pruebas de reintentos contra servidor de ensayo.
+Emisor/outbox preparado y probado localmente (23 pruebas), sin instalar en caseta.
+Pantalla, coordinador SDK y cola de operaciones siguen pendientes. No hay autorizacion
+de despliegue de esta ampliacion. Proxima validacion: entorno Dell y servidor de
+ensayo remoto antes de integrar lectura SDK con el coordinador.
 
 Las secciones siguientes conservan la secuencia historica de decisiones y pruebas;
 consultar los cierres al final para distinguir pendientes anteriores ya resueltos.
@@ -482,3 +483,19 @@ Lector diagnostico: 286aa62. Backend de ingesta: 83d78e1. Ensayo MySQL y context
 se agrupan en un tercer commit. No se autorizo push ni despliegue. Cambios anteriores
 de otros trabajos se conservan fuera de estos commits; credenciales y datos de la
 instancia SQL temporal siguen ignorados por Git.
+
+## Emisor y almacen local preparados — 2026-10-23
+
+Usuario autoriza continuar con el emisor y sus pruebas. Implementado en
+tools/agente_acceso, Python estandar, sin dependencias del polling ni SDK:
+SQLite WAL/FULL, originales y lotes inmutables, reintentos con plazos persistentes,
+leases, ACK validado contra identidad/hash/contadores y pausa ante errores que
+requieren intervencion. Estado recibido como snapshot explicito; no se recolectan
+archivos operativos todavia. DPAPI del usuario actual para secreto de ingesta.
+
+23 pruebas aprobadas, incluidas tres con Laravel real/SQLite aislado, ACK perdido
+despues del commit, reinicio, salida abrupta de proceso, SQLITE_FULL, rollback,
+conflicto 409 y DPAPI real con secreto ficticio. Servidores temporales detenidos.
+No cambios al backend, caseta, tareas ni vigencias. Disponibilidad SQLite/DPAPI en
+Dell y prueba remota controlada pendientes. Detalle, limites y repeticion en
+[control-acceso-emisor-local.md](control-acceso-emisor-local.md).

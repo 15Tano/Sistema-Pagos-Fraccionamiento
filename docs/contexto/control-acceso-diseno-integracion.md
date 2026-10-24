@@ -2,8 +2,9 @@
 
 Diseno al 2026-10-23. Usuario confirma la primera entrega de backend local:
 ingesta autenticada, almacenamiento y pruebas. Esa etapa ya esta implementada
-localmente; no se ha desplegado ni conectado con caseta. Emisor, coordinador,
-pantalla y operaciones siguen propuestos. Contrato exacto y evidencia de pruebas en
+localmente; no se ha desplegado ni conectado con caseta. Emisor/outbox local tambien
+preparado y probado (23 pruebas); coordinador, pantalla y operaciones pendientes.
+Ver [emisor local](control-acceso-emisor-local.md). Contrato exacto y evidencia de pruebas en
 [control-acceso-api-v1.md](control-acceso-api-v1.md); evidencia de hardware en
 [control-acceso-zkteco.md](control-acceso-zkteco.md).
 
@@ -90,8 +91,9 @@ No hay autologon confirmado; no prometer funcionamiento antes de iniciar sesion.
 
 ## Persistencia local y limites de entrega
 
-Propuesta: almacen transaccional local (SQLite, disponibilidad por comprobar en
-Python instalado) para respuestas originales, filas interpretadas y envios.
+Implementado localmente: almacen SQLite de respuestas originales y envios;
+la interpretacion de filas se conserva en Laravel. SQLite de Python en Dell sigue
+pendiente de comprobar antes de instalar.
 Guardar buffer/respuesta, SHA256, codigo SDK, identidad de equipo, instante de
 consulta, orden de fila y UUID local persistente antes de permitir el envio.
 Procesar toda la respuesta; no limitar la captura a la primera tarjeta mostrada
@@ -196,9 +198,10 @@ no cambiar el acceso del polling instalado durante esta primera entrega.
    aislado (24 pruebas / 186 aserciones); instancia detenida al terminar. Ver
    [ensayo MySQL](control-acceso-ensayo-mysql.md).
    Sin pantalla, solicitudes operativas ni despliegue a produccion en esta etapa.
-2. **Emisor y almacen local.** Pruebas con servidor de ensayo; Internet interrumpido,
-   reinicio, ACK perdido y falta de disco. Puede reportar estado leyendo archivos
-   actuales sin SDK, preservando el polling instalado durante preparacion.
+2. **Emisor y almacen local.** Implementado y probado localmente: 23 pruebas,
+   incluidas tres contra Laravel real de ensayo, Internet interrumpido, salida
+   abrupta, ACK perdido y falta de disco. Recibe snapshots explicitos; recoleccion
+   automatica de archivos actuales sin SDK y validacion en Dell pendientes.
 3. **Coordinador en carpeta separada.** Simular la secuencia sin escrituras; probar
    cierre SDK antes de cycle(), parada del gestor, watchdog y persistencia. Consulta
    real solo con mantenimiento; aplicacion de fechas con paquete nuevo requiere

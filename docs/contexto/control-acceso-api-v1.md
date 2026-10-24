@@ -28,7 +28,8 @@ php artisan control-acceso:agente revocar --id="UUID-DEL-AGENTE"
 ```
 
 Ejecutar desde `backend/`. Crear y rotar muestran el secreto una sola vez; su destino
-futuro en caseta es DPAPI, todavía sin implementar. Rotar invalida inmediatamente la
+en caseta es DPAPI, implementado en el emisor local y todavía sin instalar en Dell.
+Rotar invalida inmediatamente la
 credencial anterior y reactiva un agente revocado. Revocar conserva todo el historial.
 La ingesta vuelve a comprobar la credencial dentro de su transacción, con bloqueo
 del agente, para coordinarse con rotación/revocación.
@@ -209,6 +210,8 @@ MySQL 8.4.13 aislado, incluidos procesos simultáneos, bloqueo real InnoDB, migr
 reversible, claves foráneas y precisión de fechas. Instancia detenida al terminar.
 Evidencia y repetición en [control-acceso-ensayo-mysql.md](control-acceso-ensayo-mysql.md).
 La suite habitual se ejecutó con `--exclude-group=mysql-ensayo`, conservando el
-resultado anterior. Pendientes emisor/outbox/coordinador; no se han instalado
+resultado anterior. Emisor/outbox posteriormente preparado y probado localmente
+(23 pruebas); ver [emisor local](control-acceso-emisor-local.md). Validación en Dell
+y coordinador pendientes; no se han instalado
 componentes en caseta ni ejecutado migraciones sobre bases existentes. Este ensayo
 no certifica configuración del servidor de producción ni despliegue.
