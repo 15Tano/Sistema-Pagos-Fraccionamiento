@@ -405,3 +405,29 @@ a r2 cerrada. Sin nueva evidencia de watchdog. Pendiente entrega de las nuevas
 respuestas:149originales totales frente a93confirmadas por ACK; envio manual
 al backend aislado sin SDK ni nueva pausa. Servidor/tunel deben verificarse o
 abrirse si estan detenidos, sin duplicar procesos ni tocar produccion.
+
+## Acumulados tras parada y reapertura entregados — 2026-10-24
+
+Usuario comparte dos ejecuciones de enviar y consola PHP temporal, iniciado
+2026-10-25 04:06:55 (hora mostrada por servidor), atendiendo conexiones loopback
+04:08:16-04:08:27 con Accepted/Closing. Primera entrega confirma22mensajes nuevos,
+delivery acked22/idle1. Health final messages.acked53, responses149, unbatched0,
+pending_count0, paused vacio, oldest_pending_utc null. Las4respuestas sin lote
+previas se agrupan en un mensaje adicional:52->53mensajes.
+
+ACK acumulados:9mensajes de estado,44lotes, responses_stored149, rows_stored149,
+events_stored106, statuses_stored43, responses_pending_interpretation0.
+Son56respuestas adicionales respecto a la entrega anterior93 (55filas de evento
+y1de estado segun diferencia de ACK), no56vehiculos/pasos certificados.
+Originales149, hashes_verified true, mismo manifiesto anterior a envio
+edfaeae5adbfc8d3f176f0f885fbbf861ac312c2666b50b4b8433e2b9eb407e1.
+Mensajes53, body_hashes_verified true, originals_before149,
+originals_preserved true y existing_messages_unchanged true. Segunda ejecucion
+delivery idle1, mismos conteos/ACK/hash; no nuevos envios.
+
+Cierra entrega de pendientes de ambas pruebas, con evidencia de ACK validados
+localmente, sin inspeccion SQL remota independiente. Sin SDK, mantenimiento nuevo,
+cambio de vigencias ni deploy. Solicitar Ctrl+C en ventanas identificadas del
+servidor temporal y tunel, conservar datos; cierre aun no confirmado. Siguientes
+pendientes: integracion gestor/vigilancia, recuperacion tras fallo real, retencion
+y reconciliacion antes de transicion permanente autorizada.

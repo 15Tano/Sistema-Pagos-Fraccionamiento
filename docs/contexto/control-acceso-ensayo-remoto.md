@@ -209,3 +209,18 @@ no se sustituyeron procesos. Solicitar cierre del tunel y del servidor temporal
 desde sus ventanas, conservando evidencia. Cierre aun pendiente. No deploy,
 instalacion permanente ni nueva pausa. Detalle y siguientes limites en
 control-acceso-coordinador.md.
+
+## Segunda entrega real:149respuestas confirmadas — 2026-10-24
+
+Tras pruebas de parada solicitada y reapertura, usuario envia22mensajes nuevos
+desde la misma outbox/agente real. Total53confirmados (9estados/44lotes),
+149respuestas/149filas segun ACK:106eventos y43estados, interpretacion pendiente0.
+Pendientes0 y sin lote0, pausa vacia; segundo enviar idle1 y mismos totales.
+Originales149 conservados con mismo manifiesto previo
+edfaeae5adbfc8d3f176f0f885fbbf861ac312c2666b50b4b8433e2b9eb407e1;
+hashes de originales y cuerpos correctos, originales/mensajes existentes sin
+cambios. Son56respuestas adicionales a93anteriores; no se afirma cruce fisico,
+frescura ni completitud por esos conteos. Sin consulta SQL remota independiente.
+Consola PHP temporal muestra inicio y conexiones Accepted/Closing del ensayo.
+Cierre de servidor/tunel solicitado al terminar, no confirmado. Sin produccion,
+SDK ni pausa adicional. Detalle en documento de coordinador.
