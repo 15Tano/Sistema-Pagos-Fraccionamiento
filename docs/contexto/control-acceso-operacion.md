@@ -739,3 +739,13 @@ Envio_Vigilado_2026.10.25-2.zip;37casos/179totales aprobados localmente.
 Detalle de evidencia, limites y SHA en control-acceso-envio-vigilado.md.
 Validacion de ZIP2 en Dell pendiente; no considerar envio vigilado aceptado
 solo por cola vacia cuando no confirmo finalizacion del hijo.
+
+Actualizacion 2026-10-25: emisor2 separado aceptado en Dell con cierre limpio
+a20:00:34Z, cola85acked/228respuestas/0pendientes y vigencias correcto;
+detalle en control-acceso-envio-vigilado.md. Preparado candidato conjunto
+readonly y envio HTTP aislado, con parada cooperativa, recibos y verificacion
+propios; 30 pruebas nuevas/209 totales locales aprobadas. Validacion Dell
+pendiente, primero solo simulacion. No usar botones del enlace2 para el nuevo
+nombre/ruta: pausa y reanudacion siguen por gestor instalado, despues de FIN
+y verificacion del conjunto. No instala tareas ni reemplaza vigilancia.
+Detalle del paquete, limites y secuencia en control-acceso-ensayo-conjunto.md.

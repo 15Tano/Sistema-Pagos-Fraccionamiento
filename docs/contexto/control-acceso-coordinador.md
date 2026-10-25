@@ -520,3 +520,11 @@ Vigencias correcto y ambas tareas habilitadas en observacion20:00:33Z.
 Valida componente de envio separado con r2 activo; no prueba recolector SDK
 y emisor conjuntamente. Diseno de ensayo conjunto acotado propuesto como
 siguiente etapa, sin servicio permanente/aplicar; detalle en envio-vigilado.
+
+2026-10-25: candidato de ensayo conjunto preparado en
+Ensayo_Conjunto_2026.10.25-1.zip. Reutiliza completos los paquetes cierres1 y
+envio2, con supervisor propio y adaptador readonly del escritor de estado.
+30 pruebas nuevas y 209 totales aprobadas localmente; simulacion desde ZIP
+extraido aprobada. Primero verificar/simular en Dell sin mantenimiento ni SDK.
+Ejecucion conjunta real, cierres y retorno a r2 pendientes. Detalles y SHA en
+control-acceso-ensayo-conjunto.md. No reemplaza el polling ni sus controles.
