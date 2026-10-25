@@ -107,3 +107,23 @@ acotada; secuenciacion/recovery/parada/watchdog reales; envio de esas capturas;
 retencion/reconciliacion; comparacion antes de habilitar aplicacion de fechas;
 transicion operativa y rollback autorizados. Cierre del tunel/servidor remoto del
 ensayo anterior fue solicitado, sin confirmacion de procesos recibida.
+
+## Simulacion Dell aprobada — 2026-10-24
+
+Usuario comparte verificacion de paquete 2026.10.24-1 y --simular con Python32
+instalado. Resultado simulation_ok; cinco checks true (ciclos readonly simulados,
+clientes cerrados, originales recuperados sin duplicar, hashes y snapshot de
+vigencias sin reescribir). responses=139, messages.pending=33, unbatched=2,
+pending_count=35, paused vacio. Pendientes esperados, no envio HTTP.
+oldest_pending_utc=2026-10-25T02:04:00.830611+00:00 (24 octubre 20:04:00 Mexico).
+Evidencia en Dell:
+`C:\SanIsidro\CoordinadorEnsayo_20261024\datos\simulacion_20261024_200400_596825`.
+Confirma simulacion, SQLite y runtime Python32 de esta etapa; no certifica bucle
+SDK real, Python x64/ODBC, lectura de trafico ni parada en hardware.
+
+Siguiente: provisionar agente en backend aislado para CO2K225060027. Comando
+Artisan existente crear genera UUID/token; capturar salida en archivo root-only
+datos/alta-controlador-real.txt y mostrar solo agent_id. No rotar ni reutilizar
+el agente ficticio TEST-C3-001. No requiere PHP HTTP/tunel ni pausa del polling
+para esta preparacion. Lectura real seguira despues de obtener ese UUID y coordinar
+mantenimiento; todavia no se ejecuto.

@@ -6,7 +6,7 @@ localmente; no se ha desplegado en produccion. Actualizacion 2026-10-24:
 emisor/outbox y cliente manual Dell entregan fixtures a backend aislado por tunel
 SSH, con reintento previo sin conexion, ACK y originales conservados. No hay
 recolector continuo instalado. Coordinador readonly separado preparado y probado
-localmente (43 pruebas); simulacion Dell y ensayo real pendientes. Pantalla y
+localmente (43 pruebas); simulacion Dell aprobada, ensayo real pendiente. Pantalla y
 operaciones pendientes. Ver [coordinador](control-acceso-coordinador.md).
 Ver [emisor local](control-acceso-emisor-local.md). Contrato exacto y evidencia de pruebas en
 [control-acceso-api-v1.md](control-acceso-api-v1.md); evidencia de hardware en
@@ -216,8 +216,9 @@ no cambiar el acceso del polling instalado durante esta primera entrega.
    entrega ficticia Dell -> backend aislado confirmada con reintento y ACK el
    24 octubre; capturas reales aun sin enviar.
 3. **Coordinador en carpeta separada.** Prototipo readonly preparado el 24 octubre,
-   43 pruebas locales y simulacion aprobadas. Primer paso Dell: simulacion sin
-   mantenimiento. Ver documento de coordinador para limites y hallazgo del gestor.
+   43 pruebas locales y simulacion aprobadas. Simulacion Dell posteriormente
+   aprobada: cinco checks true, 139 originales, sin mantenimiento. Ver documento
+   de coordinador para limites y hallazgo del gestor. Lectura real pendiente.
    Simular la secuencia sin escrituras; probar
    cierre SDK antes de cycle(), parada del gestor, watchdog y persistencia. Consulta
    real solo con mantenimiento; aplicacion de fechas con paquete nuevo requiere

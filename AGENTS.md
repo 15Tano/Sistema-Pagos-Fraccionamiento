@@ -17,7 +17,7 @@ La documentación permanente de este proyecto está en `docs/contexto/`. Al come
 | [Ensayo MySQL de acceso](docs/contexto/control-acceso-ensayo-mysql.md) | 2026-10-23 | MySQL 8.4.13 aislado: migración, concurrencia InnoDB, 24 pruebas aprobadas, repetición y cierre de la instancia temporal. |
 | [Emisor local de acceso](docs/contexto/control-acceso-emisor-local.md) | 2026-10-24 | Outbox SQLite, DPAPI y pruebas locales; reintento y ACK desde Dell comprobados con fixtures, coordinador pendiente. |
 | [Ensayo remoto de acceso](docs/contexto/control-acceso-ensayo-remoto.md) | 2026-10-24 | Entrega ficticia autenticada desde Dell verificada: ACK, cero pendientes y originales conservados; cierre temporal solicitado. |
-| [Coordinador de acceso](docs/contexto/control-acceso-coordinador.md) | 2026-10-24 | Ensayo readonly separado preparado, 43 pruebas locales; prioridad de ciclos, originales y parada propia, simulación Dell pendiente. |
+| [Coordinador de acceso](docs/contexto/control-acceso-coordinador.md) | 2026-10-24 | Ensayo readonly separado: 43 pruebas locales y simulación Dell aprobadas; agente del serial real y lectura acotada pendientes. |
 
 Estos documentos contienen contexto histórico, no una certificación del estado actual del código o de producción. Verifica archivos, configuración y pruebas pertinentes antes de afirmar que algo está implementado, desplegado o pendiente. Una instrucción actual del usuario actualiza las preferencias históricas. Para decisiones documentadas que se contradigan, usa la decisión explícita más reciente; si la fecha o el alcance no resuelven la contradicción, expón la duda antes de implementar lo que dependa de ella.
 
