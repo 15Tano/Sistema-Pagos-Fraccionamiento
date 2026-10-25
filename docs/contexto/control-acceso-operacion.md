@@ -138,3 +138,64 @@ Get-FileHash -Algorithm SHA256 -LiteralPath 'C:\SanIsidro\ZKSync\vigilar_sync.py
 
 Si falta un archivo/tarea, conservar ese error como evidencia; no instalar,
 habilitar ni crear sustitutos para ocultarlo. Resultado de inventario pendiente.
+
+## Inventario real confirmado — 2026-10-24
+
+Usuario comparte SanIsidro-Vigencias Running/Enabled=True y SanIsidro-Vigilancia
+Ready/Enabled=True. Configuracion real: minutes5, repeat_minutes15, popup true.
+vigilancia.json: checked_utc=2026-10-25T04:18:26.433699+00:00,
+enabled_since_utc=2026-10-25T04:01:27.344420+00:00, task_state Running,
+status correcto, reason null. Esta muestra si acredita ejecucion reciente del
+monitor y reporte correcto; no es prueba de su ventana de alerta o de una falla
+provocada. Los tres hashes instalados coinciden exactamente con tabla local:
+vigilar_sync.py, iniciar_oculto.ps1 y GestionTags/mantenimiento.ps1.
+
+Inventario inmediato completo. Siguiente trabajo autorizado: preparar candidatos
+separados para contrato de mantenimiento/vigilancia y cierre SDK, segun diseno;
+instalacion permanente, modificacion de tareas y produccion siguen pendientes de
+paquete concreto, ensayo y confirmacion. No se altero ninguna instalacion.
+
+## Primera entrega candidata preparada — 2026-10-24
+
+Tras la pregunta del usuario sobre el siguiente paso, preparados en
+tools/agente_acceso, separados de fuentes/ZIP operativos:
+
+- control_operativo.py: identidad PID/run_id y parada; r2 sin run_id requiere
+  allow_legacy explicito. Checks de reanudacion exigen proceso/identidad nuevos,
+  runtime operativo con mismo PID/run_id, lock adquirido y heartbeat reciente.
+  Parada exige identidad objetivo, ausencia de proceso, cierre SDK y lock libre
+  confirmados por el futuro adaptador. No comprueba esos hechos por si solo ni
+  permite afirmar compatibilidad completa del gestor por incluir funciones.
+- salud_operativa.py: evalua vigencias por actividad y ciclo correcto, con
+  mantenimiento coherente con tarea; lector/envio separados por ejecucion/fecha.
+  Componentes ausentes/ajenos/readonly quedan desconocidos. No escribe last_ok ni
+  estado instalado. La evaluacion nueva aun no reemplaza el monitor actual.
+- trabajador_controlado.py: SDKGate compartido en memoria y ejecucion de hijo
+  propio; entorno sin SANISIDRO_*, timeout/salida no0/recibo invalido bloquean
+  siguientes turnos. Exige verify_closed del adaptador. No incluye ese adaptador
+  para r2, no modifica ReferenceProbe, no carga SDK al importar. El gate no
+  sustituye sync.lock ni persiste su fallo; esas conexiones siguen pendientes.
+- revisar_operacion.py: inspector readonly, comando que se pide ejecutar ahora.
+  Verifica fuentes candidatas antes de importarlas, lee tareas/CIM locales, estado
+  y configuracion/monitor/gestion y hashes conocidos. No lee DPAPI, Access, SQLite
+  ni originales; no abre HTTP/SSH/SDK, no habilita ni detiene tareas. Solo guarda
+  reporte filtrado bajo registros/ de la nueva carpeta. candidate_linked=false
+  explicito; lectores/emisor desconocidos son esperables en instalacion r2.
+
+Paquete final Integracion_Operativa_2026.10.24-2.zip, 7archivos, 11780bytes, SHA256
+799fe9b4d8b4b423411f3cd946a03fade74719bd62d617e9b06a464814244844.
+Borrador1 previo conservado en datos/borradores sin publicar/sustituir. Revision
+estatica ajusta captura de now despues de leer archivos/CIM (evitar falso futuro
+si el polling actualiza mientras se consulta), contador de fallos desde arranque
+y ocultacion de stdout/stderr en representacion del recibo de trabajador.
+Verificador/manifiesto correctos; analisis de sintaxis de5Python y1PowerShell
+correcto, sin ejecutar componentes ni tareas. No se agregaron/ejecutaron nuevas
+pruebas de comportamiento. No afirmar que gate, parada/reanudacion o evaluador
+nuevos estan validados en ejecucion/hardware. El inspector real en Dell aun no
+ejecutado. Detalles/comandos y limites en LEEME_OPERACION.md del paquete.
+
+Siguiente: obtener reporte readonly de Dell; despues validar los contratos y
+fallos con datos/procesos ficticios y preparar adaptadores/enlace. Esta entrega
+no es un coordinador operativo, instalador ni parche de GestionTags/vigilar_sync;
+no habilita aplicar ni servicio continuo. No se reemplazaron bibliotecas ni
+paquetes publicados ni se hizo push/despliegue.

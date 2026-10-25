@@ -245,3 +245,21 @@ y estrategia de reconciliacion historica. Reloj exacto sigue sin certificar; map
 fisico observado para este controlador en capturas del24octubre. No bloquear la
 ingesta de originales ni presentar reloj, completitud o paso vehicular como
 verificados por recibir eventos.
+
+## Consulta sobre dos pantallas exteriores — 2026-10-24
+
+Usuario pregunta si dos pantallas pequenas readonly podrian mostrar salidas
+distintas para entrada y salida. Viable como dos vistas restringidas del mismo
+flujo, filtradas/autorizadas en backend por controlador y DoorID:1entrada,
+2salida, segun mapa observado para CO2K225060027. Una misma captura alimentaria
+ambas vistas; no abrir otro cliente SDK por pantalla. Es una idea en consulta,
+no autorizacion para implementar/publicar pantallas ni cambiar la etapa actual.
+
+Contenido, hardware/conexion, autenticacion de display, visibilidad exterior y
+latencia objetivo por definir. Propuesta: interfaz solo de lectura por puerta,
+informacion minima para esa pantalla, estado de conexion y antiguedad de la
+lectura, evitando presentar backlog como lectura nueva. Datos de vigencia,
+si se muestran, resueltos por API; no inferir cruce fisico de un evento.
+El filtro visual de React por si solo no restringiria acceso a otros datos:
+el backend debe limitar los datos/permisos del display. Sin rutas ni UI nuevas
+en esta consulta. La integracion gestor/vigilancia sigue como trabajo inmediato.

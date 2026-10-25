@@ -444,3 +444,10 @@ adaptador readonly actual no transforma ese caso en UnsafeClosure. No se ha
 reproducido ese fallo en caseta ni cambiado implementacion. Solicitar inventario
 readonly de tareas, configuracion/estado vigilancia y hashes antes de preparar
 compatibilidad. Sin mantenimiento, SDK, tareas nuevas ni cambio de instalacion.
+
+Inventario posterior coincide en tres hashes (monitor/lanzador/mantenimiento) y
+vigilancia reporta correcto a2026-10-25T04:18:26.433699+00:00. Preparada primera
+capa candidata en paquete Integracion_Operativa_2026.10.24-2.zip: contratos de
+control/salud/turnos y un inspector readonly independiente. Solo sintaxis y
+manifiesto verificados, sin nuevos ensayos de comportamiento ni enlace al
+coordinador/SDK/gestor instalado. Detalle y limites en control-acceso-operacion.md.
