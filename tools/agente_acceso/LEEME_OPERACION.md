@@ -1,4 +1,4 @@
-# Integracion Operativa — candidatos 2026.10.24-2
+# Integracion Operativa — candidatos 2026.10.24-3
 
 Esta entrega prepara contratos de mantenimiento, salud y turnos SDK. No instala
 el coordinador operativo ni reemplaza ZKSync, GestionTags o vigilancia. No incluye
@@ -25,19 +25,20 @@ La API sigue siendo la unica autoridad de vigencias.
 - revisar_operacion.py: unico comando de esta entrega para Dell. Inspecciona
   tareas/proceso polling, JSON y hashes instalados; evalua salud sin modificarlos.
 
-Solo el inspector se ejecuta en este paso. Los otros componentes son candidatos
-para integrar y validar posteriormente; no se declaran probados en ejecucion
-ni en hardware por incluirlos en este paquete. Fuentes revisadas y sintaxis
-comprobada; no hay ensayos de comportamiento nuevos acreditados en esta entrega.
+Ahora se ejecuta la simulacion de los contratos, con30casos y procesos ficticios.
+Localmente pasaron las30pruebas y las50anteriores (80totales). No certifican SDK,
+lock real de caseta, parada del gestor ni instalacion permanente: las comprobaciones
+de lock/presencia del proceso se ejercitan como entradas del futuro adaptador.
+No reemplaza version2 ya extraida; usar carpeta r3 nueva. Archivo ZIP2 conservado.
 
 ## Ejecutar en Dell SIN mantenimiento
 
 Descargar ZIP a Downloads y usar PowerShell de Dell:
 
 ```powershell
-Expand-Archive -LiteralPath 'C:\Users\Dell\Downloads\Integracion_Operativa_2026.10.24-2.zip' -DestinationPath 'C:\SanIsidro\IntegracionOperativa_20261024'
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'C:\SanIsidro\IntegracionOperativa_20261024\verificar_operacion.ps1'
-& 'C:\Users\Dell\Python32\python.exe' -B 'C:\SanIsidro\IntegracionOperativa_20261024\revisar_operacion.py'
+Expand-Archive -LiteralPath 'C:\Users\Dell\Downloads\Integracion_Operativa_2026.10.24-3.zip' -DestinationPath 'C:\SanIsidro\IntegracionOperativa_20261024_r3'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'C:\SanIsidro\IntegracionOperativa_20261024_r3\verificar_operacion.ps1'
+& 'C:\Users\Dell\Python32\python.exe' -B 'C:\SanIsidro\IntegracionOperativa_20261024_r3\simular_operacion.py'
 ```
 
 No pausar polling, abrir ZKAccess, preparar mantenimiento ni abrir SSH/tunel.
@@ -47,6 +48,18 @@ Force para sustituir una entrega anterior.
 
 ## Salida
 
+Simulacion: simulation_ok, tests30, failures0, errors0, skipped0. Guarda resumen
+JSON y detalle .txt bajo registros/ de la carpeta r3. Crea temporales solo en
+datos/pruebas_operacion y los elimina con guarda de ruta. Inicia/cierra hijos
+Python ficticios propios y ejercita timeout, sin SDK ni consultas de tareas.
+La prueba del inspector sustituye tareas/archivos por fixtures antes de invocarlo.
+No necesita credenciales, PHP, pyodbc, Internet ni presentacion de tags.
+
+Si simulation_failed, compartir resumen y detalle .txt; no repetir con permisos
+de tareas ni preparar mantenimiento para evitar el error. No modifica la outbox
+real ni originales; tampoco envia pendientes del ensayo anterior.
+
+El inspector readonly sigue disponible como comando separado revisar_operacion.py.
 JSON compartible: tareas y PID, fechas/counters de vigencias, evaluacion candidata,
 ultima muestra de watchdog/configuracion y hashes de tres fuentes conocidas.
 No imprime argumentos completos, tarjetas, payloads, contrasenas o tokens.
@@ -71,9 +84,18 @@ ni cierra procesos por consultar su PID.
 
 ## Pendientes de esta integracion
 
-Validar contratos, gate y fallos con datos/procesos ficticios; implementar recibo
+Validacion Dell/Python32 de estos contratos; implementar recibo
 de cierre del worker de vigencias y su propagacion al coordinador; enlazar gestor,
 publicacion de salud, proceso emisor y monitor; comparar contra r2; ensayar rollback
 y recuperacion. La vigilancia candidata no emite alertas ni reemplaza vigilar_sync.
 Sin servicio continuo, modo aplicar ni cambio de endpoints/pantallas en esta etapa.
 Instalacion permanente requiere un paquete posterior revisado y autorizacion.
+
+## Ajustes de version3
+
+Rechaza run_id anterior aunque cambie PID y exige identidad anterior confirmada;
+pasar desde r2 legacy necesita opcion explicita. Heartbeat ausente no se califica
+correcto durante gracia. Reader/sender se evaluan por separado ante formato invalido;
+pendientes0 con fecha pendiente es incoherente. Componentes ausentes se identifican
+como components_absent y legacy sin identidad como legacy_run_without_components_identity,
+en lugar del motivo generico invalid_components recibido en Dell con version2.

@@ -18,6 +18,8 @@ def assess_vigencias(state, since, now, *, minutes=5, task_state='Unknown',
         return result('desconocido', 'maintenance_task_mismatch')
     if task_state not in ('Running', 'Ready'):
         return result('desconocido', 'task_unavailable')
+    if maintenance_active is not None and type(maintenance_active) is not bool:
+        return result('desconocido', 'invalid_maintenance_record')
     try:
         baseline = stamp(since)
         if baseline > now:
@@ -29,6 +31,8 @@ def assess_vigencias(state, since, now, *, minutes=5, task_state='Unknown',
             return result('desconocido', 'process_identity_unconfirmed')
         if state['phase'] in ('stopped', 'fault'):
             return result('alerta', 'unexpected_stop')
+        if state.get('heartbeat_utc') is None:
+            return result('desconocido', 'missing_heartbeat')
         for key, reason in (('heartbeat_utc', 'stale_heartbeat'), ('last_ok_utc', 'no_recent_successful_cycle')):
             value = stamp(state[key]) if state.get(key) is not None else baseline
             if value > now:
@@ -47,13 +51,59 @@ def assess_vigencias(state, since, now, *, minutes=5, task_state='Unknown',
         return result('desconocido', 'invalid_state_or_clock')
 
 
+def _reader_health(reader, phase, now, minutes):
+    try:
+        if not isinstance(reader, dict) or (reader.get('error') is not None and type(reader['error']) is not str):
+            raise ValueError('Estado de lector invalido.')
+        if reader.get('error'):
+            return result('degradado', 'reader_error')
+        if reader.get('state') == 'paused' and phase == 'cycle':
+            return result('pausado', 'vigencias_turn')
+        if reader.get('state') in ('catching_up', 'status_observed'):
+            age = (now - stamp(reader['checked_at_utc'])).total_seconds()
+            return result('correcto') if 0 <= age <= minutes * 60 else result('desconocido', 'stale_reader')
+        return result('desconocido', 'reader_not_observed')
+    except (ValueError, TypeError, KeyError, AttributeError, OverflowError):
+        return result('desconocido', 'invalid_reader')
+
+
+def _sender_health(sender, now, minutes):
+    try:
+        if not isinstance(sender, dict):
+            raise ValueError('Estado de emisor invalido.')
+        pending, oldest = sender['pending_count'], sender['oldest_pending_utc']
+        if type(pending) is not int or pending < 0 or type(sender.get('paused')) is not str:
+            raise ValueError('Estado pendiente invalido.')
+        if pending == 0 and oldest is not None:
+            raise ValueError('Fecha pendiente sin pendientes.')
+        age = (now - stamp(sender['checked_at_utc'])).total_seconds()
+        if not 0 <= age <= minutes * 60:
+            return result('desconocido', 'stale_sender')
+        if sender['paused']:
+            return result('degradado', 'sender_paused')
+        if pending:
+            age = (now - stamp(oldest)).total_seconds()
+            if age < 0:
+                raise ValueError('Pendiente futuro.')
+            return result('degradado' if age > minutes * 60 else 'pendiente', 'pending_delivery')
+        return result('sin_pendientes')
+    except (ValueError, TypeError, KeyError, AttributeError, OverflowError):
+        return result('desconocido', 'invalid_sender')
+
+
 def assess_components(state, components, now, *, minutes=5):
     unknown = lambda reason: {'reader': result('desconocido', reason), 'sender': result('desconocido', reason)}
     if type(minutes) is not int or not 3 <= minutes <= 60:
         raise ValueError('Umbral de componentes invalido.')
+    if components is None:
+        return unknown('components_absent')
     try:
-        current = identity(state)
-        if (not isinstance(components, dict) or components.get('pid') != current['pid'] or
+        current = identity(state, allow_legacy=True)
+        if 'run_id' not in current:
+            return unknown('legacy_run_without_components_identity')
+        if not isinstance(components, dict):
+            return unknown('invalid_components')
+        if (type(components.get('pid')) is not int or components.get('pid') != current['pid'] or
                 components.get('run_id') != current['run_id'] or components.get('mode') != 'operativo'):
             return unknown('components_not_available_for_current_run')
         age = (now - stamp(components['heartbeat_utc'])).total_seconds()
@@ -61,31 +111,7 @@ def assess_components(state, components, now, *, minutes=5):
             return unknown('stale_components')
         if state['phase'] in ('stopped', 'fault'):
             return unknown('execution_stopped')
-        reader, sender = components['reader'], components['sender']
-        if reader.get('error'):
-            reading = result('degradado', 'reader_error')
-        elif reader.get('state') == 'paused' and state['phase'] == 'cycle':
-            reading = result('pausado', 'vigencias_turn')
-        elif reader.get('state') in ('catching_up', 'status_observed'):
-            age = (now - stamp(reader['checked_at_utc'])).total_seconds()
-            reading = result('correcto') if 0 <= age <= minutes * 60 else result('desconocido', 'stale_reader')
-        else:
-            reading = result('desconocido', 'reader_not_observed')
-        pending = sender['pending_count']
-        if type(pending) is not int or pending < 0:
-            raise ValueError('Contador pendiente invalido.')
-        age = (now - stamp(sender['checked_at_utc'])).total_seconds()
-        if not 0 <= age <= minutes * 60:
-            sending = result('desconocido', 'stale_sender')
-        elif sender.get('paused'):
-            sending = result('degradado', 'sender_paused')
-        elif pending:
-            age = (now - stamp(sender['oldest_pending_utc'])).total_seconds()
-            if age < 0:
-                raise ValueError('Pendiente futuro.')
-            sending = result('degradado' if age > minutes * 60 else 'pendiente', 'pending_delivery')
-        else:
-            sending = result('sin_pendientes')
-        return {'reader': reading, 'sender': sending}
+        return {'reader': _reader_health(components.get('reader'), state['phase'], now, minutes),
+                'sender': _sender_health(components.get('sender'), now, minutes)}
     except (ValueError, TypeError, KeyError, AttributeError, OverflowError):
         return unknown('invalid_components')

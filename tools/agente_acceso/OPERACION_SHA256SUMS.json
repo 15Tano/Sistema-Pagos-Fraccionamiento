@@ -1,14 +1,14 @@
 {
-  "release": "2026.10.24-2",
-  "scope": "Componentes candidatos e inspector readonly; no instalador.",
+  "release": "2026.10.24-3",
+  "scope": "Componentes candidatos, inspector readonly y simulacion sin SDK; no instalador.",
   "files": [
     {
       "name": "control_operativo.py",
-      "sha256": "b9acb0c8281fe8c17144a3a713e27ce534755dd0af7e91c0ff0ae011099d1f3a"
+      "sha256": "17251c5f6617660751479be6d701f7cdb59dae3041505dc9801cd4dd09f9faa8"
     },
     {
       "name": "salud_operativa.py",
-      "sha256": "13be516f946d87d201b0720a87e1754ca20e3af55093a31893a1ccd4a459a605"
+      "sha256": "d4e310d240674adc7f9ea3d5da02f140a9591a12d56ecf944a46c65adfbe19aa"
     },
     {
       "name": "trabajador_controlado.py",
@@ -16,15 +16,23 @@
     },
     {
       "name": "revisar_operacion.py",
-      "sha256": "9798417ce3182ece2c91dfe8697707163d2cc3d545dc357e05f61b371b2340e0"
+      "sha256": "b85a54774bfedb0348cd689d694d4387ff10e708f8706e3311237ca64ed9919c"
     },
     {
       "name": "verificar_operacion.ps1",
-      "sha256": "e0d487d1f619e9602dff40387a3e349bdd5830748583fc6954e433cfc1cb02f2"
+      "sha256": "ce4d1396f4cb37abec75ec61ae419964c0f1fd2c08881b7a6e97536efdc589fe"
     },
     {
       "name": "LEEME_OPERACION.md",
-      "sha256": "7d0ea20e4cff24c1ff59df6a5c4b0914ad93bdc2fe4e7c29dfb95a8bd1d38787"
+      "sha256": "77260a0666fa1bc262eeaca9f785996deeef2ab58297b9861fa0316790dd1ed3"
+    },
+    {
+      "name": "simular_operacion.py",
+      "sha256": "da6295f376ba8bf668de3593491e26fbeeb9dd2af9d23ebfaf3662589a4f8097"
+    },
+    {
+      "name": "tests/test_operacion.py",
+      "sha256": "abe5a53ea26c53646defc7f4b1a942afba6f73e40b648ff35e1f4f6dcd711cd8"
     }
   ]
 }

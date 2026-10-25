@@ -57,13 +57,27 @@ def write_stop(folder, state, *, allow_legacy=False):
     return data
 
 
-def resume_check(state, runtime, previous_identity, process_pid, now, *, max_age=15):
+def _target_identity(value, *, allow_legacy=False):
+    allowed = ({'pid'}, {'pid', 'run_id'}) if allow_legacy else ({'pid', 'run_id'},)
+    if not isinstance(value, dict) or set(value) not in allowed:
+        raise ValueError('Identidad de referencia no confirmada.')
+    return identity({'protocol': 2, 'phase': 'stopped'} | value, allow_legacy=allow_legacy)
+
+
+def resume_check(state, runtime, previous_identity, process_pid, now, *, max_age=15,
+                 allow_legacy_previous=False):
     """Proceso/ruta se validan por el adaptador; lock confirmado por runtime nuevo."""
     try:
         current = identity(state)
+        if type(max_age) is not int or not 1 <= max_age <= 60:
+            return 'invalid_freshness_limit'
+        try:
+            previous = _target_identity(previous_identity, allow_legacy=allow_legacy_previous)
+        except (TypeError, ValueError, AttributeError):
+            return 'previous_identity_unconfirmed'
         if type(process_pid) is not int or current['pid'] != process_pid:
             return 'process_identity_mismatch'
-        if current == previous_identity:
+        if current['run_id'] == previous.get('run_id'):
             return 'previous_execution'
         if state['phase'] not in ('starting', 'cycle', 'idle'):
             return 'not_running'
@@ -90,7 +104,7 @@ def pause_check(state, expected_identity, *, process_present, lock_free, sdk_clo
     if sdk_closure != 'clean':
         return 'sdk_not_confirmed'
     try:
-        if identity(state) != expected_identity:
+        if identity(state) != _target_identity(expected_identity):
             return 'stop_identity_mismatch'
         if state['phase'] != 'stopped':
             return 'not_stopped'

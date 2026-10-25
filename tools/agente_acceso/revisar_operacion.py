@@ -9,9 +9,10 @@ import subprocess
 ROOT = Path(__file__).resolve().parent
 SYNC = Path(r'C:\SanIsidro\ZKSync')
 GESTOR = Path(r'C:\SanIsidro\GestionTags')
-RELEASE = '2026.10.24-2'
+RELEASE = '2026.10.24-3'
 FILES = {'control_operativo.py', 'salud_operativa.py', 'trabajador_controlado.py',
-         'revisar_operacion.py', 'verificar_operacion.ps1', 'LEEME_OPERACION.md'}
+         'revisar_operacion.py', 'verificar_operacion.ps1', 'LEEME_OPERACION.md',
+         'simular_operacion.py', 'tests/test_operacion.py'}
 EXPECTED = {
     'monitor': (SYNC / 'vigilar_sync.py', '204fc781b9d632c0decc7e11122ebcf6b9d1729191467e26d3ce67ebfcc4c1cd'),
     'lanzador': (SYNC / 'iniciar_oculto.ps1', 'd63567bfc5259d78505f8ffcc9e1a07c5b46b32c84ea6c49444409d08bdbbc92'),

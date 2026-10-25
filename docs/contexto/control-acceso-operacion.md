@@ -224,3 +224,47 @@ no prueba write_stop, pause_check/resume_check, gate ni recibos de cierre SDK.
 Sin mantenimiento ni enlace a tareas/SDK. Siguiente etapa: validacion con
 datos/procesos ficticios de contratos y errores, antes de enlazar adaptadores.
 Instalacion permanente sigue pendiente de ensayo y confirmacion.
+
+## Contratos ensayados localmente y paquete3 — 2026-10-24
+
+Usuario indica Siguiente tras proponer pruebas locales con procesos ficticios.
+Agregadas tests/test_operacion.py. Primera corrida28casos detecta6fallos de
+asercion, sobre cinco problemas candidatos: reutilizar run_id al cambiar PID;
+heartbeat ausente calificado correcto durante gracia; acoplamiento de errores
+de formato entre reader/sender; pendientes0 con fecha pendiente aceptados;
+motivos genericos para componentes ausentes/legacy. No afectan instalaciones:
+son helpers candidatos no enlazados al polling/gestor real.
+
+Corregidos control_operativo.py y salud_operativa.py; identidad anterior debe
+confirmarse, run_id debe ser nuevo, transicion desde anterior r2 legacy requiere
+allow_legacy_previous explicito y limite de frescura valido. Reader/sender se
+evaluan por separado; heartbeat ausente nunca correcto y pendientes coherentes.
+Agregados dos casos de identidad anterior/limites y transicion legacy explicita.
+30casos nuevos aprobados en1.202s. Incluyen escritura atomica de stop solo en
+temporales, peticion antigua, identidades, readonly/lock/cierre no confirmados,
+estados stale/futuros, aislamiento de salud, gate en dos hilos, hijos Python
+ficticios reales con timeout/salida no0/recibo rechazado, cierre y entorno sin
+SANISIDRO_*. Inspector ejercitado sobre fixtures con tareas/procesos sustituidos;
+no se consulta CIM real en estas pruebas.
+
+Suite completa80pruebas aprobadas en23.378s (50anteriores+30nuevas), incluyendo
+Laravel HTTP local y SQLite/DPAPI previos. Primera tentativa bajo sandbox no pudo
+iniciar PHP loopback y se interrumpio; repetida fuera del sandbox con exito.
+Sin C3, API de produccion, Access real, tareas ni datos de caseta. No acreditar
+por estos casos lock real compartido, boton del gestor o recibo Disconnect de SDK:
+esas garantias requieren adaptadores y prueba separada. Gate sigue en memoria.
+
+simular_operacion.py ejecuta solo30casos del paquete, con verificacion previa de
+fuentes, resumen JSON y detalle .txt en registros/ de su carpeta. Usa temporales
+guardados en datos/pruebas_operacion y solo hijos ficticios propios, sin red,
+SDK, Access, DPAPI o consultas de tareas. No requiere PHP ni credenciales en Dell.
+Inspector readonly sigue como comando separado. Resultado local simulation_ok,
+30tests, failures0/errors0/skipped0, repetido desde ZIP extraido con igual exito.
+
+Integracion_Operativa_2026.10.24-3.zip:9archivos,19174bytes, SHA256
+d27ef8346943fa0c6d7dab3469a6feed8d63597a198de5cc2e8b50ad377d98cf.
+Manifiesto/verificador, rutas y fuentes comprobados; ZIP2 publicado mantiene
+SHA799fe9b4d8b4b423411f3cd946a03fade74719bd62d617e9b06a464814244844.
+Destino Dell nuevo C:\SanIsidro\IntegracionOperativa_20261024_r3. No sobrescribir
+carpeta2 ni instalaciones. Pendiente simulacion con Python32 de Dell; siguiente
+enlace de adaptadores/cierre SDK/gestor/vigilancia aun no implementado ni instalado.
