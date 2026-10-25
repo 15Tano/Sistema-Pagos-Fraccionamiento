@@ -199,3 +199,28 @@ fallos con datos/procesos ficticios y preparar adaptadores/enlace. Esta entrega
 no es un coordinador operativo, instalador ni parche de GestionTags/vigilar_sync;
 no habilita aplicar ni servicio continuo. No se reemplazaron bibliotecas ni
 paquetes publicados ni se hizo push/despliegue.
+
+## Inspector candidato ejecutado en Dell — 2026-10-24
+
+Usuario verifica paquete Integracion Operativa2026.10.24-2 y ejecuta inspector
+con Python32. Scope readonly, checked_utc=2026-10-25T04:36:03.409940+00:00.
+Tareas Vigencias Running/Enabled true y Vigilancia Ready/Enabled true. Un solo
+polling_pids2640; vigencias phase idle, errores0, last_ok_utc
+2026-10-25T04:35:07.221268+00:00 y heartbeat04:35:07.221288+00:00.
+Evaluacion candidata de vigencias correcto/reason null. Watchdog observado
+correcto a04:35:26.540568+00:00, antiguedad36.869372s, sample_recent true.
+Configuracion5min/15min, popup true. Tres hashes instalados coinciden con
+referencia; read_errors vacio. candidate_linked false.
+
+Reader/sender desconocido, reason invalid_components. El inspector recibe estado
+r2 sin run_id y sin archivo de componentes; ese motivo es generico por validacion
+de identidad previa, no evidencia de corrupcion del almacen ni fallo del polling.
+Mejora pendiente: distinguir ausencia/legacy de campos corruptos en diagnostico
+del componente, en nueva version sin cambiar paquete2 publicado.
+
+Evidencia Dell: C:\SanIsidro\IntegracionOperativa_20261024\registros\revision_20261024_223603_410909.json.
+Verifica funcionamiento readonly del inspector y evaluacion sobre muestra real;
+no prueba write_stop, pause_check/resume_check, gate ni recibos de cierre SDK.
+Sin mantenimiento ni enlace a tareas/SDK. Siguiente etapa: validacion con
+datos/procesos ficticios de contratos y errores, antes de enlazar adaptadores.
+Instalacion permanente sigue pendiente de ensayo y confirmacion.
