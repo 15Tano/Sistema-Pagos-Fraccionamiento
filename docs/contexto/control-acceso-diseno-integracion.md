@@ -25,9 +25,11 @@ Ver [emisor local](control-acceso-emisor-local.md). Contrato exacto y evidencia 
   compatibilidad de clientes concurrentes ni causa universal con una sola muestra.
 - RT entrega acumulados; se alcanzo estado 255. Su hora no se actualizo entre dos
   muestras: no usarla como certificacion del RTC. Actualizacion fisica 2026-10-24:
-  tag 12230693 presentado en salida, DoorID 2/evento 0 y apertura reportada;
-  tupla nueva en historial y persistente tras relectura/reconexion. DoorID 2 se
-  asocia con salida en esa muestra; DoorID 1 y nombres Pluma 1/2 aun sin confirmar.
+  tag 12230693 presentado en salida y entrada, evento 0 y apertura reportada en
+  ambas; tuplas nuevas en historial persistentes tras relectura/reconexion.
+  DoorID 1 = entrada (direction_raw 0), DoorID 2 = salida (direction_raw 1) en
+  estas pruebas del controlador. Nombres visibles Pluma 1/2 aun sin confirmar.
+  Polling tras salida aceptado con tres ciclos; cierre posterior a entrada pendiente.
 
 Primera entrega confirmada: almacenamiento y recepcion autenticada de estado y
 eventos observados. Pantalla, captura asistida y solicitudes de alta/recuperacion

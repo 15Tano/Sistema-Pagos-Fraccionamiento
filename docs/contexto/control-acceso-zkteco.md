@@ -20,8 +20,9 @@ antes de integrar lectura SDK con el coordinador.
 
 Las secciones siguientes conservan la secuencia historica de decisiones y pruebas;
 consultar los cierres al final para distinguir pendientes anteriores ya resueltos.
-Reloj exacto sigue sin certificar. Prueba fisica del 24 octubre vincula DoorID 2
-con salida; DoorID 1 y equivalencia de nombres Pluma 1/2 siguen pendientes (ver cierre).
+Reloj exacto sigue sin certificar. Pruebas fisicas del 24 octubre vinculan DoorID 1
+con entrada y DoorID 2 con salida. Equivalencia de nombres Pluma 1/2 pendiente;
+reanudacion posterior a la captura de entrada aun por comprobar (ver cierres).
 
 ## Base operativa comprobada
 
@@ -645,3 +646,27 @@ prueba de lectura fisica de salida y reanudacion aceptada para esta ventana.
 Estado de vigilancia no aportado. DoorID 1/entrada, equivalencia Pluma 1/2 y
 entrega del emisor al backend de ensayo siguen pendientes; no se instala servicio
 lector ni se modifica produccion por este cierre.
+
+## Captura fisica de entrada confirmada — 2026-10-24
+
+Usuario ejecuta el mismo paquete con --tag 12230693 --pluma entrada --seconds 60.
+Evidencia remota: `C:\SanIsidro\CapturaTag_20261024\registros\20261024_190024_686953`.
+Tras base RT y ARMADO se recibe evento device_time_raw 2026-10-24 19:01:04,
+card 12230693, pin 693, DoorID 1, EventType 0, InOutState 0, Verified 4.
+Operador anota "19:01 si abrio". Queda observado DoorID 1 = entrada, junto a
+DoorID 2 = salida de la prueba previa, en este controlador. No se certifican los
+nombres visibles Pluma 1/2 ni se generaliza direction_raw a otros controladores.
+
+Correlacion completa con transaction Time_second 861822064. Conteos de tupla:
+history_before=0, history_after=1, history_reread=1, history_after_reconnect=1.
+Las tres comparaciones tienen cero filas historicas faltantes. Resultado
+rt_and_new_history_confirmed_pending_operator_review, con nota fisica recibida.
+No reaparece en relectura RT ni RT tras reconexion; el registro nuevo persiste en
+historial. Lectura fisica, correlacion nueva y apertura reportada confirmadas;
+no acreditar cruce, vigencia web, reloj exacto ni independencia de clientes.
+Respuestas originales/metadatos quedan en Dell, sin transferencia al repositorio
+ni envio al backend de ensayo. No se alteraron vigencias/permisos por la captura.
+
+El lector termino con Cierre diagnostico. Solicitado Terminar y reanudar desde el
+gestor; estado y dos ciclos correctos posteriores a ESTA captura de entrada
+pendientes. Los ciclos 18:56-18:58 cerraron salida y no certifican esta reanudacion.
