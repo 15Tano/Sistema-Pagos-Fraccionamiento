@@ -5,7 +5,9 @@ ingesta autenticada, almacenamiento y pruebas. Esa etapa ya esta implementada
 localmente; no se ha desplegado en produccion. Actualizacion 2026-10-24:
 emisor/outbox y cliente manual Dell entregan fixtures a backend aislado por tunel
 SSH, con reintento previo sin conexion, ACK y originales conservados. No hay
-recolector continuo instalado; coordinador, pantalla y operaciones pendientes.
+recolector continuo instalado. Coordinador readonly separado preparado y probado
+localmente (43 pruebas); simulacion Dell y ensayo real pendientes. Pantalla y
+operaciones pendientes. Ver [coordinador](control-acceso-coordinador.md).
 Ver [emisor local](control-acceso-emisor-local.md). Contrato exacto y evidencia de pruebas en
 [control-acceso-api-v1.md](control-acceso-api-v1.md); evidencia de hardware en
 [control-acceso-zkteco.md](control-acceso-zkteco.md).
@@ -211,8 +213,12 @@ no cambiar el acceso del polling instalado durante esta primera entrega.
    abrupta, ACK perdido y falta de disco. Recibe snapshots explicitos; recoleccion
    automatica de archivos actuales sin SDK pendiente. Compatibilidad de SQLite
    en disco y DPAPI verificada en Dell/Python32 mediante 13 comprobaciones;
-   entrega por red desde Dell al servidor de ensayo aun pendiente.
-3. **Coordinador en carpeta separada.** Simular la secuencia sin escrituras; probar
+   entrega ficticia Dell -> backend aislado confirmada con reintento y ACK el
+   24 octubre; capturas reales aun sin enviar.
+3. **Coordinador en carpeta separada.** Prototipo readonly preparado el 24 octubre,
+   43 pruebas locales y simulacion aprobadas. Primer paso Dell: simulacion sin
+   mantenimiento. Ver documento de coordinador para limites y hallazgo del gestor.
+   Simular la secuencia sin escrituras; probar
    cierre SDK antes de cycle(), parada del gestor, watchdog y persistencia. Consulta
    real solo con mantenimiento; aplicacion de fechas con paquete nuevo requiere
    aceptacion y comparacion frente a r2. Resolver recuperacion/gaps antes de

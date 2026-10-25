@@ -1,0 +1,10 @@
+{
+  "release": "2026.10.14-r2",
+  "scope": "Referencia inmutable para ciclo readonly; coordinador nunca llama apply=True.",
+  "files": {
+    "sincronizar_vigencias.py": "581dfa4cd428830321e3aa879812d9d8bdc09c785b3497bb97cc39b689915e35",
+    "sync_runtime.py": "adf6ded72c3f87133636a342b4d284376755fb43748679fbbb4468e5ccbfa666",
+    "c3_worker.py": "3cfb31a51fd2124d478dea434623753dd02652120eb981d8b27f8a4c571eef4c",
+    "c3_panel.py": "e3c4915c38979477e94ab55de369766446dc4e8de896b49913d298904e3dd6ed"
+  }
+}

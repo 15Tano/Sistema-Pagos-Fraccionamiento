@@ -1,0 +1,78 @@
+{
+  "release": "2026.10.24-1",
+  "scope": "Ensayo readonly; sin instalacion operativa.",
+  "files": [
+    {
+      "name": "ensayo_coordinador.py",
+      "sha256": "ed17033411807ddfdeb91f51dab2eefed381714db714414b48c34702e3ec319c"
+    },
+    {
+      "name": "coordinador.py",
+      "sha256": "bf5450bb5609bc48b64386aeedb05c20127bfd35ddff0ea48574619ddba7e615"
+    },
+    {
+      "name": "captura_rt.py",
+      "sha256": "21d09a7b5595c172b9241d80ea4bf152f5b6926001d4a7a3b789b036ffb25dd0"
+    },
+    {
+      "name": "referencia_vigencias.py",
+      "sha256": "8ad86d0110a8e1a6ada78b2e939b5cbcdd6f9839da9fd13f14aa4a6c3e17abe9"
+    },
+    {
+      "name": "outbox.py",
+      "sha256": "f00112ac88f1b3268aac628bc4987c3f9ca7e723c22f98aadc05cb71fba012ad"
+    },
+    {
+      "name": "protocolo.py",
+      "sha256": "5f43b055d0a11a2afe3e3f9cf86ec3ac2682f6c3704ee8c27c1ec69a20c266fb"
+    },
+    {
+      "name": "emisor.py",
+      "sha256": "0e7cef854b88c739274a1b2d82408bcb2c2a2629ec7cc7e10b015fabcc78359a"
+    },
+    {
+      "name": "credencial.py",
+      "sha256": "06d9e15b02a58fe0b8cc3fd10f2b3e1df531f1e753df82e2b7b75fdcb998744a"
+    },
+    {
+      "name": "agente.py",
+      "sha256": "8de9d03c5ee92aaa43d8f71876e205dcaf7f6ff7b1b1761fb23d642eb57071a5"
+    },
+    {
+      "name": "lanzar_lectura_coordinador.ps1",
+      "sha256": "7ccacb5bd798426bcd497a4bc2d841e9a27262599bd6afa6107d5ff7f84c5315"
+    },
+    {
+      "name": "verificar_coordinador.ps1",
+      "sha256": "de0d278593828d93f3daf8294d3e1e6864e36d5e2aa924dd843e3b0a39b5beaa"
+    },
+    {
+      "name": "LEEME_COORDINADOR.md",
+      "sha256": "494373f03254414f437c8575640b349d2340ee26f545b825571542a11799c0f7"
+    },
+    {
+      "name": "referencia_r2/sincronizar_vigencias.py",
+      "sha256": "581dfa4cd428830321e3aa879812d9d8bdc09c785b3497bb97cc39b689915e35"
+    },
+    {
+      "name": "referencia_r2/sync_runtime.py",
+      "sha256": "adf6ded72c3f87133636a342b4d284376755fb43748679fbbb4468e5ccbfa666"
+    },
+    {
+      "name": "referencia_r2/c3_worker.py",
+      "sha256": "3cfb31a51fd2124d478dea434623753dd02652120eb981d8b27f8a4c571eef4c"
+    },
+    {
+      "name": "referencia_r2/c3_panel.py",
+      "sha256": "e3c4915c38979477e94ab55de369766446dc4e8de896b49913d298904e3dd6ed"
+    },
+    {
+      "name": "referencia_r2/FUENTE.json",
+      "sha256": "1475752e7a6415dac1556b56073466e91054585edfbcc80d9d506d4f895d1481"
+    },
+    {
+      "name": "runtime/lector_eventos.py",
+      "sha256": "8e92df0ebd7de0645d53ffdcfeccaa4444418744ddc3e5c3ae5f65a9a4275eee"
+    }
+  ]
+}
