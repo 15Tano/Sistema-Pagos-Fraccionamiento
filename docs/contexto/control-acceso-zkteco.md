@@ -12,11 +12,13 @@ Se explico y el usuario acepto conceptualmente ampliar el backend Laravel actual
 no hace falta otra API desplegada ni otro servidor para esta arquitectura.
 Estado actual: lectura real y correlacion RT/historial verificadas en caseta;
 backend de ingesta implementado y validado localmente en SQLite y MySQL aislado.
-Emisor/outbox preparado y probado localmente (23 pruebas), sin instalar en caseta.
+Emisor/outbox validado localmente y cliente manual en Dell con entrega de fixtures
+al backend aislado confirmada por ACK; sin recolector permanente instalado.
 Pantalla, coordinador SDK y cola de operaciones siguen pendientes. No hay autorizacion
 de despliegue de esta ampliacion. Entorno Dell compatible con SQLite en disco y
-DPAPI segun preflight; proxima validacion: entrega al servidor de ensayo remoto
-antes de integrar lectura SDK con el coordinador.
+DPAPI segun preflight; entrega al servidor de ensayo remoto comprobada tras
+reintento sin conexion. Siguiente etapa: integrar lectura SDK con coordinador
+en carpeta separada, sin cambiar aun la instalacion operativa.
 
 Las secciones siguientes conservan la secuencia historica de decisiones y pruebas;
 consultar los cierres al final para distinguir pendientes anteriores ya resueltos.
@@ -683,3 +685,15 @@ polling reanudado. No se aporto estado de vigilancia; no se certifica reloj,
 cruce fisico ni comportamiento de clientes externos. Siguiente etapa autorizada
 pendiente: entrega ficticia del emisor Dell al backend aislado mediante tunel SSH,
 sin volver a pausar polling ni consultar SDK para esa prueba.
+
+## Entrega ficticia Dell a servidor validada — 2026-10-24
+
+Tras fallo de conexion esperado y conservacion de pendientes, usuario comparte
+envio por ruta privada de ensayo: acked/acked/idle, despues idle. Dos mensajes
+confirmados, cero pendientes, tres originales con mismos UUID/bytes/hashes.
+ACK lote informa 3 respuestas, 2 filas (1 evento y 1 estado255) y 1 error SDK
+ficticio conservado sin interpretar. ACK received UTC 2026-10-25T01:29:58.934905Z;
+estado a 01:29:59.460732Z. Entrega y reintento comprobados para fixtures, no para
+los eventos reales del tag 12230693. Detalle en control-acceso-ensayo-remoto.md.
+Se solicita detener servidor temporal y tunel con Ctrl+C al concluir; no tocar
+polling ni borrar evidencias. Coordinador, tareas nuevas y despliegue pendientes.

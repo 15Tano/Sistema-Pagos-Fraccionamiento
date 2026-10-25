@@ -131,3 +131,40 @@ conexion; no certifica caida general de Internet, autenticacion ni recepcion rem
 No se consulto SDK ni se requirio mantenimiento. Pendiente reiniciar PHP de
 ensayo si sigue detenido, abrir tunel 18881 y reenviar estos mismos pendientes;
 comprobar ACK, hashes/identidades conservados y segundo enviar sin nuevos mensajes.
+
+## Entrega desde Dell confirmada — 2026-10-24
+
+Usuario comparte las dos salidas de enviar despues de abrir servidor/tunel segun
+el procedimiento. Primer comando: delivery=[acked,acked,idle]; segundo: [idle].
+Ambos muestran messages.acked=2, responses=3, unbatched=0, pending_count=0,
+paused vacio y oldest_pending_utc=null. Los UUID, secuencias y hashes de los dos
+mensajes coinciden exactamente con los pendientes conservados en el fallo previo.
+Lote f640e2c4-63a9-4fae-90e8-440c2b39ea54 termina attempts=2 (fallo previo +
+entrega), estado 8d3b4772-b0d9-499e-843f-1de1a9e2475c attempts=1; error=null.
+
+ACK de lote: accepted, protocol_version=1, agente esperado, batch_id/hash
+coincidentes, server_received_at_utc=2026-10-25T01:29:58.934905Z. Informa
+responses_stored=3, rows_stored=2, events_stored=1, statuses_stored=1 y
+responses_pending_interpretation=1. Este ultimo es el error SDK ficticio -2
+conservado como sdk_error, no una falla de entrega. ACK de estado: accepted,
+sequence=0, session_id=d5c7e201-5cf1-4b08-a3b5-5e353853c568, hash coincidente,
+server_received_at_utc=2026-10-25T01:29:59.460732Z (24 octubre 19:29:59 Mexico).
+
+Los tres originales conservan 41/35/16 bytes y hashes:
+- 0001: 1e1ae8648ea9000a090bb595efe8898320f8d88c61684fb899a97126c5c619b6.
+- 0002: 96381db5e541563b2d40f24013e1fcbb7336f39d0ebad7d4c1536a4447dda99b.
+- 0003: 283474c1aeffde2affe854ce1bb4b066e4452d720ff79610141e819a840b7cce.
+
+Entrega autenticada por la ruta de ensayo, ACK validado/guardado en Dell y
+recuperacion del pendiente tras fallo de conexion comprobados para estos fixtures.
+El segundo comando no hizo nuevos envios ni aumento intentos. No equivale a
+probar perdida de ACK tras commit remoto ni reenvio deliberado de un lote ya
+aceptado; esos escenarios siguen cubiertos por pruebas locales, no por este paso.
+Conteos remotos son los informados por ACK; no se hizo inspeccion SQL independiente
+de la SQLite remota en esta salida. No se enviaron eventos reales de los tags,
+no se instalo recolector/tarea y no se ejecuto deploy/push. Emisor no toca SDK
+ni polling. Solicitado Ctrl+C en ventanas de servidor PHP temporal y tunel al
+terminar, conservando carpetas/bases/evidencia; cierre de procesos aun no aportado.
+Siguiente etapa: coordinador SDK en carpeta separada, prioridad de vigencias y
+parada/mantenimiento cooperativos; instalacion permanente requiere transicion
+autorizada y sigue pendiente.

@@ -2,8 +2,10 @@
 
 Diseno al 2026-10-23. Usuario confirma la primera entrega de backend local:
 ingesta autenticada, almacenamiento y pruebas. Esa etapa ya esta implementada
-localmente; no se ha desplegado ni conectado con caseta. Emisor/outbox local tambien
-preparado y probado (23 pruebas); coordinador, pantalla y operaciones pendientes.
+localmente; no se ha desplegado en produccion. Actualizacion 2026-10-24:
+emisor/outbox y cliente manual Dell entregan fixtures a backend aislado por tunel
+SSH, con reintento previo sin conexion, ACK y originales conservados. No hay
+recolector continuo instalado; coordinador, pantalla y operaciones pendientes.
 Ver [emisor local](control-acceso-emisor-local.md). Contrato exacto y evidencia de pruebas en
 [control-acceso-api-v1.md](control-acceso-api-v1.md); evidencia de hardware en
 [control-acceso-zkteco.md](control-acceso-zkteco.md).

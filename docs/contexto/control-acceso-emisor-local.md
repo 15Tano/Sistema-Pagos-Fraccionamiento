@@ -131,3 +131,13 @@ y 2 mensajes; enviar devuelve retry/network, aumenta a 1 el intento del lote y
 mantiene ambos pendientes, ACK nulo, sin pausa ni cambio de UUID/hashes. Base creada
 2026-10-25T01:23:30.251481+00:00. La entrega al servidor y ACK siguen pendientes;
 identidades/hashes para verificar el siguiente envío en control-acceso-ensayo-remoto.md.
+
+Entrega remota posteriormente confirmada: enviar devuelve acked/acked/idle y el
+segundo comando idle; dos mensajes confirmados, cero pendientes, tres originales
+con los mismos bytes/hashes. UUID/hash/secuencias coinciden con el fallo previo,
+sin regeneracion; lote attempts=2 y estado attempts=1. ACK received UTC
+2026-10-25T01:29:58.934905Z / 01:29:59.460732Z. Lote informa 3 respuestas,
+2 filas (1 evento/1 estado255) y 1 respuesta sin interpretar (error SDK ficticio).
+Recepcion autenticada y ACK persistido en Dell verificados para fixtures. No
+supone un recolector continuo instalado ni evento real enviado; siguiente etapa
+coordinador aparte. Cierre manual del servidor temporal/tunel solicitado.
