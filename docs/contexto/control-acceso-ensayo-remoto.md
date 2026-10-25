@@ -168,3 +168,11 @@ terminar, conservando carpetas/bases/evidencia; cierre de procesos aun no aporta
 Siguiente etapa: coordinador SDK en carpeta separada, prioridad de vigencias y
 parada/mantenimiento cooperativos; instalacion permanente requiere transicion
 autorizada y sigue pendiente.
+
+2026-10-24, preparacion de coordinador: usuario crea en esta misma copia aislada
+un agente adicional para serial real CO2K225060027, nombre EnsayoCoordinadorC3,
+UUID c8d7ccdc-991f-497c-8383-92fb52921f8a. Salida Artisan privada con umask077 en
+datos/alta-controlador-real.txt; solo UUID compartido. TEST-C3-001 permanece aparte.
+La nueva credencial aun no se importa a Dell ni se envia un lote de ese agente.
+Simulacion del coordinador en Dell aprobada; siguiente lectura readonly acotada
+durante mantenimiento, sin HTTP. Ver control-acceso-coordinador.md.

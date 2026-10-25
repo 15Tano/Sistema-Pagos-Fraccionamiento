@@ -127,3 +127,20 @@ datos/alta-controlador-real.txt y mostrar solo agent_id. No rotar ni reutilizar
 el agente ficticio TEST-C3-001. No requiere PHP HTTP/tunel ni pausa del polling
 para esta preparacion. Lectura real seguira despues de obtener ese UUID y coordinar
 mantenimiento; todavia no se ejecuto.
+
+## Agente de ensayo del serial real creado — 2026-10-24
+
+Usuario ejecuta por SSH el comando Artisan crear dentro del backend aislado,
+con entorno limpio, guardas de listo.json/ensayo.sqlite, archivo nuevo y umask077.
+Salida solo agent_id: c8d7ccdc-991f-497c-8383-92fb52921f8a, para
+CO2K225060027, nombre EnsayoCoordinadorC3. Credencial permanece en
+/root/sanisidro-ensayos/acceso-20261023-1/datos/alta-controlador-real.txt; no se
+compartio token ni se importo aun en Dell. No se cambio el agente ficticio previo.
+UUID no secreto para inicializar almacen real de lectura del coordinador.
+
+Siguiente ensayo preparado: lanzar_lectura_coordinador.ps1 -Agente con ese UUID
+-Seconds150, desde carpeta separada, durante mantenimiento confirmado. Compara
+vigencias sin aplicarlas, observa trafico normal, guarda originales y termina;
+no necesita presentar tags ni HTTP/tunel. Tras Cierre coordinador, reanudar por
+gestor y exigir dos ciclos posteriores. Lectura real y reanudacion de ESTA etapa
+todavia pendientes; simulacion no se toma como evidencia de hardware.
