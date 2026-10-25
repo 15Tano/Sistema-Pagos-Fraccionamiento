@@ -195,3 +195,39 @@ aplicaron vigencias desde el coordinador ni se instalo servicio continuo. Quedan
 pendientes vigilancia observada, parada propia/recovery en hardware y entrega
 autenticada de estas capturas. Siguiente: importar credencial del agente real
 a DPAPI y enviar su outbox al backend aislado, sin nueva pausa ni consultas SDK.
+
+## Complemento de entrega preparado — 2026-10-24
+
+Usuario pregunta como continuar con esa entrega. Preparado entregar_coordinador.py
+en tools/agente_acceso y ZIP independiente Entrega_Coordinador_2026.10.24-1.zip,
+4 archivos, SHA256 bdad2b8c196c4f7e36ae84fdb60a6ea0c9824192c088ac2bfb968ea6af01581f.
+Manifiesto y verificador PowerShell correctos, fuentes/ZIP coinciden, sin datos
+ni credenciales. No reemplaza paquetes/fuentes del coordinador.
+
+Reutiliza outbox/protocolo/emisor/credencial de CoordinadorEnsayo_20261024, exige
+sus cuatro hashes conocidos, base existente datos/lectura_mantenimiento/outbox.sqlite,
+UUID c8d7ccdc-991f-497c-8383-92fb52921f8a y serial CO2K225060027. Nunca inicializa
+otra base ni cambia identidad. Configurar lee por stdin la salida privada de
+alta-controlador-real.txt mediante SSH, hasta4096bytes, ID/token unicos y formato
+estricto; guarda solo credencial-ingesta.dpapi en carpeta de datos, usuario Dell.
+No imprime/guarda secreto en texto claro ni lo usa por argumentos.
+
+Estado muestra conteos, sumas ACK y manifiesto SHA256 de originales, sin tarjetas
+ni payload. Enviar agrupa sin lote, conserva UUID/cuerpos existentes y verifica
+hash/base64/metadatos de originales SQLite antes/despues. No relee todos los
+buffer.bin independientes. Usa Sender/ACK existente, destino fijo loopback18881
+por tunel al backend aislado. Tanda hasta100mensajes/60s mas llamada en curso,
+progreso cada5ACK; retry/limit conservan pendientes, errores permanentes pausan.
+Resumen en entrega_resumen.json y ACK completos en SQLite. Sin SDK, Access,
+tareas o nuevas capturas; no requiere mantenimiento ni altera polling.
+
+50 pruebas locales aprobadas, 15.603s: 43 anteriores y 7 nuevas (ID/token/limite,
+DPAPI real, biblioteca alterada, falta de red, identidad incorrecta, original
+corrupto antes de HTTP y entrega a Laravel real local con segundo envio idle).
+Fixtures y agente/serial equivalentes, sin conectar caseta ni produccion. Se
+verifico el ZIP por rutas/archivos/hashes; no se modifico backend.
+
+Pendientes: verificar complemento en Dell, importar credencial y comprobar estado
+de las93respuestas; despues entregar por SSH y confirmar cero pendientes, sumas
+ACK y originales/mensajes existentes sin cambios. Todavia no se envio ningun
+lote real de este agente. Pasos completos en LEEME_ENTREGA.md del paquete.

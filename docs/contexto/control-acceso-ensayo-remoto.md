@@ -176,3 +176,11 @@ datos/alta-controlador-real.txt; solo UUID compartido. TEST-C3-001 permanece apa
 La nueva credencial aun no se importa a Dell ni se envia un lote de ese agente.
 Simulacion del coordinador en Dell aprobada; siguiente lectura readonly acotada
 durante mantenimiento, sin HTTP. Ver control-acceso-coordinador.md.
+
+Tras ensayo readonly real del coordinador (93respuestas) y reanudacion r2
+confirmada con dos ciclos, se prepara complemento de entrega independiente:
+Entrega_Coordinador_2026.10.24-1.zip. Importa desde alta-controlador-real.txt por
+SSH directo a DPAPI y usa la outbox existente del UUID real; no toca SDK/polling.
+50 pruebas locales aprobadas (7 nuevas), incluyendo entrega a Laravel aislado
+local y segundo envio idle. Provision/importacion en Dell y recepcion remota de
+estas93respuestas todavia pendientes. Fuentes, SHA y pasos en documento de coordinador.

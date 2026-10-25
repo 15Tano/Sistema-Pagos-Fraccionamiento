@@ -1,0 +1,17 @@
+{
+  "release": "2026.10.24-1",
+  "files": [
+    {
+      "name": "entregar_coordinador.py",
+      "sha256": "bd7ac50080f5ac8d78f91ea03d1e7d1c1c7dfe648a5e8d19a36a33188f51e005"
+    },
+    {
+      "name": "LEEME_ENTREGA.md",
+      "sha256": "0fa197277060b662b69cf014819ddfa3497021b995641c589a3963f6cdb26d7a"
+    },
+    {
+      "name": "verificar_entrega.ps1",
+      "sha256": "a756f291a296105f943e9f0d94ebd7f352136c7fef98286098e7179bcb5a5231"
+    }
+  ]
+}
