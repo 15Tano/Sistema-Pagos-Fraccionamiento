@@ -19,6 +19,7 @@ La documentación permanente de este proyecto está en `docs/contexto/`. Al come
 | [Ensayo remoto de acceso](docs/contexto/control-acceso-ensayo-remoto.md) | 2026-10-25 | ACK de 228 respuestas reales en ensayo aislado, cero pendientes y originales conservados; segundo envío idle. |
 | [Coordinador de acceso](docs/contexto/control-acceso-coordinador.md) | 2026-10-25 | Parada por botón y cierre de dos trabajadores confirmados; polling reanudado con dos ciclos correctos, 228 respuestas y un mensaje local pendiente. |
 | [Operación de acceso](docs/contexto/control-acceso-operacion.md) | 2026-10-25 | Enlace r2 probado: pausa, parada solicitada, verificación de cierre y retorno del polling; integración permanente y vigilancia automática pendientes. |
+| [Emisor vigilado de acceso](docs/contexto/control-acceso-envio-vigilado.md) | 2026-10-25 | Candidato acotado sin SDK, emisor hijo y salud separada; 33 pruebas nuevas y 175 totales aprobadas, validación Dell pendiente. |
 
 Estos documentos contienen contexto histórico, no una certificación del estado actual del código o de producción. Verifica archivos, configuración y pruebas pertinentes antes de afirmar que algo está implementado, desplegado o pendiente. Una instrucción actual del usuario actualiza las preferencias históricas. Para decisiones documentadas que se contradigan, usa la decisión explícita más reciente; si la fecha o el alcance no resuelven la contradicción, expón la duda antes de implementar lo que dependa de ella.
 

@@ -141,3 +141,8 @@ sin regeneracion; lote attempts=2 y estado attempts=1. ACK received UTC
 Recepcion autenticada y ACK persistido en Dell verificados para fixtures. No
 supone un recolector continuo instalado ni evento real enviado; siguiente etapa
 coordinador aparte. Cierre manual del servidor temporal/tunel solicitado.
+
+2026-10-25: preparado candidato de envio automatico acotado y vigilancia con
+hijo HTTP separado, sin SDK ni tareas nuevas. Reutiliza bibliotecas publicadas
+sin cambiarlas;33pruebas nuevas y175totales aprobadas localmente. Simulacion
+Dell y ensayo real pendientes. Detalle en control-acceso-envio-vigilado.md.

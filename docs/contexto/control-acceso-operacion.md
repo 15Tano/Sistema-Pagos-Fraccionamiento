@@ -716,3 +716,17 @@ panel normalmente por X al terminar controles; polling debe continuar activo.
 Pendientes: mensaje de estado local, envio automatico independiente, vigilancia
 integrada, recuperacion/retencion/reconciliacion y transicion permanente. No
 hay nuevo deploy, aplicar fechas desde candidato ni screen/endpoints de consulta.
+
+## Emisor automatico acotado y vigilancia preparados — 2026-10-25
+
+Usuario indica continuar y autoriza pruebas aisladas del nuevo componente.
+Preparado Envio_Vigilado_2026.10.25-1.zip en carpeta separada: padre supervisor,
+hijo HTTP sin SDK/Access, cola/credencial existentes, destino fijo backend
+aislado y salud de emisor separada de vigencias. Ventana5..180s, sin instalar
+tarea/servicio ni sustituir vigilancia actual. No modo operativo SDK/aplicar.
+33pruebas nuevas y175totales aprobadas; simulacion de ZIP extraido correcta.
+Plan, limites, SHA, fuentes congeladas y evidencia en control-acceso-envio-vigilado.md.
+Primero verificar y simular en Dell sin mantenimiento; recepcion Dell y envio
+real con este supervisor pendientes. Ultima salud real de polling permanece
+en retorno de12:28-12:30, no renovada por pruebas locales. Sigue1mensaje local
+pendiente segun ultima salida, sin nuevo ACK aportado. No repetir lectura SDK.

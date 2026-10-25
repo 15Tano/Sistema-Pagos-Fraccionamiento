@@ -1,0 +1,66 @@
+{
+  "release": "2026.10.25-1",
+  "scope": "Ensayo acotado sin SDK ni instalacion permanente.",
+  "files": [
+    {
+      "name": "envio_vigilado.py",
+      "sha256": "dfee70e1972f45e51213f7588b5c2c4ae44b0cf0f8dc060c1bcb5eba2e2b298c"
+    },
+    {
+      "name": "bucle_envio.py",
+      "sha256": "8f814abd4cf421319f9d1bba6552de32acf48391809ab60a0cabe4d621d463fa"
+    },
+    {
+      "name": "vigilancia_envio.py",
+      "sha256": "2ed92e1423608f7e6d5902ca53ec9599d6b7c2bc6a40ecb4366d5140455bdd81"
+    },
+    {
+      "name": "simular_envio.py",
+      "sha256": "947fa164f15c7ccbe2f8e666f3cb5ad734cbc6e02fe864685c9298b1f3c3efa7"
+    },
+    {
+      "name": "verificar_envio.ps1",
+      "sha256": "f2952f2fd26b664417b6ad5a44f106347ae9a04a0d5446798a1646b87e1ca738"
+    },
+    {
+      "name": "LEEME_ENVIO_VIGILADO.md",
+      "sha256": "cab245c65303610e72fbac7ee8ec7614a60d0ee19795d42dbfe92cb912fd4e3b"
+    },
+    {
+      "name": "tests/test_envio_vigilado.py",
+      "sha256": "04d35d2668fa3c74a6fbf1398bd751af6ad1bf95c0cfbd7e898f03976253e925"
+    },
+    {
+      "name": "runtime/outbox.py",
+      "sha256": "f00112ac88f1b3268aac628bc4987c3f9ca7e723c22f98aadc05cb71fba012ad"
+    },
+    {
+      "name": "runtime/protocolo.py",
+      "sha256": "5f43b055d0a11a2afe3e3f9cf86ec3ac2682f6c3704ee8c27c1ec69a20c266fb"
+    },
+    {
+      "name": "runtime/emisor.py",
+      "sha256": "0e7cef854b88c739274a1b2d82408bcb2c2a2629ec7cc7e10b015fabcc78359a"
+    },
+    {
+      "name": "runtime/credencial.py",
+      "sha256": "06d9e15b02a58fe0b8cc3fd10f2b3e1df531f1e753df82e2b7b75fdcb998744a"
+    },
+    {
+      "name": "runtime/entregar_coordinador.py",
+      "sha256": "bd7ac50080f5ac8d78f91ea03d1e7d1c1c7dfe648a5e8d19a36a33188f51e005"
+    },
+    {
+      "name": "runtime/enlace_candidato.py",
+      "sha256": "b6daa663747ead2c90f802cc2a280273885a0d9f62f7ac5a516b1eb6122e0a62"
+    },
+    {
+      "name": "runtime/control_operativo.py",
+      "sha256": "17251c5f6617660751479be6d701f7cdb59dae3041505dc9801cd4dd09f9faa8"
+    },
+    {
+      "name": "runtime/salud_operativa.py",
+      "sha256": "d4e310d240674adc7f9ea3d5da02f140a9591a12d56ecf944a46c65adfbe19aa"
+    }
+  ]
+}
