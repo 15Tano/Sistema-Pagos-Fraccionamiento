@@ -77,3 +77,80 @@ originales conservados, vigencias correcto. Pruebas locales no la renuevan.
 Servicio operativo/aplicar, vigilancia continua con alertas, retencion,
 reconciliacion, rollback y transicion autorizada pendientes. Sin pantalla web,
 endpoints nuevos ni push/deploy por preparar el ensayo.
+
+## Primer intento real bloqueado — 2026-10-25
+
+Usuario confirma /salud por tunel18881: ensayo_listo/TEST-C3-001. Despues
+ejecuta --mantenimiento --seconds150; unica salida aportada:
+CONJUNTO NO CONFIRMADO: RuntimeError. Conservar mantenimiento/evidencia.
+No aparece anuncio CONJUNTO SOLO LECTURA ni resultado/sesion; codigo revisado
+situa el anuncio antes de crear hijos. Causa exacta pendiente: el manejador
+general solo imprime tipo. Solicitar lecturas de mantenimiento/tarea, almacen,
+estado SDK previo y marcadores conjuntos. No repetir ensayo ni borrar marcas
+o reanudar hasta determinar estado. No atribuir a DLL, tunel o credenciales.
+Simulacion Dell sigue aprobada; ejecucion conjunta real no validada.
+
+Salida posterior del usuario confirma SanIsidro-Vigencias Running/Enabled=true
+y mantenimiento.active=false. Esto satisface la condicion exacta de rechazo
+RuntimeError en maintenance_guard, antes de iniciar hijos SDK/HTTP. No corregir
+paquete ni eludir guard: preparar mantenimiento desde gestor instalado y
+comprobar tarea Disabled/Enabled=false, active=true y polling stopped antes
+de reintentar. Salida de objetos PowerShell posteriores no visible: el primer
+tipo tabular puede ocultar propiedades distintas; pedir Format-List por lectura.
+Revision/cierre inseguro y estado SDK previo no se acreditan con esa salida.
+
+Pausa posterior confirmada por usuario: tarea Disabled/Enabled=false,
+mantenimiento.active=true, started=2026-10-25T15:22:41.7000562-06:00,
+wasEnabled=true; estado polling PID15600, phase=stopped,
+consecutive_errors=0. Se indica reintento conjunto150s manteniendo servidor/
+tunel, seguido de --verificar-cierre. Resultado real y retorno a r2 pendientes.
+
+## Ensayo conjunto real aprobado — 2026-10-25
+
+Salida completa aportada por usuario en adjunto f547de3a-88a5-43c2-bee1-e1587d9bb50a:
+phase=stopped, trial_passed/reader_ok/sender_ok/delivery_complete=true,
+orchestration_error_type=null y safe_to_resume_candidate=true. Padre PID14316,
+run_id=4a3c1d44-0cec-46a9-af52-9903d60b673a; ended_utc
+2026-10-25T21:26:27.867919+00:00. Evidencia Dell:
+C:\SanIsidro\EnsayoConjunto_20261025\datos\sesiones\4a3c1d44-0cec-46a9-af52-9903d60b673a.
+
+SDK PID7112/run290a541f-9e13-4cce-a65a-17c9c3cd03e7, launcher9636,
+started_utc21:23:49.172851Z; 3 ciclos readonly, errores consecutivos/totales0,
+ultimo completado21:26:11.063796Z. reader_error/storage_error=null, gate sin
+fault/active; salida0 y cierre confirmado, recibos acumulados14 (antes8).
+stop_reason=requested corresponde a parada cooperativa del supervisor.
+
+Emisor PID5112/runa942d826-6c2d-43c6-b839-c79a68106d6f, hijo15324,
+salidas0/cierre confirmado, sin terminacion forzada ni errores; fin21:26:19.026499Z.
+outcomes acked77/idle114; ultimo ACK21:26:12.101140Z. Agente/serial real
+previo conservado. Total162acked (20estados/142lotes), 300respuestas/filas:
+207eventos/93estados, interpretacion pendiente0. Frente a228/85 previos:
++72respuestas (+50eventos/+22estados), +77mensajes (+5estados/+72lotes).
+Pendientes0, unbatched0, pausa vacia. Originales228anteriores preservados,
+existing_messages_unchanged=true; 300originales y cuerpos162 hashes verificados.
+Nuevo manifiesto original:
+5afb571cd792b0772729284d932530a19af166a8d1f4c4845f5edc243348be46.
+Son ACK/reportes del ensayo, no inspeccion SQL remota independiente, certificacion
+de frescura, historial completo ni conteo de vehiculos.
+
+Vigilancia observada21:26:18.550774Z: mantenimiento, Vigencias Disabled/false,
+Vigilancia Ready/true, read_errors=[], watchdog instalado sin reemplazar.
+Polling PID15600 permanecio stopped, last_ok21:22:04.488970Z sin renovarse por
+el ensayo. --verificar-cierre aun NO aportado: ejecutar antes de Terminar y
+reanudar por gestor instalado y comprobar dos ciclos nuevos. No confundir
+safe_to_resume_candidate del resultado con esa comprobacion posterior.
+Sin despliegue ni servicio permanente; aceptacion conjunta acotada validada.
+
+## Cierre final y retorno a r2 confirmados — 2026-10-25
+
+Usuario ejecuta --verificar-cierre: cierre_conjunto_confirmado para padre14316/
+run4a3c1d44-0cec-46a9-af52-9903d60b673a a21:28:45.162974Z. Despues del
+gestor: tarea SanIsidro-Vigencias Running/Enabled=true, protocol2, nuevo
+PID12648/run_started21:29:15.343791Z, phase=idle, consecutive_errors=0,
+last_error_type=null, last_ok21:30:22.584663Z. Dos ciclos nuevos correctos:
+15:29:19.174 y15:30:22.586 Mexico, ambos API838/cambios Access0/C30,
+no encontrados4 y ausentes API sin cambios116. Parada anterior15:22:42.063.
+Se cierra aceptacion del ensayo conjunto readonly y retorno al polling.
+No es instalacion de recolector/emisor permanentes; no afirmar que siguen
+leyendo/enviando tras FIN. No hubo nueva evidencia de watchdog al reanudar
+ni cierre de ventanas servidor/tunel; conservar originales, ACK y laboratorio.

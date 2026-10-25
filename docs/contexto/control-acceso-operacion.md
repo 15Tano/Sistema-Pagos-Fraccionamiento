@@ -749,3 +749,13 @@ pendiente, primero solo simulacion. No usar botones del enlace2 para el nuevo
 nombre/ruta: pausa y reanudacion siguen por gestor instalado, despues de FIN
 y verificacion del conjunto. No instala tareas ni reemplaza vigilancia.
 Detalle del paquete, limites y secuencia en control-acceso-ensayo-conjunto.md.
+
+Aceptacion posterior 2026-10-25: ensayo conjunto150s aprobado, 3ciclos readonly
+sin errores, ACK nuevos77, 300respuestas/162mensajes acumulados/cola vacia,
+originales conservados y cierres SDK/HTTP confirmados. Verificacion final propia
+cierre_conjunto_confirmado a21:28:45.162974Z, despues reanudacion por gestor:
+SanIsidro-Vigencias Running/Enabled=true, PID12648/protocol2/idle/errores0,
+last_ok21:30:22.584663Z. Dos ciclos correctos15:29:19.174/15:30:22.586 Mexico,
+API838/cambios Access0/C30/no encontrados4/ausentes116 intactos. Pausa, ensayo,
+cierre y retorno acreditados; no integracion permanente ni sustitucion de tareas,
+gestor o vigilancia. Detalles/identidades en control-acceso-ensayo-conjunto.md.

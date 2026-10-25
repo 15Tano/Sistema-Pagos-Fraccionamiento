@@ -265,3 +265,20 @@ Reporte terminado20:00:34Z valida ACK persistidos, sin ACK fresco en esa ventana
 tuvo fallo local de snapshot; emisor2 termina limpiamente y confirma al hijo.
 Detalle/correccion y evidencia en control-acceso-envio-vigilado.md. Estado final
 de ventanas servidor/tunel no compartido; no inferir que hayan sido cerradas.
+
+2026-10-25, ensayo conjunto readonly/HTTP terminado21:26:27.867919Z:
+77mensajes nuevos confirmados durante lectura (ultimo ACK21:26:12.101140Z),
+total162acked=20estados+142lotes. ACK acumulados300respuestas/filas:
+207eventos/93estados, interpretacion pendiente0. Cola pendiente0/unbatched0.
+Originales228previos conservados, ahora300 con hashes verificados; cuerpos
+162verificados y mensajes existentes sin cambios. Nuevo manifiesto:
+5afb571cd792b0772729284d932530a19af166a8d1f4c4845f5edc243348be46.
+Tres ciclos readonly y cierres SDK/emisor correctos; no consulta SQL remota
+independiente ni certificacion de pasos/frescura. Verificacion final conjunta
+y reanudacion del polling pendientes; detalle en control-acceso-ensayo-conjunto.md.
+
+Salida posterior confirma cierre conjunto21:28:45.162974Z y retorno del polling
+PID12648 con dos ciclos correctos15:29:19.174/15:30:22.586 Mexico. No ACK
+adicional ni inspeccion SQL por esas lecturas; se mantienen totales300/162.
+Cierre de ventanas laboratorio/tunel no confirmado. Ensayo conjunto concluido;
+operacion continua aun sin instalar.

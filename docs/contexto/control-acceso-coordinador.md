@@ -528,3 +528,17 @@ envio2, con supervisor propio y adaptador readonly del escritor de estado.
 extraido aprobada. Primero verificar/simular en Dell sin mantenimiento ni SDK.
 Ejecucion conjunta real, cierres y retorno a r2 pendientes. Detalles y SHA en
 control-acceso-ensayo-conjunto.md. No reemplaza el polling ni sus controles.
+
+2026-10-25: primer ensayo conjunto real aprobado, padre14316/run
+4a3c1d44-0cec-46a9-af52-9903d60b673a, fin21:26:27.867919Z. Tres ciclos
+readonly sin errores; cierres SDK/HTTP confirmados, sin forzados. ACK nuevos77,
+300respuestas/162mensajes acumulados, cola vacia e integridad conservada.
+Polling permanecio en mantenimiento. Verificacion final --verificar-cierre y
+retorno a r2/dos ciclos aun pendientes. Evidencia/limites en ensayo-conjunto.
+
+Confirmacion posterior del mismo dia: --verificar-cierre conjunto confirma
+padre14316/run4a3c1d44-0cec-46a9-af52-9903d60b673a a21:28:45.162974Z.
+Polling reanudado PID12648, tarea Running/habilitada, protocol2/idle/errores0;
+ciclos correctos15:29:19.174 y15:30:22.586 Mexico, API838/sin cambios
+Access/C3/no encontrados4/ausentes116. Ensayo y retorno aceptados. Operacion
+permanente sigue pendiente; no nuevos ACK ni lectura despues de FIN acreditados.
