@@ -6,7 +6,8 @@ localmente; no se ha desplegado en produccion. Actualizacion 2026-10-24:
 emisor/outbox y cliente manual Dell entregan fixtures a backend aislado por tunel
 SSH, con reintento previo sin conexion, ACK y originales conservados. No hay
 recolector continuo instalado. Coordinador readonly separado preparado y probado
-localmente (43 pruebas); simulacion Dell aprobada, ensayo real pendiente. Pantalla y
+localmente (43 pruebas); simulacion Dell y ensayo readonly real aprobados (tres
+comparaciones, 93 respuestas, reanudacion con dos ciclos). Envio real pendiente. Pantalla y
 operaciones pendientes. Ver [coordinador](control-acceso-coordinador.md).
 Ver [emisor local](control-acceso-emisor-local.md). Contrato exacto y evidencia de pruebas en
 [control-acceso-api-v1.md](control-acceso-api-v1.md); evidencia de hardware en

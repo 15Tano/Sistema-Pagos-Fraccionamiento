@@ -1,8 +1,10 @@
 # Control de acceso: coordinador de ensayo
 
 2026-10-24. Usuario autoriza siguiente etapa tras validar capturas fisicas y
-entrega ficticia Dell -> Laravel aislado. Preparacion local, sin sustituir polling,
-gestor, vigilancia, DLL ni tareas. No hay push/despliegue de esta etapa.
+entrega ficticia Dell -> Laravel aislado. Preparado y ensayado en lectura real
+acotada: tres comparaciones, 93 respuestas, sin errores y polling reanudado con
+dos ciclos correctos. Sin sustituir polling, gestor, vigilancia, DLL ni tareas.
+No hay push/despliegue de esta etapa; envio de capturas reales aun pendiente.
 
 ## Implementacion preparada
 
@@ -144,3 +146,52 @@ vigencias sin aplicarlas, observa trafico normal, guarda originales y termina;
 no necesita presentar tags ni HTTP/tunel. Tras Cierre coordinador, reanudar por
 gestor y exigir dos ciclos posteriores. Lectura real y reanudacion de ESTA etapa
 todavia pendientes; simulacion no se toma como evidencia de hardware.
+
+## Primera lectura readonly real completada — 2026-10-24
+
+Usuario ejecuta lanzar_lectura_coordinador.ps1 -Agente
+c8d7ccdc-991f-497c-8383-92fb52921f8a -Seconds150 durante mantenimiento.
+PAQUETE VERIFICADO, ENSAYO SOLO LECTURA y Recuperados de originales=0.
+cycle_probe: mode=readonly, phase=waiting, completed=3, consecutive_errors=0,
+total_errors=0, last_error_type=null; last_completed_utc
+2026-10-25T02:14:34.198265+00:00 (24 octubre 20:14:34 Mexico).
+reader_error=null y storage_error=null. Health: responses=93, messages.pending=30,
+unbatched=3, pending_count=33, paused vacio. oldest_pending_utc
+2026-10-25T02:12:27.227609+00:00 (20:12:27 Mexico). Pendientes normales: no HTTP.
+
+Confirma en esta ejecucion la comparacion API/Access/C3 sin aplicar, captura RT
+real a SQLite y cierres secuenciados sin error observado. Son 93 respuestas, no
+93 vehiculos/eventos: pueden incluir estado255 y acumulados. No se imprimieron
+filas/codigos ni se certifica aqui frescura/reloj/completitud. Originales y salud
+propia en C:\SanIsidro\CoordinadorEnsayo_20261024\datos\lectura_mantenimiento.
+Recovery real no ejercitado: recuperados=0; queda la evidencia simulada/local.
+
+Termina con Cierre coordinador normal. Solicitado Terminar y reanudar en gestor;
+estado y dos ciclos correctos posteriores a ESTE ensayo pendientes. No reutilizar
+los cierres de pruebas de plumas. Credencial del agente real aun no importada a
+Dell y ningun lote de estas capturas enviado al backend aislado.
+
+Primera consulta posterior del usuario aun muestra estado detenido del proceso
+anterior PID7468: phase=stopped, last_ok_utc=2026-10-25T02:11:24.870961+00:00,
+heartbeat_utc=2026-10-25T02:11:55.963084+00:00 y errores0. Ultimo log PARADA
+ORDENADA 20:11:55.967 (sin escrituras en curso); ciclos correctos 20:08-20:11
+son previos al ensayo. No hay evidencia de nuevo PID/ciclo ni de reanudacion.
+No inferir causa ni fallo del coordinador de ese estado previo. Se indica usar
+Terminar y reanudar del gestor y obtener mensaje/estado de tarea y dos ciclos
+nuevos. No se ordena iniciar tarea por fuera del gestor ni borrar stop/lock.
+
+## Reanudacion posterior al coordinador confirmada — 2026-10-24
+
+Usuario comparte SanIsidro-Vigencias Running, Enabled=True, nuevo PID10868,
+run_started_utc=2026-10-25T02:22:20.317482+00:00 (24 octubre 20:22:20 Mexico).
+Estado protocol2, phase=idle, errores0, last_error_type=null y last_ok_utc
+2026-10-25T02:23:27.812375+00:00. Dos ciclos correctos posteriores al ensayo:
+20:22:24.503 y 20:23:27.814, ambos API838, cambios Access0/C3=0,
+no encontrados4, ausentes API conservados116. Reanudacion aceptada en esta ventana;
+la consulta anterior mostraba la parada, no era evidencia de fallo del ensayo.
+
+Cierra primera prueba readonly real del coordinador y retorno a r2. No se
+aplicaron vigencias desde el coordinador ni se instalo servicio continuo. Quedan
+pendientes vigilancia observada, parada propia/recovery en hardware y entrega
+autenticada de estas capturas. Siguiente: importar credencial del agente real
+a DPAPI y enviar su outbox al backend aislado, sin nueva pausa ni consultas SDK.

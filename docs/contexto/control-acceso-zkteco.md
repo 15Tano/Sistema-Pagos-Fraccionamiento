@@ -14,8 +14,9 @@ Estado actual: lectura real y correlacion RT/historial verificadas en caseta;
 backend de ingesta implementado y validado localmente en SQLite y MySQL aislado.
 Emisor/outbox validado localmente y cliente manual en Dell con entrega de fixtures
 al backend aislado confirmada por ACK; sin recolector permanente instalado.
-Coordinador readonly preparado aparte, con 43 pruebas locales y simulacion Dell
-aprobada; ensayo de su bucle SDK real pendiente. Pantalla y cola de operaciones pendientes.
+Coordinador readonly preparado aparte, con 43 pruebas locales, simulacion Dell y
+primera lectura real completadas: 3 comparaciones, 93 respuestas, sin errores;
+polling reanudado (PID10868, dos ciclos correctos). Pantalla y cola de operaciones pendientes.
 Ver [coordinador](control-acceso-coordinador.md). No hay autorizacion
 de despliegue de esta ampliacion. Entorno Dell compatible con SQLite en disco y
 DPAPI segun preflight; entrega al servidor de ensayo remoto comprobada tras
@@ -24,7 +25,9 @@ en carpeta separada, sin cambiar aun la instalacion operativa.
 
 Actualizacion 24 octubre: carpeta de ensayo preparada; simulacion en Dell
 posteriormente aprobada sin SDK/red/mantenimiento, cinco checks true y 139
-originales. Detalle y pendientes de lectura real en documento de coordinador.
+originales simulados. Primera lectura real posterior completada: 93 respuestas,
+no 93 vehiculos; reanudacion aceptada con ciclos 20:22:24 y 20:23:27, envio pendiente.
+Detalle en documento de coordinador.
 
 Las secciones siguientes conservan la secuencia historica de decisiones y pruebas;
 consultar los cierres al final para distinguir pendientes anteriores ya resueltos.
