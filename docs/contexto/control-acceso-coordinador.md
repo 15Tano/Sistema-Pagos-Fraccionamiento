@@ -431,3 +431,16 @@ cambio de vigencias ni deploy. Solicitar Ctrl+C en ventanas identificadas del
 servidor temporal y tunel, conservar datos; cierre aun no confirmado. Siguientes
 pendientes: integracion gestor/vigilancia, recuperacion tras fallo real, retencion
 y reconciliacion antes de transicion permanente autorizada.
+
+## Revision de integracion operativa iniciada — 2026-10-24
+
+Usuario indica seguir con gestor/vigilancia. Inspeccionadas fuentes reales de
+mantenimiento, monitor, runtime, lanzador/tareas y adaptador readonly. Diseno
+propuesto y criterios en control-acceso-operacion.md: conservar tarea/entrypoint,
+SDK propio secuenciado, envio sin bloquear vigencias, parada con identidad de
+ejecucion y salud separada. Hallazgo adicional: timeout del trabajador del ciclo
+r2 requiere tratamiento de cierre inseguro antes de permitir otro cliente SDK;
+adaptador readonly actual no transforma ese caso en UnsafeClosure. No se ha
+reproducido ese fallo en caseta ni cambiado implementacion. Solicitar inventario
+readonly de tareas, configuracion/estado vigilancia y hashes antes de preparar
+compatibilidad. Sin mantenimiento, SDK, tareas nuevas ni cambio de instalacion.
