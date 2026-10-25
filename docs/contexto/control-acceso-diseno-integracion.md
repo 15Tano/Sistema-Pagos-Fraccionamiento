@@ -29,7 +29,8 @@ Ver [emisor local](control-acceso-emisor-local.md). Contrato exacto y evidencia 
   ambas; tuplas nuevas en historial persistentes tras relectura/reconexion.
   DoorID 1 = entrada (direction_raw 0), DoorID 2 = salida (direction_raw 1) en
   estas pruebas del controlador. Nombres visibles Pluma 1/2 aun sin confirmar.
-  Polling tras salida aceptado con tres ciclos; cierre posterior a entrada pendiente.
+  Polling reanudado tras ambas: tres ciclos correctos despues de salida y dos
+  despues de entrada (19:01:35 y 19:02:38 del 24 octubre, PID 7468, errores 0).
 
 Primera entrega confirmada: almacenamiento y recepcion autenticada de estado y
 eventos observados. Pantalla, captura asistida y solicitudes de alta/recuperacion

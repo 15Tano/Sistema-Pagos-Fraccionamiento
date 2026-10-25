@@ -21,8 +21,8 @@ antes de integrar lectura SDK con el coordinador.
 Las secciones siguientes conservan la secuencia historica de decisiones y pruebas;
 consultar los cierres al final para distinguir pendientes anteriores ya resueltos.
 Reloj exacto sigue sin certificar. Pruebas fisicas del 24 octubre vinculan DoorID 1
-con entrada y DoorID 2 con salida. Equivalencia de nombres Pluma 1/2 pendiente;
-reanudacion posterior a la captura de entrada aun por comprobar (ver cierres).
+con entrada y DoorID 2 con salida. Reanudacion verificada tras ambas capturas.
+Equivalencia de nombres Pluma 1/2 pendiente (ver cierres).
 
 ## Base operativa comprobada
 
@@ -670,3 +670,16 @@ ni envio al backend de ensayo. No se alteraron vigencias/permisos por la captura
 El lector termino con Cierre diagnostico. Solicitado Terminar y reanudar desde el
 gestor; estado y dos ciclos correctos posteriores a ESTA captura de entrada
 pendientes. Los ciclos 18:56-18:58 cerraron salida y no certifican esta reanudacion.
+
+Cierre de entrada confirmado por salida posterior del usuario: parada ordenada
+19:00:13.614, proceso nuevo PID 7468 iniciado 2026-10-25T01:01:32.009440+00:00
+(24 octubre 19:01:32 Mexico). Estado protocol=2, phase=idle, consecutive_errors=0,
+last_ok_utc=2026-10-25T01:02:38.941578+00:00 y last_error_type=null.
+Dos ciclos correctos posteriores a entrada: 19:01:35.441 y 19:02:38.944;
+ambos API=838, cambios Access=0/C3=0, no encontrados=4, ausentes API sin cambios=116.
+Reanudacion aceptada para esta ventana. Ambas pruebas fisicas de entrada/salida
+quedan cerradas con evento nuevo, historial persistente, apertura reportada y
+polling reanudado. No se aporto estado de vigilancia; no se certifica reloj,
+cruce fisico ni comportamiento de clientes externos. Siguiente etapa autorizada
+pendiente: entrega ficticia del emisor Dell al backend aislado mediante tunel SSH,
+sin volver a pausar polling ni consultar SDK para esa prueba.

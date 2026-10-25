@@ -11,7 +11,7 @@ La documentación permanente de este proyecto está en `docs/contexto/`. Al come
 | [Learnings](docs/contexto/learnings.md) | 2026-09-15 | Aprendizajes técnicos y precauciones del proyecto. |
 | [Corte de caja](docs/contexto/corte-caja.md) | 2026-10-05 | Reglas de negocio, decisiones, evolución y pendientes del corte. |
 | [Temporadas y tematización](docs/contexto/temporadas-tematizacion.md) | 2026-10-08 | Alcance y decisiones de tematización del dashboard del vecino. |
-| [Control de acceso ZKTeco](docs/contexto/control-acceso-zkteco.md) | 2026-10-24 | Capturas físicas e historial comprobados: DoorID 1 entrada y 2 salida; reanudación posterior a entrada pendiente. |
+| [Control de acceso ZKTeco](docs/contexto/control-acceso-zkteco.md) | 2026-10-24 | Capturas físicas e historial comprobados: DoorID 1 entrada y 2 salida; polling reanudado y ciclos correctos tras ambas. |
 | [Diseño de integración de acceso](docs/contexto/control-acceso-diseno-integracion.md) | 2026-10-24 | Ingesta Laravel local y mapa físico entrada/salida observado; coordinador y etapas posteriores pendientes. |
 | [API de control de acceso v1](docs/contexto/control-acceso-api-v1.md) | 2026-10-23 | Contrato implementado localmente: autenticación del agente, estado, lotes, ACK, límites, pruebas y pendientes de ensayo. |
 | [Ensayo MySQL de acceso](docs/contexto/control-acceso-ensayo-mysql.md) | 2026-10-23 | MySQL 8.4.13 aislado: migración, concurrencia InnoDB, 24 pruebas aprobadas, repetición y cierre de la instancia temporal. |
