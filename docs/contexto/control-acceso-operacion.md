@@ -268,3 +268,26 @@ SHA799fe9b4d8b4b423411f3cd946a03fade74719bd62d617e9b06a464814244844.
 Destino Dell nuevo C:\SanIsidro\IntegracionOperativa_20261024_r3. No sobrescribir
 carpeta2 ni instalaciones. Pendiente simulacion con Python32 de Dell; siguiente
 enlace de adaptadores/cierre SDK/gestor/vigilancia aun no implementado ni instalado.
+
+## Simulacion de contratos aprobada en Dell/Python32 — 2026-10-24
+
+Usuario verifica paquete Integracion Operativa2026.10.24-3 y ejecuta
+simular_operacion.py con C:\Users\Dell\Python32\python.exe -B. Resultado
+simulation_ok, scope contratos_y_procesos_ficticios_sin_sdk_red_access_tareas,
+tests30, failures0, errors0, skipped0. ended_utc
+2026-10-25T04:51:54.635090+00:00 (24octubre22:51:54 Mexico).
+Evidencia: C:\SanIsidro\IntegracionOperativa_20261024_r3\registros\simulacion_20261024_225152_729945.json.
+
+Confirma los30casos de contrato, salud y hijos Python ficticios en el runtime
+x86 de Dell. No consulta SDK, tareas ni Access reales, no requiere mantenimiento
+ni modifica polling, credenciales, outbox u originales. No es evidencia de
+Disconnect real, bloqueo operativo entre procesos o boton del gestor integrado.
+La ultima salud de caseta permanece la del inspector aportado antes; esta
+simulacion no renueva sus timestamps.
+
+Siguiente etapa: implementar adaptadores de cierre del trabajador de vigencias
+y turnos RT, traduciendo cierre inseguro al fallo fatal del coordinador, con
+identidad/recibo verificables; despues enlazar control con gestor y salud con
+vigilancia en candidato separado. Primero validar localmente y preparar paquete
+concreto antes de nueva lectura readonly acotada en mantenimiento. No sustituir
+archivos instalados ni habilitar aplicar/servicio permanente en esta etapa.
