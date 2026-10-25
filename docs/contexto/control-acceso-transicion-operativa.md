@@ -234,3 +234,54 @@ LEEME_PUENTE_READONLY.md. No tag físico ni otra biblioteca.
 Siguen pendientes binding de aplicación real, runner operativo/gestor/vigilancia,
 respaldo durable/rollback y transición autorizada. Ninguna aplicación de fechas,
 instalación permanente, endpoints o UI nueva por preparar este puente.
+
+## Simulación del puente aprobada en Dell — 2026-10-25
+
+Usuario verifica Puente_Readonly_2026.10.25-1 y ejecuta simular_puente_readonly.py
+con Python32: simulation_ok,23pruebas/failures0/errors0/skipped0,
+ended_utc=2026-10-25T23:41:07.974606+00:00. Evidencia:
+C:\SanIsidro\PuenteReadonly_20261025\registros\simulacion_puente_20261025_174107_974540.json.
+Simulación aislada, sin hardware/red/DPAPI/tareas reales. Se indica siguiente
+ensayo: pausa desde gestor instalado, verificar Disabled/active=true/stopped,
+lanzar_puente_readonly.ps1, FIN puente y --verificar-cierre antes de reanudar
+por gestor y comprobar dos ciclos. No necesita servidor/túnel SSH ni tag físico.
+Lectura real, comparación y retorno de esta nueva pausa aún pendientes.
+
+## Comparación readonly real aprobada; cierre final pendiente — 2026-10-25
+
+Usuario ejecuta lanzar_puente_readonly.ps1: reference y candidate completados,
+phase=stopped/stop_reason=completed/trial_passed=true/error_type=null. Ambos
+planes contienen838registros, missing/added/changed=0 y sample_tags vacío.
+Mismo SHA256 normalizado:
+3d26b5cd8c80ea713b7b3a92a600b82e2c4bd4156e7211b7f6fd33411d1c6071.
+Son planes de comparación de vigencias, no838eventos ni prueba de escritura.
+
+Padre PID12404/run_id=c829b806-a870-4b2e-bd96-1aeff136f05d,
+ended_utc=2026-10-25T23:43:50.805541+00:00. Recibos16acumulados, dos de este
+run (antes14): worker41b8b3f8-71f9-4c79-bd6c-9f3ce24874b2/PID8944 y
+worker97cb9966-6676-4e1f-a02b-3c7eac9b0e88/PID4556. La salida ordena por UUID,
+no atribuir cada PID a referencia/candidato sin sus request.json. Evidencia:
+C:\SanIsidro\PuenteReadonly_20261025\datos\sesiones\c829b806-a870-4b2e-bd96-1aeff136f05d.
+
+Valida binding SDK readonly del núcleo, comparación contra r2 y recibos en esta
+muestra. No aplica fechas, consume RT o envía/outbox. No acredita servicio
+permanente, permisos de altas ni aplicación real. Solicitar --verificar-cierre
+propio; solo con cierre_puente_confirmado reanudar por gestor y comprobar dos
+ciclos nuevos. Verificación final y retorno de esta pausa aún no aportados.
+
+## Retorno del polling confirmado; salida de cierre final no aportada — 2026-10-25
+
+Usuario aporta tarea SanIsidro-Vigencias Running/Enabled=true, protocol2,
+PID14524/run_started23:45:52.416609Z, phase=idle, consecutive_errors=0,
+last_error_type=null y last_ok23:46:59.902633Z. Dos ciclos nuevos correctos
+17:45:56.279 y17:46:59.904 Mexico: API838/cambios Access0/C30/no encontrados4/
+ausentes API sin cambios116. Parada previa17:43:20.852. Retorno y salud del
+polling comprobados en esa consulta; la comparación real anterior sigue igual.
+
+La salida compartida NO incluye --verificar-cierre/cierre_puente_confirmado.
+El resultado previo del ensayo contiene sus recibos válidos, pero no sustituye
+esa comprobación posterior. Solicitar únicamente la salida anterior o confirmar
+si apareció antes de reanudar; no pedir nueva pausa ni ejecutar ese verificador
+ahora, porque exige mantenimiento y el polling ya está saludable. No afirmar
+que el comando falló o que fue omitido. El verificador de esta versión imprime
+la confirmación y no guarda un recibo final separado. Dato histórico pendiente.

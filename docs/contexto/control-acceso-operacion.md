@@ -772,3 +772,11 @@ SDK real solo lectura, sin RT ni envío. 23 pruebas nuevas/263 totales locales
 aprobadas y ZIP extraído verificado. Primero simulación Dell sin mantenimiento;
 ensayo real, cierre propio y retorno pendientes. Binding de aplicación y runner
 continuo aún pendientes. Detalle en transición-operativa; no cambios de tareas.
+
+Puente readonly real posterior: planes r2/candidato838iguales, mismos hashes,
+dos recibos de cierre de este run/16totales, sin aplicación ni RT. Polling
+reanudado PID14524/protocol2/idle/errores0, tarea Running/habilitada, ciclos
+correctos17:45:56.279 y17:46:59.904 Mexico, last_ok23:46:59.902633Z, API838/
+Access0/C30/no encontrados4/ausentes116. Salida de --verificar-cierre propia
+no aportada; consultar confirmación histórica sin otra pausa. No inventar su
+ejecución por ver el polling activo. Evidencia en transición-operativa.
