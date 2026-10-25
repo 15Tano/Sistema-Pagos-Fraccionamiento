@@ -285,3 +285,13 @@ si apareció antes de reanudar; no pedir nueva pausa ni ejecutar ese verificador
 ahora, porque exige mantenimiento y el polling ya está saludable. No afirmar
 que el comando falló o que fue omitido. El verificador de esta versión imprime
 la confirmación y no guarda un recibo final separado. Dato histórico pendiente.
+
+## Verificación final anterior a reanudación confirmada — 2026-10-25
+
+Usuario aporta la salida anterior de --verificar-cierre:
+cierre_puente_confirmado, PID12404/run_id=c829b806-a870-4b2e-bd96-1aeff136f05d,
+checked_utc=2026-10-25T23:45:40.454780+00:00. Es anterior al arranque del polling
+23:45:52.416609Z ya aportado; queda resuelto el dato histórico pendiente.
+Aceptadas comparación readonly r2/candidato de838registros, cierre final propio
+y retorno a r2 con dos ciclos correctos. No solicitar otra pausa/lectura.
+Esto no habilita aplicación candidata ni acredita operación permanente.

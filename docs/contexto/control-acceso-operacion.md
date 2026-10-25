@@ -780,3 +780,8 @@ correctos17:45:56.279 y17:46:59.904 Mexico, last_ok23:46:59.902633Z, API838/
 Access0/C30/no encontrados4/ausentes116. Salida de --verificar-cierre propia
 no aportada; consultar confirmación histórica sin otra pausa. No inventar su
 ejecución por ver el polling activo. Evidencia en transición-operativa.
+
+Confirmación posterior recibida: cierre_puente_confirmado para PID12404/run
+c829b806-a870-4b2e-bd96-1aeff136f05d a23:45:40.454780Z, antes del arranque
+del polling23:45:52.416609Z. Resuelto el dato faltante: puente readonly y
+retorno aceptados, sin nueva pausa. Aplicación operativa sigue sin habilitar.
