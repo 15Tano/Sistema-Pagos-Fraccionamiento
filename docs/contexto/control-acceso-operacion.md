@@ -765,3 +765,10 @@ inyectados, aún sin factory SDK/CLI operativo nuevos. 31 pruebas nuevas y
 240 totales aprobadas; paquete Nucleo_Vigencias_2026.10.25-1.zip solo para
 simular en Dell sin mantenimiento. No se aplicaron fechas reales ni cambiaron
 tareas. Evidencia, SHA, límites y siguientes pasos en transición-operativa.
+
+Después, núcleo1 simulado en Dell:31pruebas/0fallos, fin23:23:31.876571Z.
+Preparado Puente_Readonly_2026.10.25-1.zip para comparar r2/candidato mediante
+SDK real solo lectura, sin RT ni envío. 23 pruebas nuevas/263 totales locales
+aprobadas y ZIP extraído verificado. Primero simulación Dell sin mantenimiento;
+ensayo real, cierre propio y retorno pendientes. Binding de aplicación y runner
+continuo aún pendientes. Detalle en transición-operativa; no cambios de tareas.

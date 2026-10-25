@@ -169,3 +169,68 @@ parada/gestor, vigilancia, respaldo durable/rollback, pruebas separadas y
 autorización para aplicar en caseta/transición. No se acorta esa secuencia por
 haber probado aplicación ficticia. Salud real sigue siendo PID12648/last_ok
 21:30:22.584663Z de la aceptación anterior; estas pruebas no la actualizan.
+
+## Simulación del núcleo aprobada en Dell — 2026-10-25
+
+Usuario verifica Nucleo_Vigencias_2026.10.25-1 y ejecuta con Python32 instalado:
+simulation_ok,31pruebas/failures0/errors0/skipped0,
+ended_utc=2026-10-25T23:23:31.876571+00:00. Evidencia Dell:
+C:\SanIsidro\NucleoVigencias_20261025\registros\simulacion_vigencias_20261025_172331_876525.json.
+No mantenimiento ni SDK/red/DPAPI/Access/tareas reales en esta simulación.
+No acredita aplicación real ni actualiza la salud remota de vigencias.
+
+## Puente SDK readonly preparado — 2026-10-25
+
+Se implementan puente_sdk_readonly.py y ensayo_puente_readonly.py en carpeta
+candidata, sin editar núcleo1, fuentes r2, adaptadores o ZIP publicados.
+
+- Binding reutiliza diagnostic_module/load_sdk: PE/hash x86, directorio DLL
+  instalado, firmas/exportaciones documentadas y comprobadas previamente de
+  Connect/Disconnect/GetDeviceParam/GetDeviceData. Serial exacto antes de leer.
+  No cambia DLL ni registra SDK. Rechaza mode distinto de read antes de construir
+  panel; write_dates siempre rechaza, no enlaza ni llama SetDeviceData/GetRTLog.
+- Padre x64/DPAPI realiza una comparación r2 readonly y otra con ReferenceCycle
+  y Exchange nuevos, apply=False. Mantiene sync.lock instalado durante ambas,
+  recibe parada propia entre ciclos y verifica cierre/recibos antes de terminar.
+  No necesita servidor/túnel SSH de ensayo: solo API de vigencias habitual,
+  Access y C3 durante una futura pausa coordinada por el gestor.
+- Dos consultas secuenciales, cada una con consulta API nueva. Se conservan CSV
+  completos; comparación por tag ignora solo orden y compara vigencia API,
+  existencia y flags de cambios. Diferencias requieren revisar datos/tiempos;
+  no implican automáticamente un fallo del candidato o cambios de API.
+- Sin lectura RT ni envío/outbox: no consume eventos, cambia originales/ACK,
+  estado_cierres.json anterior o credencial. Nuevos recibos se agregan al
+  ledger de ensayo existente; estado/stop/resultados propios bajo el paquete.
+- Verificación final propia --verificar-cierre: UUID/PID, recibos de este run,
+  ausencia de lectores/PIDs reutilizados y lock bajo mantenimiento. Watchdog
+  solo exceptuado por ruta/bytes conocidos. Fault/incompleto bloquea otro run;
+  sin reset/force. Un stopped con planes distintos es cierre, no comparación
+  aceptada. Reanudar solo tras cierre_puente_confirmado y dos ciclos r2 nuevos.
+
+23 pruebas nuevas aprobadas: DLL/mantenimiento/serial, inventario incompleto,
+no ruta de escritura, cierres de recursos, orden/parada de comparación, CSV
+inválido/diferencias, lectores/PID reutilizado/bytes watchdog, recibos, CLI sin
+--aplicar, ejecución manual completa con dos workers ficticios y bloqueo tras
+fault. SDK/API/Access/CIM/DPAPI/tareas sustituidos. Suite263aprobadas en72.047s;
+sintaxis Python y PowerShell aprobada. Fuera de sandbox por pruebas previas de
+Laravel loopback/DPAPI ficticio; sin caseta ni producción.
+
+Puente_Readonly_2026.10.25-1.zip: 46 archivos,121001bytes, SHA256
+347a629e28ba5be4bcebc7f8ed46abe9649025ff89806b241a6059fc839acd00.
+Manifiesto de45fuentes más manifiesto. Contiene cierres1 completo/intacto,
+envío2 completo/intacto bajo envio/, y dos fuentes núcleo1 byte por byte.
+Envio2 se importa para snapshots y lector de procesos; no inicia emisor.
+ZIP extraído, hashes/rutas/dependencias verificados y simulación aprobada:
+simulation_ok,23tests/failures0/errors0/skipped0,
+ended_utc=2026-10-25T23:36:00.885922+00:00. No sobrescribir publicación.
+
+Primero Dell: verificar/simular en C:\SanIsidro\PuenteReadonly_20261025 sin
+mantenimiento ni SSH/SDK/red real. Salida Dell y ensayo real pendientes.
+Después de revisar simulación: pausa por gestor instalado, cerrar otros lectores,
+lanzar_puente_readonly.ps1, FIN puente, verificación propia y reanudar con dos
+ciclos. No ejecutar todavía modo real por recibir el ZIP. Guía exacta en
+LEEME_PUENTE_READONLY.md. No tag físico ni otra biblioteca.
+
+Siguen pendientes binding de aplicación real, runner operativo/gestor/vigilancia,
+respaldo durable/rollback y transición autorizada. Ninguna aplicación de fechas,
+instalación permanente, endpoints o UI nueva por preparar este puente.
