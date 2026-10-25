@@ -486,3 +486,20 @@ Originales228 y mensajes existentes conservados, hashes correctos; manifiesto
 Queda cerrada la entrega de las79respuestas adicionales del ensayo de cierres.
 Sin SDK, nueva pausa o deploy; detalle/limites en control-acceso-ensayo-remoto.md.
 No se aporto nueva salud del polling o vigilancia ni cierre de tunel/servidor.
+
+## Parada de ensayo desde panel candidato validada — 2026-10-25
+
+Tras pausa de r2 a12:19, usuario solicita parada del ensayo PID10540/run_id
+1c5afafc-4f85-4ea9-ab8f-352d655ccabd desde boton. Resultado requested/stopped,
+una comparacion readonly correcta a18:27:36.569976Z, sin errores/gate fault.
+Verificacion del panel cierre_confirmado a18:28:16.930202Z, dos cierres de esta
+ejecucion/ocho acumulados, lock libre observado. Respuestas locales228 sin
+nuevas capturas RT,84mensajes acked y1pendiente desde18:27:36.609119Z,
+coherente con snapshot de estado; entrega de ese mensaje aun no verificada.
+
+Polling nuevo PID15600 desde18:28:46.103056Z, dos ciclos correctos12:28:49.887
+y12:29:53.479 Mexico, API838/cambios Access0/C3=0/no encontrados4/ausentes116.
+Estado phase cycle a18:30:53Z representa siguiente ciclo en curso con errores0.
+Aceptado retorno de esta ventana; detalle de limites/incidente previo Ctrl+C
+en control-acceso-operacion.md. Servicio permanente/emisor/vigilancia nuevos
+siguen pendientes, no hay nuevas tareas o despliegue de produccion.

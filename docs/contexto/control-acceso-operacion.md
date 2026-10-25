@@ -568,3 +568,151 @@ pendientes: serializar botones propios no reserva transicion frente a otros
 programas. No cambios de tareas, archivos instalados, deploy, SDK o vigencias.
 Excepcion puntual binary (-text) en .gitattributes conserva bytes del manifiesto
 congelado de cierres (CRLF heredado) para mantener su SHA al recuperar desde Git.
+
+## Simulacion del enlace2 aprobada en Dell — 2026-10-25
+
+Usuario verifica Enlace Candidato2026.10.25-2 y ejecuta simular_enlace.py con
+Python32 instalado. Resultado simulation_ok, scope
+controles_ficticios_sin_sdk_red_access_tareas_reales,41tests, failures0/errors0/
+skipped0, powershell_checks_included14. ended_utc
+2026-10-25T07:15:19.279643+00:00 (01:15:19 Mexico). Evidencia:
+C:\SanIsidro\EnlaceCandidato_20261025_r2\registros\simulacion_enlace_20261025_011519_279017.json.
+
+Confirma casos de identidad/parada/cierre/cola y funciones de delegacion/panel
+con callbacks y datos ficticios en Python x86/PowerShell de Dell. No acredita
+operacion real de los botones, ejecucion del gestor instalado o interfaz visual.
+No se consultaron tareas, SDK o Access reales, no hubo mantenimiento ni nuevas
+capturas. Ultima salud real sigue siendo la consulta de enlace1 a06:58:17Z;
+esta simulacion no la renueva. Archivos/ZIP instalados y polling conservados.
+
+Siguiente paso: abrir panel_coordinador.ps1 del enlace2 y pulsar solamente
+Consultar salud, sin mantenimiento ni otros controles, revisar vista y salida.
+Prueba visual/consulta desde el panel aun pendientes. Preparar/Terminar y
+reanudar reales y prueba de parada desde boton requieren etapa posterior.
+
+## Consulta desde panel candidato confirmada — 2026-10-25
+
+Tras indicar abrir panel2 y usar solo Consultar salud, usuario aporta resultado
+checked_utc2026-10-25T07:17:11.556554+00:00 (01:17:11 Mexico). Vigencias correcto,
+reason null; tareas Vigencias Running y Vigilancia Ready, ambas enabled true.
+Cola84acked/228respuestas, pendientes0/sin lote0/paused false, read_errors vacio,
+installed_watchdog_replaced false. Ensayo5396/7e60c27f-54a6-4333-a815-0631e6beb164
+permanece stopped sin errores, detenido_sin_verificar_cierre,
+heartbeat_age_seconds2766.5694. Coherente con ensayo terminado a06:31:04Z;
+no fallo operativo ni motivo para verificar lock con polling funcionando.
+
+Confirma ruta de consulta desde el panel segun secuencia indicada y salida
+recibida. No hay captura visual para certificar distribucion de controles;
+no acredita aun botones de mantenimiento/parada/cierre ni nueva captura SDK.
+
+Siguiente ensayo propuesto: ZKAccess cerrado y otras herramientas sin operar;
+Preparar mantenimiento del panel, esperar pausa confirmada, lanzar lectura
+readonly validada de cierres en otra PowerShell, solicitar parada desde panel
+tras15s, esperar Cierre coordinador y retorno de su consola, Verificar cierre,
+y solo con cierre_confirmado Terminar y reanudar desde panel. Comprobar dos
+ciclos nuevos r2 al final. Sin tag fisico, SSH, emisor automatico, instalacion o
+escrituras SDK. Ante error/no confirmacion conservar mantenimiento/evidencia y
+revisar antes de continuar; ningun paso real de esta secuencia acreditado aun.
+
+## Excepcion de ventana reportada, diagnostico pendiente — 2026-10-25
+
+Usuario comparte final de informe WinForms: ensamblados System.Web.Extensions,
+System.Web, Windows.Forms, Drawing y texto generico de Depuracion JIT. No
+incluye cabecera/Texto de la excepcion, mensaje, stack de fallo ni boton pulsado.
+Ese fragmento no identifica causa ni acredita una DLL faltante o un fallo SDK.
+No habilitar JIT, modificar machine.config, registrar/reemplazar SDK o reinstalar
+.NET basandose en ese texto. No se aplico parche especulativo.
+
+Revisados panel_coordinador.ps1, enlace_funciones.ps1 y wrapper de mantenimiento.
+Panel contiene operaciones de eventos fuera de try/catch (p.ej. consulta HasExited
+del timer y construccion de ProcessStartInfo); posibles rutas de excepcion
+no controlada, sin atribucion al incidente hasta obtener cabecera y accion.
+Las pruebas de funciones/delegados no ejercitaron interfaz visual completa.
+
+Solicitados boton/accion exactos, inicio del informe y estado actual de tareas,
+estado.json y ultimos ciclos. No hay evidencia nueva de pausa/reanudacion,
+parada del ensayo o salud de caseta posterior a consulta07:17:11Z. Detener la
+secuencia de botones hasta aclararlo; no reanudar o cerrar procesos a ciegas.
+
+Aclaracion posterior del usuario: pulso Ctrl+C en PowerShell que ejecutaba
+panel_coordinador.ps1 del enlace2, no identifica la lectura SDK ni SSH como
+ventana interrumpida. Ese comando mantiene ShowDialog y timer hasta cerrar
+panel; prompt ocupado es esperado mientras esta abierto. Interrupcion del
+host PowerShell es compatible con excepcion en WinForms, pero sin cabecera
+no certificar tipo/stack exacto. Explicar cierre normal por X al terminar
+controles. No consta si un boton de mantenimiento estaba en curso al pulsar
+Ctrl+C; comprobar tareas/estado antes de retomar ensayo. No hubo parche nuevo,
+reinstalacion ni autorizacion para reiniciar/forzar cierre de procesos.
+
+Segunda aclaracion del usuario: habia pulsado Preparar mantenimiento antes de
+Ctrl+C al host del panel; aun iba a ejecutar lanzar_cierres.ps1 -Seconds150,
+no habia iniciado esa nueva lectura. Sustituye duda anterior sobre boton usado:
+si hubo solicitud de pausa, pero su finalizacion no esta acreditada por salida.
+No atribuir este Ctrl+C al trabajador SDK ni afirmar nuevo cierre inseguro o
+capturas perdidas. Confirmar tarea/enabled, mantenimiento.json y estado del
+polling antes de iniciar lector o reanudar. Mantener secuencia detenida hasta
+esa comprobacion; no reinstalar componentes ni borrar evidencias/bloqueos.
+
+## Pausa tras interrupcion del host del panel confirmada — 2026-10-25
+
+Usuario aporta SanIsidro-Vigencias Disabled/Enabled false,
+mantenimiento.json active true/wasEnabled true/inicio local
+2026-10-25T12:19:34.7264830-06:00. Estado protocol2/PID9544,
+run_started_utc2026-10-25T06:31:52.156041+00:00, phase stopped,
+consecutive_errors0/last_error_type null, ultimo ciclo correcto
+2026-10-25T18:19:05.757496+00:00 y heartbeat de parada
+2026-10-25T18:19:35.495112+00:00. Confirma estado de pausa esperado y registro
+de mantenimiento conservado. No aporta inventario de procesos vivos ni prueba
+de lock libre: el lanzador validado exige tomar sync.lock antes de conectar.
+
+No repetir Preparar mantenimiento. Se puede retomar la lectura readonly acotada
+con lanzar_cierres.ps1 en otra PowerShell y usar panel para parada propia,
+verificacion de cierre y reanudacion condicionada. Mantener abierta la consola
+que sostiene panel, sin Ctrl+C; prompt ocupado mientras muestra WinForms es
+esperado. Excepcion JIT sigue sin cabecera/stack exactos, no parcheada ni
+atribuida a SDK. Nueva lectura, cierre, reanudacion y dos ciclos nuevos aun
+pendientes de evidencia; no confundir esta parada de12:19 con ciclos previos.
+
+## Parada por boton, cierre y retorno al polling comprobados — 2026-10-25
+
+Usuario comparte ensayo de cierres despues de pausa12:19 y consulta del panel:
+PID10540, run_id1c5afafc-4f85-4ea9-ab8f-352d655ccabd. Solicitud del boton
+parada_solicitada vinculada a esa identidad. Consola del lanzador termina
+normalmente, phase stopped/stop_reason requested, una comparacion readonly
+completada, errores consecutivos/totales0, last_completed_utc
+2026-10-25T18:27:36.569976+00:00. reader_error/storage_error null y gate sin fallo.
+
+Verificar cierre devuelve cierre_confirmado para el mismo PID/run_id,
+closures_acknowledged_total8, closures_for_current_run2 y lock_free_at_check true,
+checked_utc2026-10-25T18:28:16.930202+00:00 (12:28:16 Mexico). El total8 incluye
+los6anteriores, no ocho cierres nuevos. Confirma solicitud/parada cooperativa,
+verificacion de recibos, ausencia de lectores segun inventario y disponibilidad
+puntual de lock, no firmware/red/cliente externo ni reserva para otro arranque.
+No se reporta nueva excepcion JIT durante esta secuencia; tampoco se afirma
+que se haya corregido por parche la interrupcion del host observada antes.
+
+Originales anteriores revisados228, responses siguen228, unbatched0,
+messages acked84/pending1, pending_count1/paused vacio; primer pendiente
+2026-10-25T18:27:36.609119+00:00. No nuevas respuestas RT guardadas en esta
+ejecucion. El unico mensaje nuevo es coherente con snapshot de estado en
+_queue_state y ausencia de nuevos lotes; endpoint no impreso en salida, no
+acreditar entrega remota de ese mensaje sin ACK posterior. Originales/hashes
+no se vuelven a certificar con esta consola; manifiesto anterior se conserva
+como evidencia historica, no manifiesto nuevo de esta ventana.
+
+Polling nuevo PID15600, run_started_utc2026-10-25T18:28:46.103056+00:00,
+errores0/last_error_type null. Dos ciclos correctos nuevos12:28:49.887 y
+12:29:53.479 Mexico; API838, cambios Access0/C3=0, no encontrados4, ausentes
+API116 sin cambios. Parada previa12:19:35.505. Estado consultado phase cycle,
+heartbeat18:30:53.480617Z/cycle_started18:30:53.480633Z y
+last_ok18:29:53.478075Z: tercer ciclo en curso, no error ni cierre pendiente.
+Dos ciclos correctos bastan para aceptacion del retorno de esta ventana;
+no afirmar finalizacion del tercero sin su log. No se aportan nueva tabla de
+tareas/registro mantenimiento inactivo ni estado de vigilancia en esta salida.
+
+Queda aceptada secuencia de control segun resultados aportados tras instrucciones
+del panel candidato, sin sustituir gestor instalado ni tareas. Se puede cerrar
+panel normalmente por X al terminar controles; polling debe continuar activo.
+Pendientes: mensaje de estado local, envio automatico independiente, vigilancia
+integrada, recuperacion/retencion/reconciliacion y transicion permanente. No
+hay nuevo deploy, aplicar fechas desde candidato ni screen/endpoints de consulta.
