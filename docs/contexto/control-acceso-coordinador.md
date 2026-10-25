@@ -4,7 +4,8 @@
 entrega ficticia Dell -> Laravel aislado. Preparado y ensayado en lectura real
 acotada: tres comparaciones, 93 respuestas, sin errores y polling reanudado con
 dos ciclos correctos. Sin sustituir polling, gestor, vigilancia, DLL ni tareas.
-No hay push/despliegue de esta etapa; envio de capturas reales aun pendiente.
+No hay push/despliegue de esta etapa. Entrega de las93respuestas al backend
+aislado confirmada por ACK; ver evidencia al final de este documento.
 
 ## Implementacion preparada
 
@@ -281,3 +282,65 @@ en esa ventana; no matar procesos desconocidos por puerto. Conservar bases y
 evidencias. Cierre de procesos todavia no confirmado. Siguiente etapa propuesta:
 ensayos acotados de parada propia y recuperacion en hardware, integracion con
 gestor/vigilancia y comparacion con r2 antes de plantear transicion operativa.
+
+## Siguiente ensayo: parada solicitada — preparado 2026-10-24
+
+Usuario indica continuar. Revision de las fuentes reales confirma que el paquete
+instalado admite --detener, peticion por PID/run_id y publicacion de phase y
+stop_reason al cerrar. Se prepara prueba manual reutilizando ese paquete sin
+modificar fuentes ni ZIP: pausar por gestor, lanzar readonly con limite150s,
+solicitar parada desde otra PowerShell unos15s despues de los mensajes de inicio,
+esperar Cierre coordinador e inspeccionar estado propio. Criterio: phase=stopped,
+stop_reason=requested, sin reader_error/storage_error ni errores de comparacion.
+Si vence el limite antes de solicitar, stop_reason=limit no acredita esta prueba.
+Tras cierre limpio reanudar por gestor y comprobar dos ciclos nuevos. Ante fault
+o cierre SDK inseguro, conservar evidencia y revisar antes de reanudar.
+
+Punto de partida: 93originales, 31mensajes ya confirmados y manifiesto conocido.
+El arranque ejecuta recover sobre recibos existentes con mismo UUID; su contador
+indica recibos procesados, no necesariamente originales nuevos recuperados.
+La prueba agregara respuestas de trafico normal y puede dejar pendientes locales;
+no envia HTTP. Reapertura/parada antigua ignorada y recuperacion tras fallo se
+validaran por separado; no forzar una caida ni modificar originales en esta etapa.
+Prueba remota de parada aun no ejecutada, sin nueva evidencia de watchdog.
+
+## Parada solicitada en hardware confirmada — 2026-10-24
+
+Usuario comparte --detener con PARADA SOLICITADA, estado final y consola del
+lanzador. PID16112, run_id=e6753322-2db0-4797-a1d5-d52689117844,
+started_utc=2026-10-25T03:51:33.429207+00:00 (24octubre21:51:33 Mexico).
+phase=stopped, stop_reason=requested, heartbeat_utc=2026-10-25T03:52:57.523448+00:00.
+Dos comparaciones readonly completadas, errores consecutivos/totales0,
+last_completed_utc=2026-10-25T03:52:41.634142+00:00 y last_error_type=null.
+SDK last_ok_utc=2026-10-25T03:52:56.915825+00:00, last_error_code=null;
+reader_error=null, storage_error=null. Consola termina Cierre coordinador normal.
+Se acredita parada solicitada antes del limite y cierre sin fallo reportado.
+
+Arranque imprime Recuperados de originales93: recibos anteriores reprocesados
+con sus UUID, no93recuperaciones nuevas tras fallo. Estado final conserva
+messages.acked31, pendientes17, responses141, unbatched3, pending_count20,
+paused vacio, oldest_pending_utc=2026-10-25T03:51:37.551889+00:00.
+Incremento neto48respuestas respecto a93previas, compatible con nuevas lecturas;
+no se aporta aqui comparacion individual de identidades/hashes que certifique
+ausencia de duplicados. Pendientes esperados: este ensayo no envia HTTP.
+
+observed_vigencias conserva polling PID10868 en stopped, last_ok_utc
+2026-10-25T03:50:23.995854+00:00 y heartbeat03:51:12.461143+00:00, errores0.
+Es la parada para mantenimiento, no evidencia de reanudacion ni fallo.
+Siguiente inmediato: Terminar y reanudar por gestor y comprobar nuevo proceso y
+dos ciclos posteriores a03:52:57UTC. Reanudacion, nueva entrega de pendientes,
+reapertura frente a peticion antigua y recuperacion tras fallo aun pendientes.
+
+Primera evidencia de reanudacion posterior: SanIsidro-Vigencias Running,
+nuevo PID17684, run_started_utc=2026-10-25T03:54:06.186129+00:00,
+phase=idle, consecutive_errors0, last_error_type=null y last_ok_utc
+2026-10-25T03:54:10.088535+00:00. Primer ciclo correcto21:54:10.090 Mexico,
+API838, cambios Access0/C3=0, no encontrados4 y ausentes API conservados116.
+Segundo ciclo posterior aun pendiente; los ciclos21:48-21:50 son anteriores a
+la parada21:51:12.462 y no cuentan para aceptar esta reanudacion.
+
+Reanudacion cerrada por evidencia posterior del usuario: segundo ciclo correcto
+21:55:13.400, precedido de resumen API838, cambios Access0/C3=0, no encontrados4,
+ausentes API sin cambios116. Junto a21:54:10.090 acredita dos ciclos nuevos tras
+la parada solicitada del coordinador. Polling r2 reanudado, sin nueva evidencia
+de vigilancia ni entrega de los pendientes agregados durante este ensayo.
