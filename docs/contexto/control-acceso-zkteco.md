@@ -20,7 +20,8 @@ antes de integrar lectura SDK con el coordinador.
 
 Las secciones siguientes conservan la secuencia historica de decisiones y pruebas;
 consultar los cierres al final para distinguir pendientes anteriores ya resueltos.
-Reloj exacto y correspondencia fisica de plumas siguen sin certificar.
+Reloj exacto sigue sin certificar. Prueba fisica del 24 octubre vincula DoorID 2
+con salida; DoorID 1 y equivalencia de nombres Pluma 1/2 siguen pendientes (ver cierre).
 
 ## Base operativa comprobada
 
@@ -597,3 +598,31 @@ correctos; ZIP anteriores preservados. No se modifico polling, emisor ni backend
 Captura fisica, correspondencia de pluma, respuesta real y reanudacion posterior
 siguen pendientes de salida del usuario. No atribuir vigencia ni rechazo al tag
 antes de obtener evidencia. Instrucciones en LEEME_CAPTURA.md dentro del paquete.
+
+## Captura fisica de salida confirmada — 2026-10-24
+
+Usuario comparte paquete verificado y captura_controlada.py --tag 12230693,
+pluma observada salida. Evidencia remota conservada por el lector en
+`C:\SanIsidro\CapturaTag_20261024\registros\20261024_185410_959611`.
+Tras preparacion de base y ARMADO, evento recibido: device_time_raw
+2026-10-24 18:54:41, card 12230693, pin 693, DoorID 2, EventType 0,
+InOutState 1 y Verified 4. Operador anota "18:54 si abrio".
+Asociacion fisica observada: DoorID 2 = pluma de salida en este controlador y
+esta prueba. No inferir DoorID 1 = entrada ni equivalencia con nombres Pluma 1/2.
+
+Tupla completa corresponde a Time_second 861821681 en transaction. Conteos de
+esa tupla: history_before=0, history_after=1, history_reread=1,
+history_after_reconnect=1. Ninguna fila historica previa faltante en las tres
+comparaciones. Resultado rt_and_new_history_confirmed_pending_operator_review;
+nota del operador recibida permite cerrar correlacion de la presentacion, evento
+nuevo, persistencia y apertura observada. El evento no reaparece en relectura RT
+ni RT tras reconexion; sigue en historial. No prueba entrega independiente a
+clientes simultaneos/ZKAccess, cursor incremental ni ausencia universal de consumo.
+Originales y metadatos quedan en carpeta remota, no transferidos a este repositorio.
+
+Se confirma apertura reportada, no cruce del vehiculo, vigencia web ni exactitud
+del reloj/zona del controlador. No se cambiaron pagos, permisos o vigencias con
+el diagnostico. Emisor/backend de ensayo aun no recibieron este evento.
+Lector muestra Cierre diagnostico. Solicitado Terminar y reanudar por el gestor;
+reanudacion y dos ciclos correctos posteriores a ESTA captura pendientes de
+salida del usuario. No reutilizar cierres saludables anteriores como evidencia.
