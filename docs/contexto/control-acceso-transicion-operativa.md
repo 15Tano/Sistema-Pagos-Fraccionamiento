@@ -109,3 +109,63 @@ solicitudes de altas/recuperación siguen en etapas posteriores.
 Diseño preparado; no nuevo runner operativo, instalador, aplicación candidata,
 ZIP, tarea o despliegue por este documento. No nueva operación solicitada a
 Dell y no repetir mantenimiento ni lectura del ensayo ya aceptado.
+
+## Núcleo candidato implementado y probado localmente — 2026-10-25
+
+Usuario indica continuar después de recomendar High. Se implementa
+tools/agente_acceso/vigencias_candidato.py y sus pruebas, sin modificar r2 ni
+adaptadores/ZIP publicados. No hay CLI, factory de hardware o launcher nuevo
+para aplicar: panel y comando hijo son dependencias obligatorias, ficticias
+en esta entrega. No afirmar aplicación real ni integración continua terminada.
+
+- ReferenceCycle carga las cuatro fuentes r2 verificadas y conserva cycle,
+  incluida consulta nueva a API por ciclo, comparación, respaldo por tag,
+  ausentes API intactos, C3 antes de commit Access y error por aplicación parcial.
+  Solo sustituye el transporte worker, carpeta de reportes y logging de errores
+  ODBC por tipo sin mensaje de excepción. Readonly es el valor predeterminado.
+- Kernel worker valida todo el lote y su SHA antes de construir un panel.
+  Confirma serial/hash a través de la interfaz inyectada, envía solo cuatro
+  campos de fechas y compara todos los campos/autoridades tras la escritura.
+  Inventario persistido excluye Password/Group/SuperAuthorize; datos privados
+  del usuario solo permanecen en la comparación temporal ficticia.
+- Exchange verifica recibo/PID/rol/ejecución y vínculo SHA de operación con
+  respuesta. ACK del padre durable antes de liberar gate. Timeout/salida sin
+  cierre/recibo alterado bloquean SDK. Usa el mecanismo de cierre previamente
+  publicado; sus timeouts terminan únicamente el hijo propio y dejan fault.
+- Una operación fallida antes de escribir puede reintentarse tras volver a
+  consultar datos. Si se intentó escribir y falló/verificación discrepante,
+  detiene el resto del lote y conserva revision_vigencias.json. Se distingue
+  ReviewRequired de cierre SDK incierto; ReferenceCycle propaga revisión para
+  impedir seguir a RT/otro ciclo. El futuro runner debe respetar esa excepción.
+- check_operations reconstruye esa condición desde recibos aun sin marca
+  adicional, valida contenido contra hash y rechaza corrupción. Falta de ACK
+  o ledger incompleto no permite otro worker. No existe reset/force.
+
+31 pruebas nuevas aprobadas; incluyen hijos Python ficticios reales sin
+SANISIDRO_* heredado y algoritmo r2 real con API/ODBC/C3 sustituidos. Casos:
+solicitud alterada/lote inválido, fechas/permisos/cambio concurrente, cierre de
+recursos/serial incorrecto, fallo parcial en C3 y en Access, API nueva por ciclo,
+API inválida sin abrir Access/C3, ACK antes de gate, error de ACK, revisión tras
+reinicio aunque falle marca adicional, timeout/recibo de otra operación y
+exclusión frente a RT ya activo. Sintaxis Python y PowerShell aprobada.
+Suite completa: 240 pruebas en59.732s, sin fallos. Fuera de sandbox para casos
+previos Laravel loopback/DPAPI ficticio; sin caseta ni producción.
+
+Paquete inmutable Nucleo_Vigencias_2026.10.25-1.zip: 26 archivos, 65915 bytes,
+SHA256 2370108844b2276a30765746c5319180cb3c8a59f44d53066deeb453fb87ea65.
+Contiene cinco fuentes propias y 20 archivos completos/intactos de cierres1,
+más VIGENCIAS_SHA256SUMS.json. Comparados bytes con ZIP original, manifiesto y
+fuentes. Extraído en carpeta local separada y verificado por Windows PowerShell;
+simulación extraída simulation_ok,31pruebas/fallos0/errores0/omisiones0,
+ended_utc=2026-10-25T23:18:39.119591+00:00. ZIP no se sobrescribe.
+
+Siguiente paso Dell: verificar y simular con Python32 en
+C:\SanIsidro\NucleoVigencias_20261025, sin mantenimiento/SSH/SDK/red real.
+Guía exacta LEEME_VIGENCIAS_CANDIDATO.md. Salida Dell pendiente. No ejecutar
+lanzadores readonly históricos incluidos como dependencias en este paso.
+
+Después faltan factory SDK real y su verificación, runner/estado protocol2,
+parada/gestor, vigilancia, respaldo durable/rollback, pruebas separadas y
+autorización para aplicar en caseta/transición. No se acorta esa secuencia por
+haber probado aplicación ficticia. Salud real sigue siendo PID12648/last_ok
+21:30:22.584663Z de la aceptación anterior; estas pruebas no la actualizan.

@@ -759,3 +759,9 @@ last_ok21:30:22.584663Z. Dos ciclos correctos15:29:19.174/15:30:22.586 Mexico,
 API838/cambios Access0/C30/no encontrados4/ausentes116 intactos. Pausa, ensayo,
 cierre y retorno acreditados; no integracion permanente ni sustitucion de tareas,
 gestor o vigilancia. Detalles/identidades en control-acceso-ensayo-conjunto.md.
+
+2026-10-25: siguiente avance local, núcleo read/apply con transporte y panel
+inyectados, aún sin factory SDK/CLI operativo nuevos. 31 pruebas nuevas y
+240 totales aprobadas; paquete Nucleo_Vigencias_2026.10.25-1.zip solo para
+simular en Dell sin mantenimiento. No se aplicaron fechas reales ni cambiaron
+tareas. Evidencia, SHA, límites y siguientes pasos en transición-operativa.
