@@ -344,3 +344,64 @@ Reanudacion cerrada por evidencia posterior del usuario: segundo ciclo correcto
 ausentes API sin cambios116. Junto a21:54:10.090 acredita dos ciclos nuevos tras
 la parada solicitada del coordinador. Polling r2 reanudado, sin nueva evidencia
 de vigilancia ni entrega de los pendientes agregados durante este ensayo.
+
+## Integridad previa a reapertura verificada — 2026-10-24
+
+Usuario consulta entregar_coordinador.py estado sin mantenimiento ni HTTP:
+agente/serial esperados, responses141, mensajes acked31/pending17, unbatched3,
+pending_count20, paused vacio. ACK conserva5estados/26lotes, 93respuestas,
+51eventos/42estados y pendientes de interpretacion0. Originals count141,
+hashes_verified=true, manifest_sha256
+b9d4f832be39a0541e927055e55d1e588556a6cf3e866c639e793cbb46749b29.
+Messages count48, body_hashes_verified=true. Es el punto de comparacion previo;
+no equivale a verificar la igualdad individual del subconjunto original93.
+
+Siguiente preparado: mantenimiento por gestor, mismo lanzador -Seconds20 sin
+--detener, conservando detener.json anterior. Esperar cierre normal y comprobar
+nuevo PID/run_id, stop_reason=limit, comparacion readonly y ausencia de errores.
+Inicio recover debe procesar141recibos previos; conteo no significa inserciones
+nuevas. Consultar estado de entrega despues para verificar hashes/ACK, sin enviar.
+Si phase=fault o cierre inseguro, revisar antes de reanudar. Si cierre normal,
+reanudar por gestor y exigir dos ciclos nuevos. No se fuerza caida ni se prueba
+recuperacion tras fallo con esta reapertura; aun pendiente de ejecucion remota.
+
+## Reapertura acotada completada — 2026-10-24
+
+Usuario comparte consola -Seconds20, estado propio y entregar_coordinador.py
+estado. Paquete verificado, Recuperados de originales141, Cierre coordinador
+normal. Nuevo PID14204, run_id=8598f076-0dc0-4a5a-abc6-8b786425dec6,
+started_utc=2026-10-25T03:59:26.387517+00:00. Phase stopped, stop_reason limit,
+heartbeat_utc=2026-10-25T03:59:46.517429+00:00: completa nueva ejecucion sin
+detenerse por la peticion de la anterior. No se aporta lectura independiente de
+detener.json; resultado compatible con guarda PID/run_id revisada en fuentes.
+Una comparacion readonly correcta, errores consecutivos/totales0,
+last_completed_utc=2026-10-25T03:59:30.161701+00:00. SDK last_ok_utc
+2026-10-25T03:59:45.703688+00:00, last_error_code null; reader_error/storage_error
+null. Recovery reprocesa141recibos existentes; no certifica recuperacion tras caida.
+
+Almacen final: responses149 (incremento neto8), messages acked31/pending21,
+unbatched4, pending_count25, paused vacio, oldest_pending_utc
+2026-10-25T03:51:37.551889+00:00. Originales149 con hashes_verified=true,
+manifest_sha256=edfaeae5adbfc8d3f176f0f885fbbf861ac312c2666b50b4b8433e2b9eb407e1;
+mensajes52 con body_hashes_verified=true. ACK conserva5estados/26lotes,
+93respuestas/93filas, 51eventos/42estados, pendientes de interpretacion0.
+No se compara aqui subconjunto individual de originales entre ejecuciones ni se
+acredita entrega de los nuevos pendientes.
+
+Polling observado previo PID17684 en stopped, last_ok_utc
+2026-10-25T03:58:24.466497+00:00, heartbeat03:59:07.039723+00:00, errores0.
+Es la pausa de esta prueba. Siguiente: Terminar y reanudar desde gestor y obtener
+dos ciclos nuevos posteriores a03:59:46UTC. Reanudacion tras esta reapertura aun
+pendiente; no reutilizar los ciclos21:54/21:55 de la prueba anterior.
+
+Reanudacion tras reapertura confirmada por salida posterior: tarea
+SanIsidro-Vigencias Running, nuevo PID2640, run_started_utc
+2026-10-25T04:01:06.214496+00:00. Protocol2, phase idle, consecutive_errors0,
+last_error_type null, last_ok_utc=2026-10-25T04:03:17.648988+00:00.
+Tres ciclos correctos posteriores al ensayo:22:01:09.932,22:02:13.330 y
+22:03:17.650 del24octubre Mexico; todos API838, cambios Access0/C3=0,
+no encontrados4, ausentes API sin cambios116. Prueba de reapertura y retorno
+a r2 cerrada. Sin nueva evidencia de watchdog. Pendiente entrega de las nuevas
+respuestas:149originales totales frente a93confirmadas por ACK; envio manual
+al backend aislado sin SDK ni nueva pausa. Servidor/tunel deben verificarse o
+abrirse si estan detenidos, sin duplicar procesos ni tocar produccion.
