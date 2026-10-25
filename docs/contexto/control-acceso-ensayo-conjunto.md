@@ -60,13 +60,17 @@ envio2 SHA03b415a4e7aba6941d4eac219c4f986f863dbe8c1af1553591b9e611219f226b.
 
 ## Pendiente inmediato
 
-Destino Dell C:\SanIsidro\EnsayoConjunto_20261025. Primero verificar y ejecutar
-simular_conjunto.py con Python32, sin mantenimiento/SSH/SDK. Salida Dell y
-prueba real conjunta pendientes. Despues coordinar pausa con gestor instalado,
+Destino Dell C:\SanIsidro\EnsayoConjunto_20261025. Verificacion y simulacion
+Dell aprobadas por salida del usuario el 2026-10-25: simulation_ok, 30 pruebas,
+failures=0/errors=0/skipped=0, ended_utc=2026-10-25T21:10:49.868446+00:00.
+Evidencia remota: registros\simulacion_conjunto_20261025_151049_867840.json.
+Sin SDK/red/DPAPI/Access/tareas reales; no acredita lectura conjunta real ni
+renueva salud del polling. Pendiente comprobar salud del tunel18881 antes de
+pausar, luego ensayo real conjunto. Coordinar pausa con gestor instalado,
 cerrar ZKAccess/otros emisores/paneles, servidor/tunel activos y ensayo150s.
 FIN conjunto, verificacion y dos ciclos r2 tras reanudar. Guia exacta:
-tools/agente_acceso/LEEME_CONJUNTO.md. No ejecutar pasos reales antes de revisar
-simulacion. No tag fisico ni bibliotecas nuevas.
+tools/agente_acceso/LEEME_CONJUNTO.md. Simulacion revisada; la prueba real
+queda pendiente de salida del usuario. No tag fisico ni bibliotecas nuevas.
 
 Ultima salud real sigue emisor2 a20:00:34Z:228respuestas/85acked/0pendientes,
 originales conservados, vigencias correcto. Pruebas locales no la renuevan.
