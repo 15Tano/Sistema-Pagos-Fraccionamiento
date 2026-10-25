@@ -291,3 +291,62 @@ identidad/recibo verificables; despues enlazar control con gestor y salud con
 vigilancia en candidato separado. Primero validar localmente y preparar paquete
 concreto antes de nueva lectura readonly acotada en mantenimiento. No sustituir
 archivos instalados ni habilitar aplicar/servicio permanente en esta etapa.
+
+## Adaptadores de cierre enlazados en candidato readonly — 2026-10-24
+
+Usuario indica Siguele. Preparados adaptadores_cierre.py y ensayo_cierres.py,
+lanzar_cierres.ps1, verificador/manifiesto, empaquetador, guia y21pruebas nuevas.
+SafeReferenceProbe carga referencia r2 verificada e invoca cycle(password,False,None),
+inyectando solo su worker readonly. El hijo SDK x86 usa load_sdk diagnosticado,
+GetDeviceParam para serial y GetDeviceData user con argumentos conocidos; conserva
+solo CardNo/Pin/StartTime/EndTime en respuesta, sin persistir Password/Group.
+No SetDeviceData ni otra escritura al equipo. Fuentes r2 congeladas intactas.
+
+SafeRTClient usa el worker RT existente, con envoltorio que emite recibo despues
+de retornar de Disconnect/directorio. captura_rt.RTClient admite worker_command
+opcional y filtra todo SANISIDRO_* del hijo; comportamiento por defecto permanece.
+Gate compartido excluye turnos RT/vigencias. closed.json se vincula a PID/run_id/
+UUID/rol/hash SDK y tiempos UTC PC, mas tamano/hash de respuesta cuando corresponde.
+El padre confirma salida0, valida recibo y guarda parent_ack.json. Falta de ACK,
+timeout, salida anormal, serial inesperado o cierre sin confirmar producen
+UnsafeClosure fatal, no un error de ciclo que permita otro cliente SDK.
+Error de datos con cierre confirmado se mantiene como comparacion fallida.
+
+Ledger completo se comprueba antes de nueva conexion; request sin parent_ack
+bloquea tras caida del padre, incluso con recibo del hijo. Marca cierre_inseguro.json
+y estado fault impiden reinicio normal; no hay force/reset ni borrado automatico.
+Los recibos acreditan ruta de cierre y salida de proceso, no estado interno de
+firmware/red ni independencia de clientes externos. ZKAccess debe estar cerrado.
+Gate sigue en memoria pero ledger/marca hacen persistente el bloqueo del ensayo.
+
+Programa manual preparado: misma SQLite/identidad/originales de
+C:\SanIsidro\CoordinadorEnsayo_20261024\datos\lectura_mantenimiento, no nueva base.
+Agente c8d7ccdc-991f-497c-8383-92fb52921f8a y serial CO2K225060027 exigidos.
+Estado nuevo estado_cierres.json y stop propio detener_cierres.json (PID/run_id),
+sin cambiar estado/stop operativos ni estado.json del ensayo anterior. DPAPI Access
+y token API opcional solo en padre x64, hijos filtrados. Sin HTTP de ingesta ni
+servicio/aplicar; comparacion usa GET API existente y Access readonly. Preserva
+sync.lock instalado, guardas de mantenimiento y hashes r2, plazo5..180s mas
+operaciones/cierre (worker inventario300s). No ejecutar manual hasta simulacion
+Dell aprobada y coordinacion del siguiente mantenimiento. Gestor actual sigue
+sin reconocer este nombre/ruta: limite/parada propia antes de reanudar por gestor.
+
+21pruebas nuevas aprobadas en3.896s; suite completa101 en15.609s (80anteriores+21),
+con Laravel loopback temporal fuera del sandbox y sin C3/produccion/Access reales.
+Ejercitan adaptadores, worker real con SDK sustituido, hijos Python ficticios,
+serial, recibos alterados/incompletos, cierre/desconexion fallidos, gate ocupado,
+caida antes de ACK, timeout fatal que impide RT y conservacion de originales.
+Se corrigio limpieza de fixtures para no llamar communicate sobre pipes ya
+cerrados por RTClient; ultima corrida sin excepciones de hilos. Simulacion desde
+ZIP extraido: simulation_ok,21tests, fallos/errores/omisiones0.
+
+Cierres_Coordinador_2026.10.24-1.zip,20archivos,50664bytes, SHA256
+62afc55c986178e8086035fa978c7d2241f715296f359cc02997db7698819a11.
+Manifiesto/rutas/hashes/fuentes comprobados y sintaxis Python/PowerShell valida,
+sin ejecutar lanzador/DPAPI local. Verificacion desde arbol fuente sin runtime/
+fallo por ese archivo empaquetado; verificador real correcto desde ZIP extraido
+con runtime/lector_eventos.py incluido. ZIPs anteriores conservan sus hashes.
+Destino Dell nuevo C:\SanIsidro\CierresCoordinador_20261024. Primero --simular con
+Python32, sin mantenimiento. Simulacion Dell, SDK real de estos adaptadores y
+reanudacion de ese ensayo pendientes. Enlace de botones gestor/vigilancia y
+transicion operativa permanecen para etapas posteriores.

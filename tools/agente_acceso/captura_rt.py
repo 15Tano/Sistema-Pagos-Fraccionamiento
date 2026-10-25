@@ -157,16 +157,14 @@ def worker(folder):
 
 
 class RTClient:
-    def __init__(self, folder, python32):
+    def __init__(self, folder, python32, *, worker_command=None):
         self.folder = Path(folder)
         self.folder.mkdir(parents=True, exist_ok=True)
         self.stderr = (self.folder.parent / 'rt_worker.stderr.log').open('a', encoding='utf-8')
-        environment = dict(os.environ)
-        for key in ('SANISIDRO_ACCESS_PASSWORD', 'SANISIDRO_API_TOKEN'):
-            environment.pop(key, None)
+        environment = {key: value for key, value in os.environ.items() if not key.upper().startswith('SANISIDRO_')}
         try:
-            self.process = subprocess.Popen([str(python32), '-B', str(Path(__file__).resolve()),
-                '--worker', str(self.folder)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            command = worker_command or [str(python32), '-B', str(Path(__file__).resolve()), '--worker', str(self.folder)]
+            self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                 stderr=self.stderr, text=True, env=environment,
                 creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
         except BaseException:

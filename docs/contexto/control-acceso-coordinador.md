@@ -451,3 +451,10 @@ capa candidata en paquete Integracion_Operativa_2026.10.24-2.zip: contratos de
 control/salud/turnos y un inspector readonly independiente. Solo sintaxis y
 manifiesto verificados, sin nuevos ensayos de comportamiento ni enlace al
 coordinador/SDK/gestor instalado. Detalle y limites en control-acceso-operacion.md.
+
+Tras simulacion r3 aprobada en Dell, siguiente candidato Cierres_Coordinador_
+2026.10.24-1.zip enlaza gate y recibos con trabajadores readonly de inventario/RT.
+21pruebas nuevas y101totales aprobadas localmente; simulacion de ZIP extraido
+correcta. No ejecutado aun en Dell ni conectado a C3 real. Mantiene almacen/
+originales anteriores y usa estado_cierres/stop propios, sin tocar r2 instalado.
+Detalle, SHA y limites en control-acceso-operacion.md y LEEME_CIERRES.md.
