@@ -109,3 +109,25 @@ Esto confirma importación/cifrado local según el cliente revisado; no certific
 túnel, envío, ACK ni estado actual del proceso PHP. Esos pasos siguen pendientes.
 Usuario está ahora físicamente en caseta con tag 12230693 para una captura SDK
 controlada, que se realizará aparte sin enviar sus datos al backend de ensayo.
+
+## Pendientes conservados sin conexion — 2026-10-24
+
+Usuario comparte preparar y enviar en Dell, con destino de tunel aun sin abrir.
+Preparacion: dos mensajes pendientes, tres originales, unbatched=0, paused vacio.
+oldest_pending_utc=2026-10-25T01:23:30.251481+00:00 (24 octubre 19:23:30 Mexico).
+Envio: delivery=[retry], lote attempts pasa de 0 a 1, error=network, ack=null;
+estado conserva attempts=0. Ambos siguen pendientes, sin pausa global.
+
+Identidades para comparar en el siguiente reintento:
+- Lote f640e2c4-63a9-4fae-90e8-440c2b39ea54, sequence=0, SHA256
+  92ab401adab4b8b42afa52502755b3e4383ff6b455635d0c4189e94da02f0239.
+- Estado 8d3b4772-b0d9-499e-843f-1de1a9e2475c, sequence=0, SHA256
+  549760fa90d2ac344488fdea6d1de61d09b12e4c564428d4b75eeb0c8fc414f7.
+
+Los tres response_id fijos terminados 0001/0002/0003 mantienen 41/35/16 bytes y
+los mismos hashes antes/despues del fallo. No se borro ni renumero evidencia.
+Confirma en Dell persistencia de originales/mensajes y reintento ante fallo de
+conexion; no certifica caida general de Internet, autenticacion ni recepcion remota.
+No se consulto SDK ni se requirio mantenimiento. Pendiente reiniciar PHP de
+ensayo si sigue detenido, abrir tunel 18881 y reenviar estos mismos pendientes;
+comprobar ACK, hashes/identidades conservados y segundo enviar sin nuevos mensajes.

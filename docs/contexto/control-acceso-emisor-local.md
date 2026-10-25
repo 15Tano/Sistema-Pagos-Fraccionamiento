@@ -125,3 +125,9 @@ Reloj/mapa físico y reconciliación histórica siguen pendientes.
 credencial por SSH directamente a DPAPI; salida CONFIGURADO con identidad de
 ensayo verificada. Túnel/ACK/entrega remota aún pendientes. Retoma captura física
 independiente del tag 12230693; no confundir esa lectura con envío del emisor.
+
+Ensayo Dell sin conexión confirmado posteriormente: preparar conserva 3 originales
+y 2 mensajes; enviar devuelve retry/network, aumenta a 1 el intento del lote y
+mantiene ambos pendientes, ACK nulo, sin pausa ni cambio de UUID/hashes. Base creada
+2026-10-25T01:23:30.251481+00:00. La entrega al servidor y ACK siguen pendientes;
+identidades/hashes para verificar el siguiente envío en control-acceso-ensayo-remoto.md.
