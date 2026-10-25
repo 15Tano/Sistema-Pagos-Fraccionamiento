@@ -18,7 +18,7 @@ FROZEN = {
 
 
 def main():
-    target = ROOT / 'Envio_Vigilado_2026.10.25-1.zip'
+    target = ROOT / 'Envio_Vigilado_2026.10.25-2.zip'
     if target.exists():
         raise FileExistsError('Conservar ZIP; publicar otra version.')
     entries = {name: (ROOT / name).read_bytes() for name in FILES}
@@ -29,7 +29,7 @@ def main():
         with zipfile.ZipFile(path) as archive:
             for member in members:
                 entries['runtime/' + member] = archive.read(member)
-    manifest = {'release': '2026.10.25-1', 'scope': 'Ensayo acotado sin SDK ni instalacion permanente.',
+    manifest = {'release': '2026.10.25-2', 'scope': 'Ensayo acotado sin SDK ni instalacion permanente.',
         'files': [{'name': name, 'sha256': hashlib.sha256(value).hexdigest()} for name, value in entries.items()]}
     entries['ENVIO_SHA256SUMS.json'] = (json.dumps(manifest, indent=2) + '\n').encode('utf-8')
     (ROOT / 'ENVIO_SHA256SUMS.json').write_bytes(entries['ENVIO_SHA256SUMS.json'])

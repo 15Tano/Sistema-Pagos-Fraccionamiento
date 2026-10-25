@@ -23,7 +23,7 @@ def main():
         folder.mkdir(exist_ok=True)
         name = 'simulacion_envio_' + dt.datetime.now().strftime('%Y%m%d_%H%M%S_%f')
         (folder / (name + '.txt')).write_text(log.getvalue(), encoding='utf-8')
-        success = result.wasSuccessful() and result.testsRun == 33 and not result.skipped
+        success = result.wasSuccessful() and result.testsRun == 37 and not result.skipped
         report = {'result': 'simulation_ok' if success else 'simulation_failed',
             'scope': 'emisor_y_vigilancia_ficticios_sin_sdk_red_dpapi_access_tareas',
             'tests': result.testsRun, 'failures': len(result.failures), 'errors': len(result.errors),

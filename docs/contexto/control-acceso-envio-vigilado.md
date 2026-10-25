@@ -84,3 +84,88 @@ Pendientes: simulacion/ensayo Dell, vigilancia independiente con alertas (aqui
 solo diagnostico durante ensayo), servicio permanente, integracion SDK y botones,
 retencion/reconciliacion, rollback y transicion autorizada. Sin push/deploy,
 pantalla web o endpoints nuevos. Ultimo pendiente real sigue sin ACK aportado.
+
+## Simulacion aprobada en Dell — 2026-10-25
+
+Usuario verifica Envio Vigilado2026.10.25-1 y ejecuta simular_envio.py con
+Python32 instalado. Resultado simulation_ok,33tests, failures0/errors0/skipped0,
+scope emisor_y_vigilancia_ficticios_sin_sdk_red_dpapi_access_tareas,
+ended_utc2026-10-25T19:42:27.583715+00:00 (13:42:27 Mexico). Evidencia:
+C:\SanIsidro\EnvioVigilado_20261025\registros\simulacion_envio_20261025_134227_582777.json.
+
+Confirma los33casos sobre fixtures y trabajadores ficticios en runtime Dell;
+no hubo SDK/red/DPAPI/Access/tareas reales ni se renueva salud de polling por
+esta salida. Siguiente: comprobar servidor/tunel del ensayo y ejecutar envio
+real acotado120s con polling activo, sin mantenimiento. Confirmar ACK del
+pendiente, cierre de hijo y originales preservados. Servidor/tunel disponibles,
+nuevo ACK y resultado real del supervisor todavia pendientes.
+
+Comprobacion previa de red aportada despues por usuario: Invoke-RestMethod a
+http://127.0.0.1:18881/salud falla con WebException/UnableToConnect. Solo acredita
+ruta local del ensayo no disponible en ese momento; no distingue tunel ausente
+de servidor detenido ni fallo de Internet. No se ha iniciado --ensayo nuevo,
+no hay nuevo intento/ACK del pendiente acreditado. Reabrir/usar servidor privado
+127.0.0.1:18880 y tunel18881, verificar salud y despues ejecutar emisor120s.
+Sin mantenimiento, SDK, cambios de polling o produccion para restablecer ruta.
+
+## Ensayo1: cola vacia, finalizacion con PermissionError — 2026-10-25
+
+Salud por tunel restablecida: ensayo_listo/TEST-C3-001 es marcador estatico del
+laboratorio, no serial del agente emisor. Usuario ejecuta --ensayo120s. Padre
+PID5948/run_idf6fd9070-20d2-49ee-847d-a2614fbb033d, hijo712, ended_utc
+2026-10-25T19:47:32.320805+00:00 (13:47:32 Mexico). phase fault, exit_code1,
+worker_closure_confirmed false, forced_own_sender_exit false,
+supervisor_error_type null, sender_report null. Proceso hijo termino por error;
+no atribuir ausencia de cierre confirmado a proceso vivo o trabajador SDK.
+
+Observacion real a19:47:27.893954Z: vigencias correcto, tareas Vigencias y
+Vigilancia Running/enabled true, read_errors vacio, vigilancia instalada intacta.
+Ensayo SDK10540 anterior permanece stopped sin errores. Cola228respuestas,
+85mensajes acked,0pendientes/0sin lote/paused false: aumento de1confirmado frente
+a84anteriores. No hay manifiesto nuevo ni totales/ACK individual impresos para
+certificar nuevamente integridad o recepcion por inspeccion SQL independiente.
+No confundir entrega observada con aprobacion del ensayo de cierre.
+
+Archivos sender.json y closed.json aportados despues: phase fault,
+error_type PermissionError, heartbeat19:47:31.995481Z, identidad712/mismo run_id,
+exit_code1. No codigo winerror/errno, etapa o stack en version1. Evidencia:
+C:\SanIsidro\EnvioVigilado_20261025\datos\sesiones\f6fd9070-20d2-49ee-847d-a2614fbb033d.
+No modificar ni borrar sesion, base, credencial o ZIP1. Polling sigue separado;
+no se ha confirmado cierre de ventanas del servidor/tunel despues del ensayo.
+
+## Colision de snapshot corregida en candidato2 — 2026-10-25
+
+Reproduccion local determinista: mantener lectura abierta de snapshot.json y
+llamar save produce PermissionError WinError5 en os.replace. En Windows, lector
+sin FILE_SHARE_DELETE impide sustituir archivo mientras permanece abierto.
+Ruta del candidato compatible con incidente: padre lee sender.json mientras
+hijo lo reemplaza cada vuelta. Recibo remoto carece de etapa/codigo, por tanto
+no certificar que esta sea la unica causa de PermissionError en Dell ni cambiar
+permisos globales/reinstalar SDK basandose solo en tipo de excepcion.
+
+save ahora reintenta SOLO os.replace21veces con20esperas50ms (maximo1s).
+No reintenta HTTP, ACK o transacciones por este evento. Si persiste error,
+conserva destino anterior, intenta limpiar solo su temporal y eleva excepcion.
+Marca operacion/rol del snapshot en error; worker agrega etapa/errno/winerror
+sin ruta, mensaje arbitrario o secretos. Padre muestra worker_error vinculado
+a identidad del recibo incluso cuando ensayo fault; no oculta salida1 ni da
+cierre confirmado a un fallo. No cambios en cola, biblioteca Sender o SDK.
+
+Cuatro casos agregados a33previos: reproduccion de lectura/reemplazo y
+recuperacion tras liberacion, permiso persistente acotado/destino intacto,
+diagnostico filtrado y salida real del canal del hijo con stdin del padre aun
+abierto. Este ultimo paso sin errores ya con codigo previo: no atribuirle otra
+causa ni afirmar parche de canal. Primer caso fallo antes del parche con
+WinError5, ahora37pruebas aprobadas en5.632s. Suite completa179aprobadas
+en25.698s, fuera del sandbox por Laravel loopback previo; mismas restricciones
+sin caseta/Access/SDK/produccion. Nuevos37casos sin red/DPAPI/tareas reales.
+
+ZIP2 extraido y verificado: simulation_ok,37tests/failures0/errors0/skipped0,
+ended_utc2026-10-25T19:54:30.113698+00:00. Sintaxis/rutas/hashes verificados.
+Envio_Vigilado_2026.10.25-2.zip:16archivos,40835bytes, SHA256
+03b415a4e7aba6941d4eac219c4f986f863dbe8c1af1553591b9e611219f226b.
+ZIP1 conserva a70d81fa6b2e594bce3e8d1c5143381f40453b89179a21e26b3d924935fcd1eb.
+Destino Dell nuevo C:\SanIsidro\EnvioVigilado_20261025_r2, misma outbox/DPAPI
+originales. Primero verificar/simular ZIP2 sin mantenimiento/SSH; salida Dell2
+y siguiente ensayo real aun pendientes. Ultima cola real0pendientes; repetir
+ensayo no requiere crear eventos nuevos ni releer SDK.

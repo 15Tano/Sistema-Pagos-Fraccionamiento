@@ -20,7 +20,7 @@ from vigilancia_envio import combined
 ROOT = Path(__file__).resolve().parent
 BASE = Path(r'C:\SanIsidro\CoordinadorEnsayo_20261024')
 DESTINATION = 'http://127.0.0.1:18881/api/control-acceso/agente'
-RELEASE = '2026.10.25-1'
+RELEASE = '2026.10.25-2'
 FILES = {'envio_vigilado.py', 'bucle_envio.py', 'vigilancia_envio.py', 'simular_envio.py',
          'verificar_envio.ps1', 'LEEME_ENVIO_VIGILADO.md', 'tests/test_envio_vigilado.py',
          'runtime/entregar_coordinador.py', 'runtime/enlace_candidato.py',
@@ -45,11 +45,34 @@ def read(path, maximum=131072):
 def save(path, value):
     path = Path(path)
     temporary = path.with_name(path.name + '.' + str(uuid.uuid4()) + '.tmp')
-    with temporary.open('x', encoding='utf-8') as stream:
-        json.dump(value, stream, indent=2)
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temporary, path)
+    operation = 'create_snapshot'
+    try:
+        with temporary.open('x', encoding='utf-8') as stream:
+            json.dump(value, stream, indent=2)
+            stream.flush()
+            os.fsync(stream.fileno())
+        operation = 'replace_snapshot'
+        # Windows puede impedir replace mientras otro proceso mantiene un lector
+        # sin FILE_SHARE_DELETE. Reintentar solo el reemplazo, nunca HTTP/ACK.
+        for attempt in range(21):
+            try:
+                os.replace(temporary, path)
+                break
+            except PermissionError:
+                if attempt == 20:
+                    raise
+                time.sleep(.05)
+    except PermissionError as exc:
+        exc.snapshot_operation = operation
+        exc.snapshot_role = path.name if path.name in (
+            'sender.json', 'closed.json', 'vigilancia.json', 'resultado.json',
+            'request.json', 'estado_envio.json', 'detener_envio.json') else 'other_snapshot'
+        raise
+    finally:
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError:
+            pass  # No ocultar la causa original; no tocar el destino anterior.
 
 
 def verify_package():
@@ -121,7 +144,7 @@ def parent_channel(stream, request):
 def worker(folder):
     request = request_at(folder)
     stop = parent_channel(sys.stdin, request)
-    delivery, code, report = None, 1, None
+    delivery, code, report, stage = None, 1, None, 'runtime'
     identity = {'pid': os.getpid(), 'run_id': request['run_id']}
     try:
         if stop():
@@ -131,16 +154,23 @@ def worker(folder):
             raise ValueError('Solo backend aislado por tunel loopback18881.')
         if not (BASE / 'datos' / 'lectura_mantenimiento' / 'outbox.sqlite').is_file():
             raise RuntimeError('Falta almacen existente; no inicializar.')
+        stage = 'open_store'
         delivery = module.Delivery(BASE)
         # Token solo se descifra en el hijo y nunca se pasa por argumentos/entorno/salida.
+        stage = 'credential'
         transport = delivery.lib.sender.HttpTransport(module.URL,
             delivery.lib.secret.load(delivery.secret_file), local_trial=True, timeout=5)
+        stage = 'sender_loop'
         report = run_sender(delivery, transport, identity, request['seconds'],
             lambda value: save(folder / 'sender.json', value), stop)
         code = 2 if report['stop_reason'] == 'blocked' else 0
     except BaseException as exc:
         report = {'protocol': 1, **identity, 'phase': 'fault', 'heartbeat_utc': now(),
-                  'error_type': type(exc).__name__}
+                  'error_type': type(exc).__name__, 'error_stage': stage,
+                  'os_errno': getattr(exc, 'errno', None) if type(getattr(exc, 'errno', None)) is int else None,
+                  'os_winerror': getattr(exc, 'winerror', None) if type(getattr(exc, 'winerror', None)) is int else None,
+                  'snapshot_operation': getattr(exc, 'snapshot_operation', None),
+                  'snapshot_role': getattr(exc, 'snapshot_role', None)}
         save(folder / 'sender.json', report)
     finally:
         if delivery is not None:
@@ -214,11 +244,17 @@ def supervise(folder, request, observe, stopped, *, worker_command=None, clock=t
             if not clean or failure is not None:
                 watch['emisor'] = {'status': 'degradado', 'reason': 'supervisor_or_closure_fault'}
             save(folder / 'vigilancia.json', watch)
+            fault = closure.get('report') if isinstance(closure, dict) else None
+            error = None
+            if (isinstance(fault, dict) and fault.get('phase') == 'fault' and fault.get('pid') == child.pid and
+                    fault.get('run_id') == request['run_id']):
+                error = {k: fault.get(k) for k in ('error_type', 'error_stage', 'os_errno', 'os_winerror',
+                                                 'snapshot_operation', 'snapshot_role')}
             result = {'scope': 'supervisor_ensayo_emisor_sin_sdk', 'phase': 'stopped' if clean and failure is None else 'fault',
                 'pid': os.getpid(), 'run_id': request['run_id'], 'worker_pid': child.pid,
                 'worker_exit_code': child.returncode, 'worker_closure_confirmed': clean,
                 'forced_own_sender_exit': forced, 'supervisor_error_type': failure,
-                'ended_utc': now(), 'sender_report': closure.get('report') if clean else None,
+                'ended_utc': now(), 'sender_report': closure.get('report') if clean else None, 'worker_error': error,
                 'last_watch': watch}
             save(folder / 'resultado.json', result)
     return result

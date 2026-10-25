@@ -503,3 +503,10 @@ Estado phase cycle a18:30:53Z representa siguiente ciclo en curso con errores0.
 Aceptado retorno de esta ventana; detalle de limites/incidente previo Ctrl+C
 en control-acceso-operacion.md. Servicio permanente/emisor/vigilancia nuevos
 siguen pendientes, no hay nuevas tareas o despliegue de produccion.
+
+Observacion posterior del emisor vigilado1 a2026-10-25T19:47:27.893954Z:
+85mensajes acked/228respuestas y0pendientes, vigencias correcto y tareas Running/
+enabled true. Emisor acaba con PermissionError/exit1, no cierre confirmado;
+aceptacion de ese componente sigue pendiente pese a cola vacia. Correccion
+de snapshot Windows preparada en version2, detalle en envio-vigilado. No nueva
+captura SDK ni nuevo manifiesto de228originales aportado con ese informe.

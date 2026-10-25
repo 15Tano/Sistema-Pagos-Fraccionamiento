@@ -1,4 +1,4 @@
-# Envio vigilado — 2026.10.25-1
+# Envio vigilado — 2026.10.25-2
 
 Candidato manual acotado; no instala servicio/tareas, no reemplaza polling,
 gestor o vigilancia. No importa/carga SDK ni Access, no modifica vigencias.
@@ -10,16 +10,26 @@ tunel127.0.0.1:18881; no produccion. Limite5..180s,120s predeterminado.
 Descargar ZIP a Downloads de Dell. PowerShell:
 
 ```powershell
-Expand-Archive -LiteralPath 'C:\Users\Dell\Downloads\Envio_Vigilado_2026.10.25-1.zip' -DestinationPath 'C:\SanIsidro\EnvioVigilado_20261025'
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'C:\SanIsidro\EnvioVigilado_20261025\verificar_envio.ps1'
-& 'C:\Users\Dell\Python32\python.exe' -B 'C:\SanIsidro\EnvioVigilado_20261025\simular_envio.py'
+Expand-Archive -LiteralPath 'C:\Users\Dell\Downloads\Envio_Vigilado_2026.10.25-2.zip' -DestinationPath 'C:\SanIsidro\EnvioVigilado_20261025_r2'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'C:\SanIsidro\EnvioVigilado_20261025_r2\verificar_envio.ps1'
+& 'C:\Users\Dell\Python32\python.exe' -B 'C:\SanIsidro\EnvioVigilado_20261025_r2\simular_envio.py'
 ```
 
-Esperado33pruebas,0fallos/errores/omisiones, simulation_ok. Sin SDK/red/DPAPI/
+Esperado37pruebas,0fallos/errores/omisiones, simulation_ok. Sin SDK/red/DPAPI/
 Access/tareas reales. Estados/CIM/transporte/credencial ficticios, SQLite/locks
 temporales y trabajadores Python ficticios propios. No presenta tags ni abre
 panel/SSH. Temporales bajo datos/pruebas_envio con limpieza guardada por ruta;
 detalle txt/resumen JSON en registros/. Primero compartir salida y revisarla.
+
+ZIP2 corrige colision local reproducida: Windows rechaza os.replace cuando un
+lector mantiene el JSON abierto sin permiso de borrado. Reintenta solo el
+reemplazo21intentos/20esperas de50ms (hasta1s), conserva destino anterior si
+persiste el fallo y limpia solo su temporal cuando es posible. No reenvia HTTP
+ni cambia ACK/cuerpos por ese reintento. Nuevos diagnosticos: etapa, errno/
+winerror y rol/operacion del snapshot, sin texto de excepcion/rutas/secretos.
+La incidencia Dell aporto solo PermissionError, sin etapa/codigo: la colision
+se verifico localmente, no certificar que sea unica causa remota. Conservar
+carpeta/ZIP1 y su evidencia; no sobrescribirlos ni reiniciar la outbox.
 
 ## Implementacion candidata
 
@@ -62,19 +72,21 @@ no requiere mantenimiento. No ejecutar lector/ensayo de cierres simultaneo en
 esta primera aceptacion. Emisor automatico no genera capturas/eventos ficticios.
 
 ```powershell
-& 'C:\Users\Dell\Python32\python.exe' -B 'C:\SanIsidro\EnvioVigilado_20261025\envio_vigilado.py' --ensayo --seconds 120
+& 'C:\Users\Dell\Python32\python.exe' -B 'C:\SanIsidro\EnvioVigilado_20261025_r2\envio_vigilado.py' --ensayo --seconds 120
 ```
 
 Otra PowerShell para pedir parada propia, si hace falta:
 
 ```powershell
-& 'C:\Users\Dell\Python32\python.exe' -B 'C:\SanIsidro\EnvioVigilado_20261025\envio_vigilado.py' --detener
+& 'C:\Users\Dell\Python32\python.exe' -B 'C:\SanIsidro\EnvioVigilado_20261025_r2\envio_vigilado.py' --detener
 ```
 
 Esperar resultado; no usar Ctrl+C para una parada normal. Tras final normal:
 worker_closure_confirmed true, forced_own_sender_exit false, worker_exit_code0,
 sender_report con salud/ACK/manifiesto de originales conservados. Sin pendientes
-no implica capturas nuevas; el ultimo ensayo dejo solo un mensaje pendiente.
+no implica capturas nuevas; ultima observacion real228respuestas/85mensajes
+acked/0pendientes. El ensayo1 termino con PermissionError pese a cola vacia;
+no se considera cierre confirmado. No crear eventos para probar otro envio.
 ACK reportados no sustituyen inspeccion SQL remota independiente.
 
 No ejecutar botones del enlace mientras este candidato este activo: su detector

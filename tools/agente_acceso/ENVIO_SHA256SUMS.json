@@ -1,10 +1,10 @@
 {
-  "release": "2026.10.25-1",
+  "release": "2026.10.25-2",
   "scope": "Ensayo acotado sin SDK ni instalacion permanente.",
   "files": [
     {
       "name": "envio_vigilado.py",
-      "sha256": "dfee70e1972f45e51213f7588b5c2c4ae44b0cf0f8dc060c1bcb5eba2e2b298c"
+      "sha256": "56b9c545e077882c7b8fdf86161a1ab005606f173adef3d435be5fa6e151e9bf"
     },
     {
       "name": "bucle_envio.py",
@@ -16,19 +16,19 @@
     },
     {
       "name": "simular_envio.py",
-      "sha256": "947fa164f15c7ccbe2f8e666f3cb5ad734cbc6e02fe864685c9298b1f3c3efa7"
+      "sha256": "c6b79470356f2dc08853a0bbddecef77356cafe997e8c6b624df8afb3ecb8809"
     },
     {
       "name": "verificar_envio.ps1",
-      "sha256": "f2952f2fd26b664417b6ad5a44f106347ae9a04a0d5446798a1646b87e1ca738"
+      "sha256": "bb907e93c9c3aa244e478011a0f32147ba56c22cfb438bf6ce031adad7e5e09d"
     },
     {
       "name": "LEEME_ENVIO_VIGILADO.md",
-      "sha256": "cab245c65303610e72fbac7ee8ec7614a60d0ee19795d42dbfe92cb912fd4e3b"
+      "sha256": "b1bf7d0421a0d10c7c1ecf036ef6b017a086b54ae44a4e1a589a71a8c25f49f9"
     },
     {
       "name": "tests/test_envio_vigilado.py",
-      "sha256": "04d35d2668fa3c74a6fbf1398bd751af6ad1bf95c0cfbd7e898f03976253e925"
+      "sha256": "9673c89767d88edc224a2224b04661dfa4ac7c282d22bfff735a4f94c1cfb858"
     },
     {
       "name": "runtime/outbox.py",

@@ -730,3 +730,12 @@ Primero verificar y simular en Dell sin mantenimiento; recepcion Dell y envio
 real con este supervisor pendientes. Ultima salud real de polling permanece
 en retorno de12:28-12:30, no renovada por pruebas locales. Sigue1mensaje local
 pendiente segun ultima salida, sin nuevo ACK aportado. No repetir lectura SDK.
+
+Ensayo posterior del emisor1 termina fault/exit1 PermissionError, pero observacion
+real19:47:27Z muestra vigencias correcto/tareas habilitadas, cola228respuestas/
+85acked/0pendientes. No SDK ni nueva pausa. Colision de os.replace contra lector
+Windows reproducida localmente, correccion acotada y diagnostico ampliado en
+Envio_Vigilado_2026.10.25-2.zip;37casos/179totales aprobados localmente.
+Detalle de evidencia, limites y SHA en control-acceso-envio-vigilado.md.
+Validacion de ZIP2 en Dell pendiente; no considerar envio vigilado aceptado
+solo por cola vacia cuando no confirmo finalizacion del hijo.

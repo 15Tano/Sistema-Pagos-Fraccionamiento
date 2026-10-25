@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import types
 import unittest
@@ -234,6 +235,47 @@ sys.exit(code)
 
 
 class SupervisorTests(Fixture):
+    def test_worker_channel_can_exit_at_deadline_while_parent_pipe_remains_open(self):
+        code = '''import ctypes,json,sys,time
+ctypes.windll.kernel32.SetErrorMode(2)
+sys.path.insert(0,sys.argv[1])
+import envio_vigilado as app
+app.parent_channel(sys.stdin,{'parent_pid':123,'run_id':sys.argv[2]})
+time.sleep(.1)
+'''
+        child = subprocess.Popen([sys.executable, '-B', '-c', code, str(ROOT), RUN],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        self.children.append(child)
+        child.stdin.write((json.dumps({'parent_pid': 123, 'run_id': RUN}) + '\n').encode())
+        child.stdin.flush()
+        child.wait(timeout=6)  # Conservar stdin abierto: simula limite del hijo antes del padre.
+        self.assertEqual(child.returncode, 0, child.stderr.read().decode(errors='replace')[-1200:])
+
+    def test_atomic_snapshot_retries_when_reader_temporarily_holds_file(self):
+        path = self.folder / 'snapshot.json'
+        app.save(path, {'old': True})
+        handle = path.open('rb')
+        closer = threading.Thread(target=lambda: (time.sleep(.15), handle.close()))
+        closer.start()
+        try:
+            app.save(path, {'new': True})
+        finally:
+            closer.join(timeout=2)
+            handle.close()
+        self.assertEqual(app.read(path), {'new': True})
+
+    def test_persistent_permission_failure_is_bounded_and_keeps_old_snapshot(self):
+        path = self.folder / 'snapshot.json'
+        app.save(path, {'old': True})
+        with patch.object(app.os, 'replace', side_effect=PermissionError(13, 'ficticio')) as replace, \
+             patch.object(app.time, 'sleep') as sleep:
+            with self.assertRaises(PermissionError): app.save(path, {'new': True})
+        self.assertEqual(replace.call_count, 21)
+        self.assertEqual(sleep.call_count, 20)
+        self.assertEqual(app.read(path), {'old': True})
+        self.assertFalse(list(self.folder.glob('snapshot.json.*.tmp')))
+
     def supervise(self, mode='ok', observe=lambda: {'vigencias': {'status': 'correcto'}}):
         request = {'protocol': 1, 'parent_pid': os.getpid(), 'run_id': RUN, 'seconds': 5}
         return app.supervise(self.folder, request, observe, lambda: True,
@@ -323,7 +365,7 @@ class SupervisorTests(Fixture):
 
 
 class WorkerTests(Fixture):
-    def start(self, *, secret_error=False, wrong_url=False):
+    def start(self, *, secret_error=False, wrong_url=False, loop_error=None):
         sessions = self.folder / 'datos' / 'sesiones'
         folder = sessions / RUN
         folder.mkdir(parents=True)
@@ -331,6 +373,8 @@ class WorkerTests(Fixture):
         module = types.SimpleNamespace(Delivery=lambda base: self.delivery,
             URL='http://no-permitido' if wrong_url else app.DESTINATION)
         def loop(*args, **kwargs):
+            if loop_error is not None:
+                raise loop_error
             return run_sender(*args, **kwargs, clock=lambda: self.instant, sleep=self.sleep, utc=at)
         with patch.object(app, 'ROOT', self.folder), patch.object(app, 'BASE', self.base), \
              patch.object(app, 'parent_channel', return_value=lambda: False), \
@@ -358,6 +402,18 @@ class WorkerTests(Fixture):
         self.assertEqual(code, 1)
         self.assertEqual(receipt['report']['error_type'], 'ValueError')
         self.assertFalse(self.transport.calls)
+
+    def test_permission_report_keeps_codes_without_paths_or_secret_text(self):
+        error = PermissionError(13, 'ruta_ficticia_y_secreto_que_no_se_debe_publicar')
+        error.winerror = 5
+        error.snapshot_operation, error.snapshot_role = 'replace_snapshot', 'sender.json'
+        code, receipt = self.start(loop_error=error)
+        self.assertEqual(code, 1)
+        report = receipt['report']
+        self.assertEqual(report['error_stage'], 'sender_loop')
+        self.assertEqual(report['os_winerror'], 5)
+        self.assertEqual(report['snapshot_role'], 'sender.json')
+        self.assertNotIn('secreto_que_no_se_debe_publicar', json.dumps(report))
 
 
 if __name__ == '__main__':
