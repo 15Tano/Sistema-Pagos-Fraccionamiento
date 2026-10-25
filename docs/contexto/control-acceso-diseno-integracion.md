@@ -215,11 +215,15 @@ no cambiar el acceso del polling instalado durante esta primera entrega.
    automatica de archivos actuales sin SDK pendiente. Compatibilidad de SQLite
    en disco y DPAPI verificada en Dell/Python32 mediante 13 comprobaciones;
    entrega ficticia Dell -> backend aislado confirmada con reintento y ACK el
-   24 octubre; capturas reales aun sin enviar.
+   24 octubre. Posteriormente entrega real confirmada por ACK: 93 respuestas,
+   51 filas de eventos y42 de estado, pendientes0 y originales conservados;
+   segundo envio idle. Ver coordinador y ensayo remoto.
 3. **Coordinador en carpeta separada.** Prototipo readonly preparado el 24 octubre,
    43 pruebas locales y simulacion aprobadas. Simulacion Dell posteriormente
    aprobada: cinco checks true, 139 originales, sin mantenimiento. Ver documento
-   de coordinador para limites y hallazgo del gestor. Lectura real pendiente.
+   de coordinador para limites y hallazgo del gestor. Lectura real150s completada:
+   tres ciclos readonly sin error, 93respuestas capturadas, retorno a r2 confirmado
+   con dos ciclos correctos y posterior entrega de outbox al backend aislado.
    Simular la secuencia sin escrituras; probar
    cierre SDK antes de cycle(), parada del gestor, watchdog y persistencia. Consulta
    real solo con mantenimiento; aplicacion de fechas con paquete nuevo requiere
@@ -230,12 +234,14 @@ no cambiar el acceso del polling instalado durante esta primera entrega.
    a mano. Backend por Git y despliegue probado fuera del docroot, con confirmacion.
 5. **Pantalla y captura asistida.** Salud desglosada, acumulados con sus fechas,
    filtro/consulta por tag, captura armada y confirmada por operador. Aun pendiente
-   validar correspondencia fisica y distinguir evento posterior a armar de backlog.
+   integrar mapa fisico ya observado (DoorID1 entrada, DoorID2 salida) y distinguir
+   evento posterior a armar de backlog.
 6. **Altas/recuperaciones.** Solicitud humana autorizada en backend, reconsulta de
    vigencia oficial al ejecutar, resultados verificados y conciliacion de fallos.
    Sin dinero ni cortes modificados para habilitar tags. Diseno detallado posterior.
 
 Pendientes de acuerdo: frecuencias/limites definitivos, retencion, permisos humanos
-y estrategia de reconciliacion historica. Reloj exacto y mapa fisico se muestran
-como desconocidos hasta obtener evidencia; no bloquear la ingesta de originales
-ni presentar esas propiedades como verificadas.
+y estrategia de reconciliacion historica. Reloj exacto sigue sin certificar; mapa
+fisico observado para este controlador en capturas del24octubre. No bloquear la
+ingesta de originales ni presentar reloj, completitud o paso vehicular como
+verificados por recibir eventos.

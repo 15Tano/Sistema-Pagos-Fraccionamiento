@@ -184,3 +184,28 @@ SSH directo a DPAPI y usa la outbox existente del UUID real; no toca SDK/polling
 50 pruebas locales aprobadas (7 nuevas), incluyendo entrega a Laravel aislado
 local y segundo envio idle. Provision/importacion en Dell y recepcion remota de
 estas93respuestas todavia pendientes. Fuentes, SHA y pasos en documento de coordinador.
+
+Importacion en Dell posteriormente confirmada: complemento verificado,
+CONFIGURADO (DPAPI del agente real), estado con93respuestas/30mensajes/3sinlote,
+ningun ACK y hashes verificados. Manifiesto de originales
+ee79ca83bef66050d092b171967985bfe8dc703f022fc35f62bd2f1a70b99700.
+Pendiente activar/usar servidor y tunel privados, enviar capturas y verificar ACK
+sin cambio de originales ni mensajes existentes. No se compartio token.
+
+## Recepcion de capturas reales confirmada por ACK — 2026-10-24
+
+Usuario entrega outbox del agente c8d7ccdc-991f-497c-8383-92fb52921f8a,
+serial CO2K225060027: 31mensajes confirmados, 5estados y26lotes. ACK suma
+93respuestas/93filas, 51eventos y42estados, pendientes de interpretacion0.
+Pendientes locales0, sin lote0, pausa vacia. Segundo enviar idle1 y mismos totales.
+Los93originales conservan manifiesto
+ee79ca83bef66050d092b171967985bfe8dc703f022fc35f62bd2f1a70b99700;
+hashes de originales/cuerpos verificados, originals_preserved=true y
+existing_messages_unchanged=true en ambas salidas. No hay inspeccion SQL remota
+independiente ni reenvio deliberado de mensajes ya confirmados en esta prueba.
+
+Servidor existente respondio /salud tras puerto ocupado al intentar otra instancia;
+no se sustituyeron procesos. Solicitar cierre del tunel y del servidor temporal
+desde sus ventanas, conservando evidencia. Cierre aun pendiente. No deploy,
+instalacion permanente ni nueva pausa. Detalle y siguientes limites en
+control-acceso-coordinador.md.

@@ -231,3 +231,53 @@ Pendientes: verificar complemento en Dell, importar credencial y comprobar estad
 de las93respuestas; despues entregar por SSH y confirmar cero pendientes, sumas
 ACK y originales/mensajes existentes sin cambios. Todavia no se envio ningun
 lote real de este agente. Pasos completos en LEEME_ENTREGA.md del paquete.
+
+## Credencial real importada y almacen verificado — 2026-10-24
+
+Usuario comparte PAQUETE VERIFICADO Entrega Coordinador 2026.10.24-1 y
+CONFIGURADO por tuberia SSH -> DPAPI. Agente esperado
+c8d7ccdc-991f-497c-8383-92fb52921f8a, serial CO2K225060027. Sin secreto compartido.
+Estado previo a envio: responses93, mensajes pendientes30, unbatched3,
+pending_count33, paused vacio, oldest_pending_utc=2026-10-25T02:12:27.227609+00:00.
+ACK totales todos0. originales.count93, hashes_verified=true,
+manifest_sha256=ee79ca83bef66050d092b171967985bfe8dc703f022fc35f62bd2f1a70b99700;
+messages.count30, body_hashes_verified=true. Este manifiesto sirve para comparar
+antes/despues del envio. Agrupar las3respuestas sin lote puede cambiar cantidad
+de mensajes, no originales ni UUID/cuerpo de los30mensajes existentes.
+Entrega real todavia pendiente. Siguiente: servidor/tunel privados y enviar dos
+veces; exigir pendientes0, 93respuestas confirmadas por ACK, manifiesto conservado
+y segundo envio idle. No requiere nueva pausa ni consultas SDK.
+
+## Entrega real al backend aislado confirmada — 2026-10-24
+
+Usuario comparte fallo al iniciar otra instancia PHP por puerto18880 ocupado;
+GET /salud mediante SSH devuelve ensayo_listo/TEST-C3-001, marcador fijo de salud
+del ensayo. Se utiliza la instancia existente. No se identifica aqui su PID ni
+se atribuye el marcador de salud al agente real.
+
+Dos ejecuciones de entregar_coordinador.py enviar con scope
+entrega_capturas_reales_backend_aislado, agente
+c8d7ccdc-991f-497c-8383-92fb52921f8a y serial CO2K225060027. Primera entrega:
+31 mensajes confirmados (5 estados y 26 lotes), delivery acked31/idle1.
+ACK totales: responses_stored93, rows_stored93, events_stored51,
+statuses_stored42, responses_pending_interpretation0. Health responses93,
+messages.acked31, unbatched0, pending_count0, paused vacio y oldest_pending_utc=null.
+Las3respuestas antes sin lote quedaron agrupadas: de30 a31mensajes, sin cambiar
+los mensajes existentes. Segunda ejecucion delivery idle1, mismos conteos y ACK;
+no realiza nuevos envios. No equivale a reenvio forzado de mensajes ya aceptados.
+
+Ambas salidas: originales.count93, hashes_verified=true y mismo manifiesto previo
+ee79ca83bef66050d092b171967985bfe8dc703f022fc35f62bd2f1a70b99700.
+messages.count31, body_hashes_verified=true, originals_before93,
+originals_preserved=true y existing_messages_unchanged=true. ACK validados y
+guardados en Dell; originales conservados en SQLite. Conteos remotos acreditados
+por ACK, sin consulta SQL independiente del servidor en esta evidencia. No se
+certifica frescura, completitud de historial ni51vehiculos/pasos fisicos.
+
+Cierra entrega autenticada de las capturas reales de este ensayo, sin nueva
+consulta SDK, pausa de polling, despliegue ni servicio permanente. Solicitar
+Ctrl+C en ventana del tunel y, si se localiza la ventana del servidor temporal,
+en esa ventana; no matar procesos desconocidos por puerto. Conservar bases y
+evidencias. Cierre de procesos todavia no confirmado. Siguiente etapa propuesta:
+ensayos acotados de parada propia y recuperacion en hardware, integracion con
+gestor/vigilancia y comparacion con r2 antes de plantear transicion operativa.
