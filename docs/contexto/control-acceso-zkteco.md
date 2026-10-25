@@ -626,3 +626,22 @@ el diagnostico. Emisor/backend de ensayo aun no recibieron este evento.
 Lector muestra Cierre diagnostico. Solicitado Terminar y reanudar por el gestor;
 reanudacion y dos ciclos correctos posteriores a ESTA captura pendientes de
 salida del usuario. No reutilizar cierres saludables anteriores como evidencia.
+
+Primera reanudacion posterior comprobada por salida del usuario: parada ordenada
+18:53:44.510; nuevo proceso PID 11376 iniciado 2026-10-25T00:56:05.337368+00:00
+(24 octubre 18:56:05 Mexico). Estado protocol=2, phase=idle, errores consecutivos 0,
+last_ok_utc=2026-10-25T00:56:09.273568+00:00. Primer ciclo correcto 18:56:09.276:
+API=838, cambios Access/C3=0, no encontrados=4, ausentes API conservados=116.
+No atribuir la diferencia frente a los conteos historicos 5/117 al diagnostico:
+4/116 ya figuraban antes de la pausa. Los ciclos 18:48-18:52 son anteriores a
+esta captura; no cuentan para su cierre. Segundo ciclo posterior y estado de
+vigilancia todavia pendientes de evidencia; no afirmar aceptacion de dos ciclos.
+
+Cierre posterior confirmado por salida del usuario: ciclos correctos 18:56:09.276,
+18:57:12.535 y 18:58:15.691 del 24 octubre, todos posteriores a reanudacion y
+captura fisica. Los tres mantienen API=838, cambios Access=0/C3=0,
+no encontrados=4 y ausentes API conservados=116. Requisito de dos ciclos cumplido;
+prueba de lectura fisica de salida y reanudacion aceptada para esta ventana.
+Estado de vigilancia no aportado. DoorID 1/entrada, equivalencia Pluma 1/2 y
+entrega del emisor al backend de ensayo siguen pendientes; no se instala servicio
+lector ni se modifica produccion por este cierre.
