@@ -224,3 +224,34 @@ frescura ni completitud por esos conteos. Sin consulta SQL remota independiente.
 Consola PHP temporal muestra inicio y conexiones Accepted/Closing del ensayo.
 Cierre de servidor/tunel solicitado al terminar, no confirmado. Sin produccion,
 SDK ni pausa adicional. Detalle en documento de coordinador.
+
+## Tercera entrega real: 228 respuestas confirmadas — 2026-10-25
+
+Tras el ensayo de cierres readonly, usuario comparte salud de tunel18881 con
+status ensayo_listo/device_serial TEST-C3-001 (marcador estatico del laboratorio,
+no identidad del agente que envia) y dos ejecuciones de entregar_coordinador.py
+enviar. Agente real c8d7ccdc-991f-497c-8383-92fb52921f8a, serial CO2K225060027.
+Primer envio confirma31mensajes nuevos; acumulado84 (14estados y70lotes).
+ACK validados suman228respuestas/228filas:157eventos,71estados y0respuestas
+pendientes de interpretacion. Frente a entrega anterior: +79respuestas,
++51filas de evento y+28de estado; no son conteos certificados de vehiculos.
+
+Pendientes0, unbatched0, pausa vacia y oldest_pending_utc null. Segundo envio
+delivery idle1 sin nuevas confirmaciones, mismos totales y manifiesto original:
+483c43bc939fdece659d2fd9e6d67974e19d5784f4fabbfc45f570744da4ee32.
+Ambas salidas: originales228/hashes_verified true, cuerpos de84mensajes con
+hashes verificados, originals_before228, originals_preserved true y
+existing_messages_unchanged true. Evidencia local resumida en
+C:\SanIsidro\CoordinadorEnsayo_20261024\datos\lectura_mantenimiento\entrega_resumen.json;
+ACK completos y originales retenidos en outbox.sqlite del mismo almacen.
+Salida compartida no incluye timestamps nuevos de ACK; no inventar hora de
+recepcion ni afirmar inspeccion SQL remota independiente. Segundo envio idle
+verifica cola vacia; no prueba reenvio forzado de un lote ya aceptado.
+
+Entrega concluida al backend aislado sin SDK, mantenimiento ni deploy nuevo.
+Polling se conserva funcionando; ultima evidencia de salud sigue siendo los
+tres ciclos posteriores al ensayo de cierres, no renovada por esta entrega.
+Solicitar Ctrl+C en ventanas identificadas del tunel y del servidor temporal
+si siguen abiertas, conservando datos; cierre de esos procesos sin confirmar.
+Pendiente siguiente: enlace de control/estado con gestor y vigilancia en
+candidato separado, antes de transicion permanente autorizada.

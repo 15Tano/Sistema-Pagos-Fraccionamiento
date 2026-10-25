@@ -16,9 +16,9 @@ La documentación permanente de este proyecto está en `docs/contexto/`. Al come
 | [API de control de acceso v1](docs/contexto/control-acceso-api-v1.md) | 2026-10-23 | Contrato implementado localmente: autenticación del agente, estado, lotes, ACK, límites, pruebas y pendientes de ensayo. |
 | [Ensayo MySQL de acceso](docs/contexto/control-acceso-ensayo-mysql.md) | 2026-10-23 | MySQL 8.4.13 aislado: migración, concurrencia InnoDB, 24 pruebas aprobadas, repetición y cierre de la instancia temporal. |
 | [Emisor local de acceso](docs/contexto/control-acceso-emisor-local.md) | 2026-10-24 | Outbox SQLite y DPAPI; entrega ficticia y 93 respuestas reales confirmadas en ensayo remoto, detalle en coordinador. |
-| [Ensayo remoto de acceso](docs/contexto/control-acceso-ensayo-remoto.md) | 2026-10-24 | Entrega real autenticada: ACK de 149 respuestas, cero pendientes y originales conservados; segundo envío idle. |
-| [Coordinador de acceso](docs/contexto/control-acceso-coordinador.md) | 2026-10-24 | Parada, reapertura readonly y retorno a r2 verificados; 149 respuestas entregadas en ensayo aislado, instalación permanente pendiente. |
-| [Operación de acceso](docs/contexto/control-acceso-operacion.md) | 2026-10-24 | Contratos r3 aprobados en Dell; adaptadores readonly con recibos de cierre preparados y 101 pruebas locales aprobadas, validación Dell pendiente. |
+| [Ensayo remoto de acceso](docs/contexto/control-acceso-ensayo-remoto.md) | 2026-10-25 | ACK de 228 respuestas reales en ensayo aislado, cero pendientes y originales conservados; segundo envío idle. |
+| [Coordinador de acceso](docs/contexto/control-acceso-coordinador.md) | 2026-10-25 | Cierres readonly reales y retorno a r2 verificados; 228 respuestas entregadas al ensayo aislado, enlace operativo pendiente. |
+| [Operación de acceso](docs/contexto/control-acceso-operacion.md) | 2026-10-25 | Enlace r2: 41 pruebas nuevas con delegados ficticios y 142 totales aprobadas localmente; simulación Dell y aceptación del panel pendientes. |
 
 Estos documentos contienen contexto histórico, no una certificación del estado actual del código o de producción. Verifica archivos, configuración y pruebas pertinentes antes de afirmar que algo está implementado, desplegado o pendiente. Una instrucción actual del usuario actualiza las preferencias históricas. Para decisiones documentadas que se contradigan, usa la decisión explícita más reciente; si la fecha o el alcance no resuelven la contradicción, expón la duda antes de implementar lo que dependa de ella.
 

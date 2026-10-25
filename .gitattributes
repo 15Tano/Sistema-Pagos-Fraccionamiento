@@ -1,5 +1,8 @@
 * text=auto eol=lf
 
+# Conservar bytes del manifiesto congelado incluido en paquetes con SHA256.
+tools/agente_acceso/cierres_manifest_referencia.json binary
+
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html

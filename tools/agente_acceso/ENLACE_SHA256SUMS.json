@@ -1,0 +1,54 @@
+{
+  "release": "2026.10.25-2",
+  "scope": "Control candidato y simulacion ficticia; no instalador.",
+  "files": [
+    {
+      "name": "enlace_candidato.py",
+      "sha256": "b6daa663747ead2c90f802cc2a280273885a0d9f62f7ac5a516b1eb6122e0a62"
+    },
+    {
+      "name": "panel_coordinador.ps1",
+      "sha256": "32e0651f11157dc90769018609d27aa0786d38439f96fb50284d4a28ada74911"
+    },
+    {
+      "name": "mantenimiento_candidato.ps1",
+      "sha256": "677a6a32a9d06312a05fdb9a6a6853de3ec537cc2319e7e1950156b13de631fa"
+    },
+    {
+      "name": "control_operativo.py",
+      "sha256": "17251c5f6617660751479be6d701f7cdb59dae3041505dc9801cd4dd09f9faa8"
+    },
+    {
+      "name": "salud_operativa.py",
+      "sha256": "d4e310d240674adc7f9ea3d5da02f140a9591a12d56ecf944a46c65adfbe19aa"
+    },
+    {
+      "name": "verificar_enlace.ps1",
+      "sha256": "96d00850458ef5560b8b85866797491c2b0b95374152f898eea8187d241c0fcc"
+    },
+    {
+      "name": "LEEME_ENLACE.md",
+      "sha256": "652598d078a092c89b42322e1704f5d324de020f778bb678bd4181e2d8faf7a8"
+    },
+    {
+      "name": "enlace_funciones.ps1",
+      "sha256": "3da87a2def0bdb8cad5b0e68b71f0e234c40abe85d3e4dc17d09541928bf4a33"
+    },
+    {
+      "name": "simular_enlace.py",
+      "sha256": "95f977a16ab15a820c600007b5c6bac1cfb5221e4fb400ec00cbc54f64cab508"
+    },
+    {
+      "name": "tests/test_enlace_candidato.py",
+      "sha256": "550ef9ed9a707e0b92d601dd3af78fe21e1d4be678ff3d1abfef211a66b5d610"
+    },
+    {
+      "name": "tests/enlace_ficticio.ps1",
+      "sha256": "a0af2a7f22208706f7c9373358c04ea849caa5d28d403ddea71b9ba89086a251"
+    },
+    {
+      "name": "cierres_manifest_referencia.json",
+      "sha256": "4c328dcf264684b907dde6b8eb42041cbf4b1363d8bd1a73d13e7c9705c4752c"
+    }
+  ]
+}

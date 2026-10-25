@@ -350,3 +350,221 @@ Destino Dell nuevo C:\SanIsidro\CierresCoordinador_20261024. Primero --simular c
 Python32, sin mantenimiento. Simulacion Dell, SDK real de estos adaptadores y
 reanudacion de ese ensayo pendientes. Enlace de botones gestor/vigilancia y
 transicion operativa permanecen para etapas posteriores.
+
+## Simulacion de adaptadores aprobada en Dell — 2026-10-25
+
+Usuario verifica Cierres Coordinador2026.10.24-1 y ejecuta ensayo_cierres.py
+--simular con Python32 instalado. Resultado simulation_ok, scope
+adaptadores_ficticios_sin_sdk_red_access_tareas, tests21, failures0, errors0,
+skipped0. Evidencia:
+C:\SanIsidro\CierresCoordinador_20261024\registros\simulacion_cierres_20261025_002338_326174.json.
+Fecha local segun nombre de evidencia25octubre00:23:38; resumen no aporta UTC.
+
+Confirma casos de adaptadores/recibos sobre procesos ficticios en Dell x86.
+No es prueba del SDK real ni renueva salud de polling/vigilancia. Siguiente
+ensayo preparado:150s readonly con lanzar_cierres.ps1, mantenimiento confirmado
+por gestor y ZKAccess cerrado, conservando outbox/originales anteriores. Exigir
+cierre normal, phase stopped, gate fault false, comparaciones sin errores y
+recibos confirmados; despues reanudar por gestor y verificar dos ciclos nuevos.
+Ante cierre/identidad SDK sin confirmar o phase fault, revisar antes de reanudar.
+Lectura real de estos adaptadores y su reanudacion todavia pendientes.
+
+## Cierres con SDK real y retorno a r2 verificados — 2026-10-25
+
+Salida aportada por usuario tras lanzar_cierres.ps1 -Seconds 150, paquete
+Cierres Coordinador2026.10.24-1. PID5396, run_id
+7e60c27f-54a6-4333-a815-0631e6beb164, inicio
+2026-10-25T06:28:34.837254+00:00 (00:28:34 Mexico). Termina por limite,
+phase stopped, tres comparaciones readonly completadas, errores consecutivos y
+totales0, ultimo ciclo2026-10-25T06:30:58.277499+00:00. reader_error y
+storage_error null; sdk_gate_fault false, active null y seis cierres confirmados
+por el padre. Ultima lectura SDK06:31:03.984616Z, heartbeat final06:31:04.987154Z.
+El Ctrl+C compartido aparece despues del retorno normal al prompt, no como
+interrupcion de este ensayo. Los recibos acreditan ruta de cierre y salida de
+los trabajadores segun validacion del padre; no estado interno del firmware ni
+independencia de clientes externos.
+
+Originales anteriores revisados149; responses228 al cierre (+79), mensajes
+acked53/pending30, unbatched1, pending_count31, paused vacio. Primer pendiente
+2026-10-25T06:28:42.904202+00:00. Son pendientes locales esperados sin envio HTTP;
+las149 respuestas anteriores siguen como entrega previa confirmada, no afirmar
+que las228 esten en el servidor. Esta salida no aporta nuevo manifiesto SHA ni
+desglose de eventos/estados de las79 respuestas. Almacen de evidencia:
+C:\SanIsidro\CoordinadorEnsayo_20261024\datos\lectura_mantenimiento,
+estado_cierres.json, resultado_cierres.json y cierres/ con recibos/ACK del padre.
+No se modificaron fuentes instaladas, tareas, SDK o vigencias por este ensayo.
+
+Reanudacion confirmada con tarea SanIsidro-Vigencias Running, PID9544,
+run_started_utc2026-10-25T06:31:52.156041+00:00, phase idle, errores0 y
+last_ok_utc2026-10-25T06:34:02.896227+00:00. Tres ciclos nuevos correctos a
+00:31:55.703,00:32:59.708 y00:34:02.897 Mexico; API838, cambios Access0/C3=0,
+no encontrados4, ausentes API sin cambios116. La parada previa fue00:28:24.168.
+Queda cerrada esta ventana de mantenimiento. Vigilancia no fue consultada en
+esta salida; no actualizar su ultima comprobacion ni inferir nuevas alertas.
+
+Pendiente inmediato: entregar las nuevas capturas con el emisor existente al
+backend aislado y validar ACK, originales y segunda ejecucion idle, sin pausar
+polling ni abrir SDK. Enlace real con botones del gestor/vigilancia, recuperacion
+ante fallo real y transicion permanente siguen pendientes; no hay deploy nuevo.
+
+Entrega posterior al backend aislado verificada por salidas del usuario,
+2026-10-25:31mensajes nuevos confirmados;84acumulados,228respuestas/228filas
+(157eventos/71estados), interpretacion pendiente0. Pendientes y sin lote0,
+segundo envio idle1, originales/mensajes existentes sin cambios y hashes
+verificados; manifiesto228originales
+483c43bc939fdece659d2fd9e6d67974e19d5784f4fabbfc45f570744da4ee32.
+Se cierra el pendiente inmediato de entrega anterior. No hubo mantenimiento,
+SDK o deploy; no actualizar salud del polling por esta salida de emisor.
+Siguiente pendiente de implementacion: enlazar control/estado del candidato
+con gestor y vigilancia, preservando r2 instalado hasta transicion autorizada.
+Detalle de ACK/evidencia y cierre de ventanas pendiente en ensayo-remoto.
+
+## Panel/enlace candidato preparado, sin activar en caseta — 2026-10-25
+
+Usuario indica seguir. Releidos mantenimiento.ps1, GestionTags.ps1,
+vigilar_sync.py, runtime, contratos y ensayo de cierres reales. Preparados
+enlace_candidato.py, panel_coordinador.ps1, mantenimiento_candidato.ps1,
+empaquetador/verificador y LEEME_ENLACE.md, separados de fuentes instaladas.
+No se modifican tools/gestion_tags ni tools/zkaccess ni ZIPs anteriores.
+
+Panel WinForms candidato con botones Preparar mantenimiento, Solicitar parada
+ensayo, Verificar cierre, Terminar y reanudar y Consultar salud. No se enlazo
+dentro del gestor original, no inicia lector, no instala tareas ni vigilancia
+automatica. No hay ejecucion local de botones ni SDK/CIM/Access/DPAPI reales.
+
+Solicitud de parada confirma script/ruta exacta mediante CommandLineToArgvW,
+PID/run_id y creacion del proceso; escribe solo detener_cierres.json, sin matar
+procesos. Verificacion separada exige stopped por limit/requested, gate limpio,
+ausencia del PID objetivo y otros lectores, revision del gestor ausente, todos
+los recibos/ACK completos y toma/liberacion de sync.lock existente. Modulos de
+cierre se verifican contra manifiesto congelado del ZIP publicado, no solo
+contra el manifiesto que se encuentre en Dell. Importacion no carga SDK.
+Python sin script identificable y otras herramientas SanIsidro desconocidas
+bloquean confirmacion. Procesos/argumentos completos solo se inspeccionan en
+memoria, no se imprimen ni persisten. No se eliminan locks, ledger ni fallos.
+
+Botones de pausa/reanudacion delegan al mantenimiento instalado exigiendo SHA
+840c500933e644fb9545c88091a287416a018b7c3e16434d634138531b97b4f4. Reanudacion
+exige ademas cierre del ensayo confirmado y mantenimiento activo. El contrato
+legacy de r2 sigue sin acreditar lock/ciclo nuevo por confirmar un proceso:
+el wrapper lo explicita y siguen requiriendose dos ciclos nuevos. No afirmar
+compatibilidad completa ni sustituir el gestor. El control propio serializa
+sus comandos; el lock libre es observacion puntual, no reserva transaccional
+frente a lanzadores externos. No abrir otros lectores durante transiciones;
+validar carreras y errores antes de usar botones. No hay reanudacion automatica.
+
+Salud: evalua vigencias desde estado/tarea/PID reales y referencia de vigilancia,
+sin usar el exito readonly para last_ok. Muestra ensayo readonly por separado;
+stopped se denomina detenido_sin_verificar_cierre hasta comprobacion explicita.
+Consulta cola existente SQLite mode=ro/query_only, identidad real exigida, sin
+inicializar/agrupar/enviar ni tocar leases. Cantidad pendiente y pausa locales
+no equivalen a transporte saludable. Informe filtrado propio en registros/,
+sin copiar filas/tags/commandlines ni estado instalado. Sin popup/eventos nuevos.
+
+Comprobadas sintaxis Python por AST, PowerShell por parser (incluido comando
+CIM embebido, sin ejecutarlo), manifiesto/rutas/fuentes del ZIP y verificador
+desde copia extraida. No se agregaron ni ejecutaron pruebas de comportamiento
+nuevas: las101anteriores pertenecen a etapa previa, no validan este enlace.
+UI/CIM, bloqueo Win32, SQLite real, timeout, carreras, delegacion y fallos de
+botones siguen pendientes de validacion con procesos/tareas sustituidos.
+
+Enlace_Candidato_2026.10.25-1.zip,9archivos,17460bytes, SHA256
+4203c95d96dc3f22b47c66f34a9ffdd56440c4f081e7cca41a319fc749941032.
+ZIP de cierres conserva SHA62afc55c986178e8086035fa978c7d2241f715296f359cc02997db7698819a11
+y operacionr3 conserva d27ef8346943fa0c6d7dab3469a6feed8d63597a198de5cc2e8b50ad377d98cf.
+Destino nuevo C:\SanIsidro\EnlaceCandidato_20261025. Primer paso solicitado:
+verificar paquete y ejecutar solo enlace_candidato.py salud, sin mantenimiento.
+No abrir panel ni usar controles antes de revisar salida y validar candidato.
+Salida Dell aun pendiente. Instalacion operativa, emisor continuo, integracion
+de alertas, recuperacion/retencion/reconciliacion y deploy siguen pendientes.
+
+## Inspeccion readonly del enlace aprobada en Dell — 2026-10-25
+
+Usuario verifica paquete Enlace Candidato2026.10.25-1 y ejecuta solo salud con
+Python32. checked_utc2026-10-25T06:58:17.285122+00:00 (00:58:17 Mexico).
+Vigencias status correcto/reason null. SanIsidro-Vigencias Running/enabled true,
+SanIsidro-Vigilancia Ready/enabled true. read_errors vacio y
+installed_watchdog_replaced false. Confirma lectura/evaluacion de estado,
+CIM/tareas y cola reales en esta ejecucion; no funcionamiento de botones.
+
+Ensayo previo PID5396/run_id7e60c27f-54a6-4333-a815-0631e6beb164 permanece
+stopped, sin errores de lector/almacenamiento. Se muestra
+detenido_sin_verificar_cierre y heartbeat_age_seconds1632.297968, coherentes
+con ensayo terminado a06:31:04Z: salud no vuelve a verificar ledger/lock.
+Este rotulo no invalida los seis cierres y retorno a r2 aportados antes ni
+demanda pausar un polling saludable para repetir la comprobacion ahora.
+
+Cola actual leida:84mensajes acked,228respuestas, sin lote0, pendientes0,
+paused false. Solo acredita cola local; no conectividad actual del transporte.
+Sin SDK, Access, DPAPI, HTTP, mantenimiento nuevo, tareas modificadas ni
+vigilancia sustituida. Informe propio de salud guardado por CLI en registros/
+de EnlaceCandidato_20261025; usuario no aporta nombre concreto del archivo.
+
+Siguiente etapa: validar controles con procesos/tareas ficticios (identidad,
+parada/cierre, errores y transiciones) antes de abrir panel o usar botones en
+caseta. Validacion de esos controles e integracion operativa siguen pendientes.
+
+## Controles probados con procesos/tareas ficticios, enlace2 — 2026-10-25
+
+Usuario autoriza continuar con simulacion. Agregadas41pruebas Python en
+test_enlace_candidato.py; una ejecuta14comprobaciones de PowerShell mediante
+tests/enlace_ficticio.ps1. Ninguno de esos41casos consulta SDK, red, Access,
+DPAPI o tareas/CIM reales. Inventario y ledger sustituidos, estados/SQLite
+temporales, bloqueos reales sobre archivos temporales propios, parser argv de
+Windows y un hijo Python ficticio propio con salida redirigida. Verificacion
+de contenido/recibos SDK ya cubierta en etapa anterior; no atribuir a mocks
+una lectura de recibos del equipo ni cierre de firmware real.
+
+Primeros26casos detectan5fallos del candidato: cambio de ejecucion durante
+inventario antes de stop; inicio futuro; cambio de gate durante comprobacion;
+ledger vacio pese a ciclo completado; recibos solo de otra ejecucion. Corregido
+releyendo estado/identidad y orden temporal, comprobando estado final completo,
+y exigiendo solicitudes de inventario de la misma ejecucion suficientes para
+los ciclos declarados completados, despues de validar ledger entero. Tambien
+se repite comprobacion de procesos bajo sync.lock antes de confirmar cierre.
+Cinco errores de limpieza de fixtures provenian de usar contexto SQLite sin
+cerrar la conexion: cambiados a contextlib.closing, no era fallo del producto.
+
+Casos adicionales detectan clasificacion falsa de python -c con ruta .py como
+entrada de ensayo. Ahora exige script despues de opciones Python admitidas,
+no una ruta incidental de otro argumento. Inventario fallido, timeout, comando
+ausente, PID reutilizado, procesos desconocidos, revision pendiente, fault y
+lock ausente/ocupado impiden confirmacion. Exito RT/readonly no oculta last_ok
+de vigencias vencido; cola readonly conserva bytes y exige identidad del agente.
+
+enlace_funciones.ps1 concentra mapa de acciones, constructor oculto de procesos,
+flujo de precondicion/hash/delegacion y mutex. mantenimiento_candidato.ps1 toma
+mantenimiento_enlace.lock durante todo precheck Y delegacion; antes CLI liberaba
+su mutex al terminar precheck. Funciones reales compartidas con panel/wrapper
+ejercitadas con callbacks ficticios: orden/argumentos, bloqueo ante precheck/hash
+fallido o no tipado, error de delegado, timeout ficticio, exclusion/liberacion
+tras excepcion, cinco acciones, entorno sin SANISIDRO_* y pipes/hijo propio.
+dispatch usa la misma ruta de CLI para exigir cierre/mantenimiento/hash antes
+de previo_reanudar. No se ejecuto delegado de produccion ni se abrio WinForms.
+
+Final41pruebas nuevas aprobadas en2.441s; suite completa142 en19.338s, fuera del
+sandbox por HTTP loopback de Laravel en pruebas anteriores. Sin caseta/API de
+produccion/Access reales; suite anterior incluye SQLite, DPAPI ficticio y
+Laravel local. powershell_checks_included14 no se suma a142: esta incluido en
+una prueba Python. Sin nuevos fallos/errores/omisiones. Sintaxis Python y cinco
+scripts PowerShell comprobada, empaquetado y manifiesto verificados.
+
+simular_enlace.py ejecuta solo41casos sobre fixtures, verifica paquete primero,
+guarda txt y JSON en registros/ propio, temporales guardados bajo
+datos/pruebas_enlace. Repetida desde ZIP extraido: simulation_ok,
+41tests/failures0/errors0/skipped0,14checks PowerShell incluidos, ended_utc
+2026-10-25T07:10:44.222652+00:00. No consulta estado actual de caseta ni
+renueva la ultima salud real recibida del enlace1 a06:58:17Z.
+
+Enlace_Candidato_2026.10.25-2.zip:13archivos,27993bytes, SHA256
+03d16983db51a8bc421694c37e044f469e2ea33623004c1da8ade5b854de9e51.
+ZIP1 conserva4203c95d96dc3f22b47c66f34a9ffdd56440c4f081e7cca41a319fc749941032;
+cierres1 y operacion3 tambien conservan sus SHA publicados. No sobrescribir
+EnlaceCandidato_20261025; destino nuevo C:\SanIsidro\EnlaceCandidato_20261025_r2.
+Siguiente: verificar ZIP2 y ejecutar simular_enlace.py con Python32 de Dell,
+sin mantenimiento. No abrir panel ni usar botones hasta revisar resultado.
+Interfaz visual, operaciones reales y carreras con lanzadores externos siguen
+pendientes: serializar botones propios no reserva transicion frente a otros
+programas. No cambios de tareas, archivos instalados, deploy, SDK o vigencias.
+Excepcion puntual binary (-text) en .gitattributes conserva bytes del manifiesto
+congelado de cierres (CRLF heredado) para mantener su SHA al recuperar desde Git.

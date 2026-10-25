@@ -458,3 +458,31 @@ Tras simulacion r3 aprobada en Dell, siguiente candidato Cierres_Coordinador_
 correcta. No ejecutado aun en Dell ni conectado a C3 real. Mantiene almacen/
 originales anteriores y usa estado_cierres/stop propios, sin tocar r2 instalado.
 Detalle, SHA y limites en control-acceso-operacion.md y LEEME_CIERRES.md.
+
+## Aceptacion real de adaptadores de cierre — 2026-10-25
+
+Usuario aporta ensayo150s con paquete Cierres Coordinador2026.10.24-1:
+PID5396/run_id7e60c27f-54a6-4333-a815-0631e6beb164, tres ciclos readonly sin
+errores, seis cierres confirmados, gate sin fallo y sin cliente activo, parada
+normal por limite. Almacen previo revisado149 respuestas, total local228 (+79),
+53 mensajes ya acked,30 pendientes y1 respuesta sin lote: pending_count31.
+No hubo envio HTTP;149 respuestas son la entrega previa al backend aislado,
+no las228. Nuevos manifiestos y ACK de esta captura aun pendientes.
+
+Polling reanudado PID9544 desde2026-10-25T06:31:52.156041+00:00: tarea Running,
+phase idle, errores0, tres ciclos correctos00:31:55,00:32:59 y00:34:02 Mexico,
+API838, cambios Access0/C3=0, no encontrados4, ausentes API116 sin cambios.
+Ventana de mantenimiento cerrada; vigilancia no consultada en esta muestra.
+Detalle de timestamps y evidencia en control-acceso-operacion.md. Cierres
+validados por el padre no certifican estado interno de firmware o clientes
+externos. Siguiente entrega al ensayo aislado puede hacerse sin mantenimiento;
+enlace gestor/vigilancia e instalacion permanente siguen pendientes.
+
+Entrega posterior confirmada el2026-10-25:31mensajes nuevos y84ACK acumulados
+(14estados/70lotes),228respuestas/228filas segun ACK:157eventos y71estados,
+interpretacion pendiente0. Cola pendiente/sin lote0; segundo envio idle1.
+Originales228 y mensajes existentes conservados, hashes correctos; manifiesto
+483c43bc939fdece659d2fd9e6d67974e19d5784f4fabbfc45f570744da4ee32.
+Queda cerrada la entrega de las79respuestas adicionales del ensayo de cierres.
+Sin SDK, nueva pausa o deploy; detalle/limites en control-acceso-ensayo-remoto.md.
+No se aporto nueva salud del polling o vigilancia ni cierre de tunel/servidor.
