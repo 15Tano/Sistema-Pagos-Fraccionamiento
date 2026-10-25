@@ -120,3 +120,8 @@ Después: coordinador SDK en carpeta separada, parada/mantenimiento cooperativos
 prioridad de vigencias, watchdog y transición autorizada. La lectura real todavía
 no llama `Outbox.capture()`; no dar por instalado un recolector permanente.
 Reloj/mapa físico y reconciliación histórica siguen pendientes.
+
+2026-10-24, evidencia posterior: usuario verifica ZIP del cliente Dell e importa
+credencial por SSH directamente a DPAPI; salida CONFIGURADO con identidad de
+ensayo verificada. Túnel/ACK/entrega remota aún pendientes. Retoma captura física
+independiente del tag 12230693; no confundir esa lectura con envío del emisor.

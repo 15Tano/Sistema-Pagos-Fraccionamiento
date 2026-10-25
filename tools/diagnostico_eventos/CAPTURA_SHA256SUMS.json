@@ -1,0 +1,29 @@
+{
+  "release": "2026.10.24-1",
+  "files": [
+    {
+      "name": "captura_controlada.py",
+      "sha256": "28419e3af43a2d8168616f13c91c21d06d2a2c3b168db0b640bf031801700f1f"
+    },
+    {
+      "name": "lector_eventos.py",
+      "sha256": "8e92df0ebd7de0645d53ffdcfeccaa4444418744ddc3e5c3ae5f65a9a4275eee"
+    },
+    {
+      "name": "test_captura.py",
+      "sha256": "732a0420ec728151abcefdb0ee6f19a8c73e1e18770e0b4ae7240bfcb7281ae5"
+    },
+    {
+      "name": "test_lector.py",
+      "sha256": "18946afa57808622c2e41b2addba979562e53b5a3bed6cd3224e02aca9aaff4c"
+    },
+    {
+      "name": "LEEME_CAPTURA.md",
+      "sha256": "13856ae304c16530b8611462b3bbb60f2266c4ce49ef678787e3a9fc9a0be53c"
+    },
+    {
+      "name": "verificar_captura.ps1",
+      "sha256": "f372f13961939574cd96f34e6144013c61b45e088a64fbead569b023b4d2c0b5"
+    }
+  ]
+}

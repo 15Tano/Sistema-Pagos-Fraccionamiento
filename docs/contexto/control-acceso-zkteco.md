@@ -568,3 +568,32 @@ autenticacion del agente ni entrega de lotes. Cliente manual de fixtures prepara
 en ensayo_dell.py, con identidad/destino limitados e importacion SSH directa a
 DPAPI. No lee C3 ni estado real de ZKSync; no requiere mantenimiento. Importacion
 real, tunel 18881, ACK y conteos pendientes. Ver ensayo-remoto para pasos/evidencia.
+
+## Presentacion controlada preparada — 2026-10-24
+
+Usuario confirma estar fisicamente en caseta con tag 12230693 y quiere probarlo.
+Tambien comparte importacion SSH a DPAPI del cliente de ensayo: CONFIGURADO;
+entrega remota por emisor todavia pendiente, sin secreto compartido.
+
+Preparada captura_controlada.py, paquete Captura_Tag_C3_2026.10.24-1.zip en
+tools/diagnostico_eventos, SHA256
+4c4d10cfe73e5e31e9e446226584792b2c44750952ff9d7975c00b118eb01a33.
+Reutiliza lector_eventos.py sin modificar firmas, DLL, hash, serial, bloqueo ni
+guardas de mantenimiento. Una sola sesion a la vez; evita el ensayo antiguo con
+A/B simultaneos que dio -2. Pausa/reanudacion exclusivamente desde el gestor.
+Historial previo, base de dos estados 255 separados >=1 s sin eventos/vacios
+intermedios (preparacion <=60 s/300 llamadas), ARMADO y una presentacion del tag
+en hasta 60 s. Seleccion solo del numero solicitado; conserva todos los originales.
+Relectura RT, historial posterior/relectura, cierre A antes de reconexion B y
+consulta RT/historial. Compara tupla completa con Time_second y aumento de
+multiplicidad respecto a antes, sin filas historicas faltantes. Nota fisica del
+operador queda separada del evento; no demuestra cruce ni vigencia API.
+
+18 pruebas simuladas aprobadas, incluidas 5 nuevas para tupla, multiplicidad,
+historial antiguo/vacio, otro tag, base no confirmada, cierre/error y no solapar
+clientes. Sin SDK/red/hardware. Primer intento bloqueado por permisos de temporales
+del sandbox; repeticion fuera de este aprobada. Manifiesto y verificador PowerShell
+correctos; ZIP anteriores preservados. No se modifico polling, emisor ni backend.
+Captura fisica, correspondencia de pluma, respuesta real y reanudacion posterior
+siguen pendientes de salida del usuario. No atribuir vigencia ni rechazo al tag
+antes de obtener evidencia. Instrucciones en LEEME_CAPTURA.md dentro del paquete.

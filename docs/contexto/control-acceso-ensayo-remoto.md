@@ -99,3 +99,13 @@ sin interpretar (el error SDK ficticio conservado como sdk_error).
 La primera corrida fue bloqueada por WinError 10013 del sandbox; se repitió con
 acceso HTTP local permitido. Otra repetición agotó el inicio PHP en una prueba
 anterior; la última corrida completa pasó. No se cambió el backend ni sus límites.
+
+## Cliente Dell configurado — 2026-10-24
+
+Usuario comparte PAQUETE VERIFICADO del cliente 2026.10.24-1 y ejecución de la
+tubería SSH a ensayo_dell.py configurar. Resultado CONFIGURADO: credencial DPAPI
+del usuario actual e identidad de ensayo verificadas. No compartió el secreto.
+Esto confirma importación/cifrado local según el cliente revisado; no certifica
+túnel, envío, ACK ni estado actual del proceso PHP. Esos pasos siguen pendientes.
+Usuario está ahora físicamente en caseta con tag 12230693 para una captura SDK
+controlada, que se realizará aparte sin enviar sus datos al backend de ensayo.
