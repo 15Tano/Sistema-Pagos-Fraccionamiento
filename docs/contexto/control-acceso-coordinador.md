@@ -510,3 +510,13 @@ enabled true. Emisor acaba con PermissionError/exit1, no cierre confirmado;
 aceptacion de ese componente sigue pendiente pese a cola vacia. Correccion
 de snapshot Windows preparada en version2, detalle en envio-vigilado. No nueva
 captura SDK ni nuevo manifiesto de228originales aportado con ese informe.
+
+Ensayo emisor2 posterior aceptado a2026-10-25T20:00:34.149307Z: padre12552/
+run_id8a1d710a-51b0-412d-8673-141071cdd262, hijo5864 con salida0 y cierre
+confirmado, sin terminacion forzada/errores. Cola vacia85acked/228respuestas,
+215idle sin ACK nuevo; originales/cuerpos conservados y mismo manifiesto
+483c43bc939fdece659d2fd9e6d67974e19d5784f4fabbfc45f570744da4ee32.
+Vigencias correcto y ambas tareas habilitadas en observacion20:00:33Z.
+Valida componente de envio separado con r2 activo; no prueba recolector SDK
+y emisor conjuntamente. Diseno de ensayo conjunto acotado propuesto como
+siguiente etapa, sin servicio permanente/aplicar; detalle en envio-vigilado.

@@ -169,3 +169,64 @@ Destino Dell nuevo C:\SanIsidro\EnvioVigilado_20261025_r2, misma outbox/DPAPI
 originales. Primero verificar/simular ZIP2 sin mantenimiento/SSH; salida Dell2
 y siguiente ensayo real aun pendientes. Ultima cola real0pendientes; repetir
 ensayo no requiere crear eventos nuevos ni releer SDK.
+
+## Simulacion de version2 aprobada en Dell — 2026-10-25
+
+Usuario verifica Envio Vigilado2026.10.25-2 y ejecuta simular_envio.py con Python32.
+Resultado simulation_ok,37tests, failures0/errors0/skipped0, scope
+emisor_y_vigilancia_ficticios_sin_sdk_red_dpapi_access_tareas, ended_utc
+2026-10-25T19:57:34.637515+00:00 (13:57:34 Mexico). Evidencia:
+C:\SanIsidro\EnvioVigilado_20261025_r2\registros\simulacion_envio_20261025_135734_637017.json.
+
+Confirma regresion de archivo compartido y casos previos sobre fixtures en
+runtime Dell. Sin SDK/red/DPAPI/Access/tareas reales; no prueba cierre real del
+emisor2 ni renueva salud del polling. Siguiente: comprobar salud del tunel y
+repetir --ensayo120s desde carpeta_r2 con polling activo. Ultima cola real
+0pendientes/85acked/228respuestas; no generar nuevos eventos para esta prueba.
+Sin ACK nuevo, transporte de esta ejecucion puede figurar no comprobado aunque
+termine limpiamente y siga sin pendientes. Resultado real2 todavia pendiente.
+
+## Ensayo real2 aceptado: cierre limpio y polling correcto — 2026-10-25
+
+Usuario ejecuta --ensayo120s desde carpeta_r2. Padre12552,
+run_id8a1d710a-51b0-412d-8673-141071cdd262, hijo5864. Termina phase stopped,
+worker_exit_code0, worker_closure_confirmed true, forced_own_sender_exit false,
+supervisor_error_type/worker_error null. ended_utc
+2026-10-25T20:00:34.149307+00:00 (14:00:34 Mexico). Evidencia:
+C:\SanIsidro\EnvioVigilado_20261025_r2\datos\sesiones\8a1d710a-51b0-412d-8673-141071cdd262.
+
+Hijo stopped, stop_reason requested y heartbeat20:00:33.973625Z. Es coherente
+con cierre cooperativo del canal por padre al limite de su ventana; no implica
+que operador haya pulsado stop/Ctrl+C.215resultados idle, last_ack_utc y
+last_delivery_outcome null: no hubo mensaje nuevo enviado ni ACK fresco en
+esta ejecucion con cola vacia. last_attempt_utc20:00:33.390799Z representa intento
+de reclamar mensaje, no prueba de peticion HTTP. No crear eventos para forzar.
+
+Reporte final valida ACK acumulados:85mensajes (15estados/70lotes),228respuestas/
+228filas (157eventos/71estados), interpretacion pendiente0; pendientes0, sin
+lote0, paused false (en reporte original de libreria cadena vacia), oldest null.
+Originales228 con hashes verificados y mismo manifiesto previo
+483c43bc939fdece659d2fd9e6d67974e19d5784f4fabbfc45f570744da4ee32.
+85cuerpos verificados, originals_before228, originals_preserved true,
+existing_messages_unchanged true. Esto valida tambien ACK ya persistido del
+mensaje de estado adicional frente a84; no inspeccion SQL remota independiente.
+
+Ultima vigilancia checked_utc20:00:34.120727Z, operacion observada
+20:00:33.412815Z: vigencias correcto/reason null, tarea Vigencias Running y
+Vigilancia Ready, ambas habilitadas, read_errors vacio y watchdog instalado
+sin sustituir. Cola consistente85acked/228respuestas/0pendientes. Emisor
+detenido/bounded_run_finished, no fallo de vigilancia por fin esperado.
+Ensayo SDK10540 anterior sigue stopped; detenido_sin_verificar_cierre es etiqueta
+del inspector de salud, no invalida verificacion de recibos SDK anterior.
+
+Aceptado este ensayo de cierre y conservacion en version2; fallo PermissionError
+no reaparece en esta ventana. No certificar eliminado para cualquier ACL/antivirus
+o lector que bloquee mas de1s; esos casos siguen siendo fallo explicito.
+Sin mantenimiento/SDK/captura nueva/tareas modificadas/deploy. Emisor2 supervisado
+se probo separado del recolector SDK, con polling operativo r2 concurrente.
+
+Siguiente etapa propuesta: integrar lectura readonly y emisor sin SDK en un
+ensayo acotado conjunto, con parada/cierre de ambos y salud separada; primero
+diseno/parche/pruebas locales, despues ensayo Dell coordinado. No instalar tarea
+permanente ni habilitar aplicar por aprobar componentes separados. Vigilancia
+continua con alertas, retencion/reconciliacion, rollback y transicion pendientes.

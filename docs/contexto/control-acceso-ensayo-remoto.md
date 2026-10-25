@@ -255,3 +255,13 @@ Solicitar Ctrl+C en ventanas identificadas del tunel y del servidor temporal
 si siguen abiertas, conservando datos; cierre de esos procesos sin confirmar.
 Pendiente siguiente: enlace de control/estado con gestor y vigilancia en
 candidato separado, antes de transicion permanente autorizada.
+
+2026-10-25, validacion acumulada posterior por reporte de emisor vigilado2:
+85mensajes acked (15estados/70lotes) frente a84anteriores,228respuestas/filas
+(157eventos/71estados), pendientes0 y originales/cuerpos conservados con mismo
+manifiesto483c43bc939fdece659d2fd9e6d67974e19d5784f4fabbfc45f570744da4ee32.
+Reporte terminado20:00:34Z valida ACK persistidos, sin ACK fresco en esa ventana
+(215idle, cola ya vacia). No inspeccion SQL remota ni reenvio forzado. Emisor1
+tuvo fallo local de snapshot; emisor2 termina limpiamente y confirma al hijo.
+Detalle/correccion y evidencia en control-acceso-envio-vigilado.md. Estado final
+de ventanas servidor/tunel no compartido; no inferir que hayan sido cerradas.
