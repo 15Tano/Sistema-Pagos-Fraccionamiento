@@ -7,6 +7,31 @@ use Illuminate\Support\Facades\DB;
 
 class MonitorService
 {
+    // Asociación actual de la app; no atribuye quién portaba el tag en el pasado.
+    private function neighborNames(array $cards): array
+    {
+        if (!$cards) {
+            return [];
+        }
+        $matches = DB::table('tags as t')->join('tag_vecino as tv', 'tv.tag_id', '=', 't.id')
+            ->join('vecinos as v', 'v.id', '=', 'tv.vecino_id')->whereIn('t.codigo', $cards)
+            ->select('t.codigo', 'v.id', 'v.nombre')->get();
+        $byCard = [];
+        foreach ($matches as $match) {
+            if (in_array((string) $match->codigo, $cards, true)) {
+                $byCard[(string) $match->codigo][$match->id] = $match->nombre;
+            }
+        }
+        $result = [];
+        foreach ($byCard as $card => $neighbors) {
+            $single = count($neighbors) === 1;
+            $result[$card] = ['neighbor_name' => $single ? array_values($neighbors)[0] : null,
+                'neighbor_status' => $single ? 'single' : 'multiple'];
+        }
+
+        return $result;
+    }
+
     private function iso(?string $value): ?string
     {
         return $value === null ? null : CarbonImmutable::parse($value, 'UTC')->toISOString();
@@ -128,6 +153,8 @@ class MonitorService
         if ($after === null) {
             $rows = $rows->reverse();
         }
+        $cards = $rows->pluck('card_no')->filter(fn ($card) => is_string($card) && $card !== '' && $card !== '0')->uniqueStrict()->values()->all();
+        $names = $this->neighborNames($cards);
         $data = $rows->values()->map(fn ($row) => [
             'id' => (string) $row->id, 'response_id' => $row->response_id, 'ordinal' => (int) $row->ordinal,
             'source' => $row->source, 'device_time_raw' => $row->device_time_raw,
@@ -138,6 +165,7 @@ class MonitorService
             'event_code' => (int) $row->event_code, 'direction' => $row->direction, 'verification' => $row->verification,
             'captured_started_utc' => $this->iso($row->captured_started_utc),
             'captured_ended_utc' => $this->iso($row->captured_ended_utc), 'received_at_utc' => $this->iso($row->received_at_utc),
+            ...($names[$row->card_no] ?? ['neighbor_name' => null, 'neighbor_status' => 'none']),
         ])->all();
 
         return ['data' => $data, 'meta' => ['server_time_utc' => CarbonImmutable::now('UTC')->toISOString(),

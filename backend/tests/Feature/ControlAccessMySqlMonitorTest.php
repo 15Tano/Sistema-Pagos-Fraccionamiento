@@ -18,5 +18,8 @@ class ControlAccessMySqlMonitorTest extends ControlAccessMonitorTest
         // Solo la instancia/base/usuario/ruta/marcador exclusivos comprobados por configure().
         (require database_path('migrations/2026_10_23_210000_create_control_acceso_ingestion_tables.php'))->down();
         Schema::dropIfExists('personal_access_tokens');
+        Schema::dropIfExists('tag_vecino');
+        Schema::dropIfExists('vecinos');
+        Schema::dropIfExists('tags');
     }
 }

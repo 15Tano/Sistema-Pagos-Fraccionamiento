@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createMonitorSession, initialMonitor } from "../monitorSession";
 
-export function useControlAccess(client, filters) {
+export function useControlAccess(client, filters, maxPages = 2) {
     const key = JSON.stringify(filters);
     const [snapshot, setSnapshot] = useState(() => ({ key: "", ...initialMonitor() }));
     const [automatic, setAutomatic] = useState(true);
@@ -11,12 +11,13 @@ export function useControlAccess(client, filters) {
     const session = useRef(null);
     const automaticRef = useRef(automatic);
     useEffect(() => {
-        const instance = createMonitorSession(client, JSON.parse(key), (value) => setSnapshot({ ...value, key }));
+        const instance = createMonitorSession(client, JSON.parse(key), (value) => { setSnapshot({ ...value, key }); setTick(performance.now()); }, { maxPages });
         session.current = instance;
         instance.setEnabled(automaticRef.current);
         const visibility = () => {
             const available = navigator.onLine !== false;
             setOnline(available);
+            setTick(performance.now());
             instance.setVisible(!document.hidden && available);
         };
         visibility(); instance.start();
@@ -28,7 +29,7 @@ export function useControlAccess(client, filters) {
             document.removeEventListener("visibilitychange", visibility);
             window.removeEventListener("online", visibility); window.removeEventListener("offline", visibility);
         };
-    }, [client, key]);
+    }, [client, key, maxPages]);
     useEffect(() => { automaticRef.current = automatic; session.current?.setEnabled(automatic); }, [automatic]);
     const value = snapshot.key === key ? snapshot : initialMonitor();
     const anchor = value.anchor || localAnchor;

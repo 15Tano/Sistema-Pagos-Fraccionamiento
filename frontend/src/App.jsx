@@ -127,6 +127,9 @@ function App() {
                 />
 
                 <Route path="/vigilancia" element={<VistaVigilancia />} />
+                <Route path="/vigilancia/lecturas" element={
+                    <PrivateRoute allowedRoles={["admin", "vigilancia"]}><ControlAcceso vigilancia /></PrivateRoute>
+                } />
                 <Route path="/control-acceso" element={
                     <PrivateRoute allowedRoles={["admin", "vigilancia"]}><ControlAcceso /></PrivateRoute>
                 } />

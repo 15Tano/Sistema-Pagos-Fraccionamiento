@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setImmediate } from 'node:timers/promises';
 import { createMonitorSession } from '../src/pages/ControlAcceso/monitorSession.js';
-import { mergeRows, rowId, eventsResponse, reporting, cycleLabel, deviceText, utcText } from '../src/pages/ControlAcceso/model.js';
+import { mergeRows, rowId, eventsResponse, reporting, cycleLabel, deviceText, utcText, neighborText, eventPresentation, displayReading, displayDoor } from '../src/pages/ControlAcceso/model.js';
 
 const AGENT = '00000000-0000-4000-8000-000000000001';
 const STAMP = '2026-10-26T18:30:00Z';
@@ -20,7 +20,7 @@ const failure = (status, headers = {}) => Object.assign(new Error('HTTP'), { res
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; };
 const settle = async () => { await setImmediate(); await setImmediate(); };
 
-function harness(t, events, filters = {}, stateReader = states) {
+function harness(t, events, filters = {}, stateReader = states, runtime = {}) {
     let value, time = 0, serial = 0;
     const timers = new Map(), calls = [], updates = [];
     const session = createMonitorSession({ states: stateReader, events: async (params, config) => {
@@ -29,6 +29,7 @@ function harness(t, events, filters = {}, stateReader = states) {
         clock: () => time,
         schedule: (fn, delay) => { const id = ++serial; timers.set(id, { fn, delay }); return id; },
         cancel: (id) => timers.delete(id),
+        ...runtime,
     });
     t.after(() => session.close());
     return { session, calls, updates, timers, get value() { return value; },
@@ -152,4 +153,61 @@ test('una respuesta inválida no adelanta cursor ni crea reintentos ilimitados',
     await h.start(); await h.next(); assert.equal(h.value.error.terminal, true); assert.equal(h.timers.size, 0);
     assert.deepEqual(h.value.rows.map((r) => r.id), ['9']);
     h.session.refresh(); await settle(); assert.equal(h.calls.at(-1).params.after_id, '9');
+});
+
+test('nombre completo, ausencia y asociaciones múltiples; campos viejos no inventan asociación', () => {
+    assert.equal(neighborText({ neighbor_status: 'single', neighbor_name: 'María Fernanda López Morales' }), 'María Fernanda López Morales');
+    assert.equal(neighborText({ neighbor_status: 'none' }), 'Sin vecino asociado');
+    assert.equal(neighborText({ neighbor_status: 'multiple', neighbor_name: 'No mostrar' }), 'Verificar asociación');
+    assert.equal(neighborText({}), 'Nombre no disponible');
+    const invalid = page(['1']); invalid.data[0].neighbor_name = { value: 'invalid' };
+    assert.throws(() => eventsResponse(invalid, null), /invalid_response/);
+});
+
+test('clasificación contrastada: 20 es repetición, nunca vencimiento ni rechazo genérico', () => {
+    assert.equal(eventPresentation(0).title, 'Acceso autorizado');
+    assert.equal(eventPresentation(20).title, 'Lectura repetida');
+    assert.equal(eventPresentation(20).tone, 'warning');
+    assert.equal(eventPresentation(99).title, 'Consulte a vigilancia');
+    assert.equal(eventPresentation(null).tone, 'review');
+});
+
+test('display admite solo lectura RT fresca de la pluma fijada y con seguimiento listo', () => {
+    const candidate = row('1'); const options = { door: '1', ready: true };
+    assert.equal(displayReading(candidate, NOW + 3000, options), candidate);
+    assert.equal(displayReading(candidate, NOW + 8000, options), null);
+    assert.equal(displayReading(candidate, NOW, { ...options, door: '2' }), null);
+    assert.equal(displayReading(candidate, NOW, { ...options, ready: false }), null);
+    assert.equal(displayReading(candidate, NOW, { ...options, catchingUp: true }), null);
+    assert.equal(displayReading({ ...candidate, source: 'transaction' }, NOW, options), null);
+    assert.equal(displayReading({ ...candidate, card_no: '0' }, NOW, options), null);
+    assert.equal(displayReading({ ...candidate, captured_ended_utc: null }, NOW, options), null);
+    assert.equal(displayReading(candidate, NOW - 5000, options), null);
+    assert.equal(displayReading(null, NOW, options), null);
+});
+
+test('un lote atrasado no se vuelve lectura nueva por recibirse ahora', () => {
+    const backlog = { ...row('1'), captured_ended_utc: '2026-10-26T18:00:00Z', received_at_utc: STAMP };
+    assert.equal(displayReading(backlog, NOW, { door: '1', ready: true }), null);
+    assert.equal(displayDoor('entrada'), '1'); assert.equal(displayDoor('salida'), '2'); assert.equal(displayDoor('all'), '');
+});
+
+test('el controlador físico conocido se elige sin selector ni depender del orden de agentes de ensayo', async (t) => {
+    const physical = { ...agent(), device_serial: 'CO2K225060027' };
+    const h = harness(t, () => page(['1']), {}, () => ({ data: [{ ...agent(), agent_id: '00000000-0000-4000-8000-000000000099', device_serial: 'TEST-C3-001' }, physical], meta: { server_time_utc: STAMP } }));
+    await h.start(); assert.equal(h.calls[0].params.agent_id, AGENT);
+});
+
+test('cada display limita drenaje a una página por tanda conservando su cursor', async (t) => {
+    const h = harness(t, (p) => !p.after_id ? page(['9']) : p.after_id === '9' ? page(['10'], true) : page(['11']), { door: '2' }, states, { maxPages: 1 });
+    await h.start(); await h.next(); assert.equal(h.calls.length, 2); assert.equal(h.value.catchingUp, true);
+    await h.next(); assert.equal(h.calls.at(-1).params.after_id, '10'); assert.equal(h.calls.at(-1).params.door_id, '2');
+});
+
+test('un refresco en espera no salta Retry-After del servidor', async (t) => {
+    const pending = deferred(); let calls = 0;
+    const h = harness(t, () => ++calls === 1 ? page(['9']) : pending.promise);
+    await h.start(); await h.next(); h.session.refresh();
+    pending.reject(failure(429, { 'retry-after': '60' })); await settle();
+    assert.equal([...h.timers.values()][0].delay, 60000);
 });

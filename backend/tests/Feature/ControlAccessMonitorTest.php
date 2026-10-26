@@ -31,6 +31,9 @@ class ControlAccessMonitorTest extends TestCase
             $table->string('token', 64)->unique();
         });
         $this->hash = hash('sha256', 'sica_'.str_repeat('f', 64));
+        Schema::create('tags', function ($table) { $table->id(); $table->string('codigo')->unique(); });
+        Schema::create('vecinos', function ($table) { $table->id(); $table->string('nombre'); $table->string('calle')->nullable(); });
+        Schema::create('tag_vecino', function ($table) { $table->unsignedBigInteger('tag_id'); $table->unsignedBigInteger('vecino_id'); });
         foreach ([$this->agent, $this->other] as $index => $id) {
             DB::table('control_acceso_agentes')->insert(['id' => $id, 'nombre' => 'Caseta '.($index + 1),
                 'device_serial' => $index === 0 ? 'CO2K225060027' : 'UNKNOWN-C3',
@@ -213,6 +216,38 @@ class ControlAccessMonitorTest extends TestCase
         $this->getJson($this->feed('&door_id=1&card_no=00111'))->assertOk()->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.door_label', 'Entrada')->assertJsonPath('data.0.card_no', '00111');
         $this->getJson('/api/control-acceso/monitor/eventos?agent_id='.$this->other)->assertOk()->assertJsonCount(0, 'data');
+    }
+
+    public function test_neighbor_name_is_current_exact_and_does_not_expose_address(): void
+    {
+        DB::table('tags')->insert([['id' => 1, 'codigo' => '00111'], ['id' => 2, 'codigo' => '111']]);
+        DB::table('vecinos')->insert([['id' => 1, 'nombre' => 'Nombre Ficticio Completo', 'calle' => 'Domicilio privado'],
+            ['id' => 2, 'nombre' => 'Otro Nombre', 'calle' => 'Otra calle']]);
+        DB::table('tag_vecino')->insert([['tag_id' => 1, 'vecino_id' => 1], ['tag_id' => 2, 'vecino_id' => 2]]);
+        $this->events(['2026-10-26 10:00:00,1,00111,1,0,0,4', '2026-10-26 10:00:01,2,111,1,0,0,4',
+            '2026-10-26 10:00:02,3,999,1,0,0,4']);
+        $this->login('vigilancia');
+        $response = $this->getJson($this->feed())->assertOk()->assertJsonPath('data.0.neighbor_name', 'Nombre Ficticio Completo')
+            ->assertJsonPath('data.0.neighbor_status', 'single')->assertJsonPath('data.1.neighbor_name', 'Otro Nombre')
+            ->assertJsonPath('data.2.neighbor_name', null)->assertJsonPath('data.2.neighbor_status', 'none');
+        foreach (['Domicilio privado', 'Otra calle', 'vecino_id', 'user_id'] as $private) {
+            $this->assertStringNotContainsString($private, $response->getContent());
+        }
+        DB::table('vecinos')->where('id', 1)->update(['nombre' => 'Nombre actualizado']);
+        $this->getJson($this->feed('&card_no=00111'))->assertJsonPath('data.0.neighbor_name', 'Nombre actualizado');
+    }
+
+    public function test_multiple_neighbors_are_not_chosen_and_removed_association_becomes_unknown(): void
+    {
+        DB::table('tags')->insert(['id' => 1, 'codigo' => '111']);
+        DB::table('vecinos')->insert([['id' => 1, 'nombre' => 'Primero'], ['id' => 2, 'nombre' => 'Segundo']]);
+        DB::table('tag_vecino')->insert([['tag_id' => 1, 'vecino_id' => 1], ['tag_id' => 1, 'vecino_id' => 2]]);
+        $this->events(['2026-10-26 10:00:00,1,111,1,0,0,4']); $this->login();
+        $this->getJson($this->feed())->assertOk()->assertJsonPath('data.0.neighbor_status', 'multiple')
+            ->assertJsonPath('data.0.neighbor_name', null);
+        DB::table('tag_vecino')->delete();
+        $this->getJson($this->feed())->assertOk()->assertJsonPath('data.0.neighbor_status', 'none')
+            ->assertJsonPath('data.0.neighbor_name', null);
     }
 
     public function test_empty_incremental_page_keeps_client_cursor_and_invalid_filters_are_rejected(): void

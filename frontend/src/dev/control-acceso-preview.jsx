@@ -1,51 +1,81 @@
-// Solo entrada HTML de Vite dev; no se importa desde App ni entra en el build de produccion.
+// Entrada exclusivamente local de Vite. Sin Axios, auth, OneSignal ni API real.
 import { useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { Search } from "lucide-react";
 import "../index.css";
-import ControlAccessView from "../pages/ControlAcceso/components/ControlAccessView";
-import { useControlAccess } from "../pages/ControlAcceso/hooks/useControlAccess";
+import VigilanciaLayout from "../components/VigilanciaLayout";
+import ControlAccessPanel from "../pages/ControlAcceso/components/ControlAccessPanel";
 
 const AGENT = "00000000-0000-4000-8000-000000000001";
+const NAMES = ["María Fernanda López Morales", "Carlos Alberto Ramírez Soto", "Ana Sofía Hernández Cruz", "José Luis Martínez Ríos"];
 const iso = (ms) => new Date(ms).toISOString();
-const start = Date.now();
-const rows = Array.from({ length: 16 }, (_, i) => ({ id: String(200 - i), response_id: `demo-${i}`, ordinal: 0,
-    source: i === 15 ? "transaction" : "rt", card_no: `8800${String(40 + i).padStart(4, "0")}`, pin: String(400 + i),
-    door_id: i % 3 === 0 ? "2" : "1", door_label: i % 3 === 0 ? "Salida" : "Entrada", event_code: i === 3 ? 20 : 0,
-    direction: i % 3 === 0 ? "1" : "0", verification: "4", device_time_raw: `2026-10-26 12:${String(41 - i).padStart(2, "0")}:18`,
-    captured_ended_utc: iso(start - i * 45000), received_at_utc: iso(start - i * 45000 + 500) }));
+let sequence = 200;
+function fixture(id, door, code = 0, time = Date.now(), index = 0) {
+    return { id: String(id), response_id: "demo-" + id, ordinal: 0, source: "rt",
+        card_no: "8800" + String(40 + index).padStart(4, "0"), pin: String(400 + index),
+        door_id: door, door_label: door === "2" ? "Salida" : "Entrada", event_code: code,
+        direction: door === "2" ? "1" : "0", verification: "4",
+        device_time_raw: new Date(time - 21600000).toISOString().slice(0, 19).replace("T", " "),
+        captured_ended_utc: iso(time), received_at_utc: iso(time),
+        neighbor_name: NAMES[index % NAMES.length], neighbor_status: "single" };
+}
 function demoClient(scenario) {
+    const rows = Array.from({ length: 16 }, (_, i) => fixture(200 - i, i % 3 === 0 ? "2" : "1", i === 0 && scenario === "review" ? 99 : i === 3 ? 20 : 0, Date.now() - i * 45000, i));
+    rows[14].neighbor_name = null; rows[14].neighbor_status = "none";
+    rows[15].neighbor_name = null; rows[15].neighbor_status = "multiple"; rows[15].source = "transaction";
     return {
+        capture(door, code = 0) {
+            rows.push(fixture(++sequence, door, code, Date.now(), sequence % NAMES.length));
+        },
         async states() {
-            if (scenario === "error") throw { response: { status: 503 } };
-            if (scenario === "disabled") throw { response: { status: 404 } };
-            const time = Date.now(), stamp = iso(time - (scenario === "stale" ? 900000 : 5000));
-            return { data: scenario === "empty" ? [] : [{ agent_id: AGENT, name: "Caseta principal", device_serial: "CO2K225060027", revoked_at_utc: null,
+            if (scenario === "error") throw Object.assign(new Error(), { response: { status: 503 } });
+            if (scenario === "disabled") throw Object.assign(new Error(), { response: { status: 404 } });
+            const time = Date.now(), stamp = iso(time - (scenario === "stale" ? 900000 : 1000));
+            return { data: scenario === "empty" ? [] : [{ agent_id: AGENT, name: "Demostración", device_serial: "CO2K225060027",
                 reporting_status: scenario === "stale" ? "sin_reporte_reciente" : "reciente", received_at_utc: stamp, reported_at_utc: stamp,
-                vigencias_status: scenario === "stale" ? "sin_confirmar" : "correcto", vigencias: { last_ok_utc: stamp, heartbeat_utc: stamp, phase: "idle", consecutive_errors: 0 },
-                reader: { state: "status_observed", checked_at_utc: stamp }, sender: { pending_count: scenario === "stale" ? 24 : 0, oldest_pending_at_utc: stamp } }],
+                vigencias_status: scenario === "stale" ? "sin_confirmar" : "correcto",
+                vigencias: { last_ok_utc: stamp, heartbeat_utc: stamp, phase: "idle", consecutive_errors: 0 },
+                reader: { state: "status_observed", checked_at_utc: stamp },
+                sender: { pending_count: scenario === "stale" ? 24 : 0, oldest_pending_at_utc: stamp } }],
                 meta: { server_time_utc: iso(time), truncated: false } };
         },
         async events(params) {
             const data = rows.filter((r) => (!params.door_id || r.door_id === params.door_id) && (!params.card_no || r.card_no === params.card_no) &&
-                (params.source === "all" || params.source === r.source) && (!params.after_id || BigInt(r.id) > BigInt(params.after_id)) && (!params.before_id || BigInt(r.id) < BigInt(params.before_id)))
-                .sort((a, b) => Number(a.id) - Number(b.id));
-            return { data, meta: { server_time_utc: iso(Date.now()), first_id: data[0]?.id ?? null,
-                last_id: data.at(-1)?.id ?? params.after_id ?? null, has_more: false, physical_passage_confirmed: false } };
+                (params.source === "all" || params.source === r.source) && (!params.after_id || BigInt(r.id) > BigInt(params.after_id)) &&
+                (!params.before_id || BigInt(r.id) < BigInt(params.before_id))).sort((a, b) => Number(a.id) - Number(b.id));
+            return { data, meta: { first_id: data[0]?.id ?? null, last_id: data.at(-1)?.id ?? params.after_id ?? null,
+                has_more: false, physical_passage_confirmed: false } };
         },
     };
 }
+function PreviewSearch() {
+    const [value, setValue] = useState("");
+    return <div className="mx-auto max-w-[540px] rounded-3xl border border-white/80 bg-white/50 p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-stone-800">Buscar vecino</h2><p className="mt-2 text-xs text-stone-500">Vista previa. Este buscador utiliza únicamente nombres ficticios.</p>
+        <label className="mt-5 flex items-center gap-3 rounded-xl border border-stone-200 bg-white/70 p-3"><Search size={17} className="text-stone-400" /><input aria-label="Buscar vecino de demostración" className="w-full bg-transparent text-sm outline-none" placeholder="Nombre, casa o número de tag…" value={value} onChange={(e) => setValue(e.target.value)} /></label>
+        {value && <div className="mt-4 space-y-2">{NAMES.filter((name) => name.toLowerCase().includes(value.toLowerCase())).map((name) => <p key={name} className="rounded-xl bg-white/70 p-3 text-sm text-stone-700">{name}</p>)}</div>}
+    </div>;
+}
 export default function Preview() {
     const [scenario, setScenario] = useState("normal");
-    const [filters, setFilters] = useState({ agentId: "", door: "", card: "", source: "rt" });
     const client = useMemo(() => demoClient(scenario), [scenario]);
-    const monitor = useControlAccess(client, filters);
-    return <div className="app-shell"><div className="app-bg" /><main className="relative z-10 w-full max-w-[1500px] mx-auto p-4 sm:p-8 lg:p-10">
-        <div className="flex flex-wrap items-center justify-between mb-8 gap-3"><span className="font-semibold text-stone-700 text-sm">SAN ISIDRO <span className="text-stone-400 font-normal ml-2">Vista previa privada</span></span>
-            <label className="text-xs text-stone-500">Escenario <select aria-label="Escenario de demostración" className="ml-2 rounded-lg border border-stone-200 bg-white/70 p-2"
-                value={scenario} onChange={(e) => setScenario(e.target.value)}><option value="normal">Con reportes</option><option value="stale">Reporte atrasado</option>
-                <option value="empty">Sin casetas</option><option value="error">Error de conexión</option><option value="disabled">Monitor no disponible</option></select></label></div>
-        <div className="ac-demo">Vista previa local · datos ficticios. No conectada a la caseta.</div>
-        <ControlAccessView monitor={monitor} filters={filters} onFilters={(patch) => setFilters((f) => ({ ...f, ...patch }))} />
-    </main></div>;
+    const controls = <div className="ac-demo mx-4 mt-3 flex flex-wrap items-center justify-between gap-2 text-[10px]">
+        <span>Demostración local · nombres y lecturas ficticios</span>
+        <div className="flex flex-wrap gap-2"><select aria-label="Escenario de demostración" className="rounded-lg border border-amber-200 bg-white/70 p-1" value={scenario} onChange={(e) => setScenario(e.target.value)}>
+            <option value="normal">Funcionando</option><option value="review">Lectura por revisar</option><option value="stale">Sin reportes recientes</option><option value="empty">Sin datos</option><option value="error">Error de conexión</option><option value="disabled">No disponible</option></select>
+            <button type="button" className="rounded-lg bg-white/70 px-2 py-1" onClick={() => client.capture("1")}>Simular entrada</button>
+            <button type="button" className="rounded-lg bg-white/70 px-2 py-1" onClick={() => client.capture("2")}>Simular salida</button>
+            <button type="button" className="rounded-lg bg-white/70 px-2 py-1" onClick={() => client.capture("1", 20)}>Simular repetida</button></div>
+    </div>;
+    return <MemoryRouter initialEntries={["/vigilancia/lecturas" + window.location.search]}>
+        {controls}
+        <Routes>
+            <Route path="/vigilancia" element={<VigilanciaLayout active="search" onLogout={() => {}}><PreviewSearch /></VigilanciaLayout>} />
+            <Route path="/vigilancia/lecturas" element={<VigilanciaLayout active="readings" onLogout={() => {}}><ControlAccessPanel client={client} displayBase="/monitor-preview.html" /></VigilanciaLayout>} />
+        </Routes>
+    </MemoryRouter>;
 }
-createRoot(document.getElementById("root")).render(<Preview />);
+const previewRoot = import.meta.hot?.data.previewRoot || createRoot(document.getElementById("root"));
+if (import.meta.hot) import.meta.hot.data.previewRoot = previewRoot;
+previewRoot.render(<Preview />);

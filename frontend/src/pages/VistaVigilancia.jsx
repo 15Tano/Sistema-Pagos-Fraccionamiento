@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import VigilanciaLayout from "../components/VigilanciaLayout";
 import useAuthStore from "../store/authStore";
 import api from "../lib/axios";
 
@@ -37,20 +37,6 @@ const HomeIcon = () => (
             d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
         />
         <polyline points="9 22 9 12 15 12 15 22" strokeWidth="2" />
-    </svg>
-);
-const ShieldIcon = () => (
-    <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            strokeLinecap="round"
-            strokeWidth="2"
-            d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-        />
     </svg>
 );
 const CheckCircleIcon = () => (
@@ -91,29 +77,6 @@ const CardIcon = () => (
         <path strokeLinecap="round" strokeWidth="2" d="M2 10h20" />
     </svg>
 );
-const LogoutIcon = () => (
-    <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            strokeLinecap="round"
-            strokeWidth="2"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
-        />
-    </svg>
-);
-
-const BackgroundBlobs = () => (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none bg-stone-50 z-0">
-        <div className="absolute top-[-15%] left-[-10%] w-[500px] h-[500px] rounded-full bg-orange-300/25 blur-[120px]" />
-        <div className="absolute top-[20%] right-[-10%] w-[450px] h-[450px] rounded-full bg-amber-300/25 blur-[100px]" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] rounded-full bg-rose-200/20 blur-[120px]" />
-    </div>
-);
-
 const TagCard = ({ tag }) => {
     const activo = tag.activo ?? tag.active ?? true;
     return (
@@ -295,41 +258,8 @@ export default function VistaVigilancia() {
     };
 
     return (
-        <div className="min-h-screen relative flex flex-col p-4 pb-8">
-            <BackgroundBlobs />
-
-            <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 pt-10 pb-3 pointer-events-none">
-                {/* Pill izquierda: escudo + textos */}
-                <div className="pointer-events-auto flex items-center gap-3 bg-white/40 backdrop-blur-sm border border-white/60 rounded-2xl px-3 py-2 shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.8)]">
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-orange-500/15 text-orange-500">
-                        <ShieldIcon />
-                    </div>
-                    <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-orange-500 leading-none">
-                            Caseta de Vigilancia
-                        </p>
-                        <p className="text-sm font-bold text-stone-800 leading-tight mt-0.5">
-                            Consulta de acceso
-                        </p>
-                    </div>
-                </div>
-
-                {/* Pill derecha: botón salir */}
-                <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/40 backdrop-blur-sm border border-white/60 shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.8)] text-sm font-bold text-stone-600 hover:text-red-600 hover:bg-red-50/50 hover:border-red-200/60 transition-all active:scale-95"
-                >
-                    <LogoutIcon />
-                    Salir
-                </button>
-            </header>
-
-            <main className="relative z-10 flex flex-col gap-4 w-full max-w-[540px] mx-auto pt-24">
-                {["admin", "vigilancia"].includes(role) && <Link to="/control-acceso"
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/60 backdrop-blur-xl px-5 py-4 text-stone-700 shadow-sm">
-                    <span><span className="block text-sm font-bold">Monitor de caseta</span><span className="block mt-1 text-xs text-stone-500">Lecturas de tags y estado del controlador</span></span><span aria-hidden="true">→</span>
-                </Link>}
+        <VigilanciaLayout active="search" onLogout={handleLogout} showTabs={["admin", "vigilancia"].includes(role)}>
+            <div className="flex flex-col gap-4 w-full max-w-[540px] mx-auto">
                 {/* Buscador */}
                 <div className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] p-6">
                     <label className="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-3 ml-1">
@@ -494,7 +424,7 @@ export default function VistaVigilancia() {
                         )}
                     </div>
                 )}
-            </main>
-        </div>
+            </div>
+        </VigilanciaLayout>
     );
 }

@@ -18,7 +18,9 @@ export function eventsResponse(value, after, before = null) {
         value.meta.physical_passage_confirmed !== false || value.data.some((r) => !rowId(r?.id) ||
             !["rt", "transaction"].includes(r.source) || !Number.isInteger(r.event_code) ||
             ["card_no", "pin", "door_id", "door_label", "device_time_raw", "direction", "verification",
-                "captured_ended_utc", "received_at_utc"].some((key) => r[key] !== null && typeof r[key] !== "string"))) {
+                "captured_ended_utc", "received_at_utc"].some((key) => r[key] !== null && typeof r[key] !== "string") ||
+            (r.neighbor_status !== undefined && !["single", "none", "multiple"].includes(r.neighbor_status)) ||
+            (r.neighbor_name !== undefined && r.neighbor_name !== null && typeof r.neighbor_name !== "string"))) {
         throw new Error("invalid_response");
     }
     for (let i = 0; i < value.data.length; i++) {
@@ -47,6 +49,10 @@ export function utcText(value) {
     return Number.isFinite(date.getTime()) ? dateFormat.format(date) : "Sin dato";
 }
 export function deviceText(value) { return typeof value === "string" && value ? value : "Sin hora reportada"; }
+const clockFormat = new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23", timeZone: "America/Mexico_City" });
+export function timeText(value) {
+    return utcText(value) === "Sin dato" ? "Sin hora" : clockFormat.format(new Date(value));
+}
 export function ageText(value, now) {
     const age = (now - Date.parse(value)) / 1000;
     if (!Number.isFinite(age)) return "Sin dato";
@@ -78,4 +84,25 @@ export function cycleLabel(agent, now) {
             Math.max(...ages) > 300000 || Math.min(...ages) < -30000) return "Sin confirmar";
     }
     return labels[agent?.vigencias_status] ?? "Sin datos";
+}
+
+export function neighborText(row) {
+    if (row?.neighbor_status === "multiple") return "Verificar asociación";
+    if (row?.neighbor_status === "none") return "Sin vecino asociado";
+    return row?.neighbor_status === "single" && row.neighbor_name?.trim() ? row.neighbor_name : "Nombre no disponible";
+}
+
+// PullSDK, anexo 6: solo significados contrastados; nunca deducir vigencia del código 20.
+export function eventPresentation(code) {
+    if (code === 0) return { tone: "success", title: "Acceso autorizado", short: "Autorizado", message: "Tag reconocido por el lector.", icon: "check" };
+    if (code === 20) return { tone: "warning", title: "Lectura repetida", short: "Lectura repetida", message: "Espere un momento antes de volver a intentarlo.", icon: "repeat" };
+    return { tone: "review", title: "Consulte a vigilancia", short: "Por revisar", message: "El vigilante le ayudará a revisar esta lectura.", icon: "help" };
+}
+
+export const displayDoor = (value) => value === "entrada" ? "1" : value === "salida" ? "2" : "";
+export function displayReading(row, now, { door, ready, catchingUp = false }) {
+    if (!ready || catchingUp || !["1", "2"].includes(door) || row?.door_id !== door || row.source !== "rt" ||
+        !row.card_no || row.card_no === "0") return null;
+    const ages = [row.captured_ended_utc, row.received_at_utc].map((value) => now - Date.parse(value));
+    return ages.every((age) => Number.isFinite(age) && age >= -1000 && age < 8000) ? row : null;
 }

@@ -8,6 +8,7 @@ export function createMonitorSession(client, filters, notify, options = {}) {
     const clock = options.clock ?? (() => performance.now());
     const schedule = options.schedule ?? ((fn, delay) => setTimeout(fn, delay));
     const cancel = options.cancel ?? ((id) => clearTimeout(id));
+    const maxPages = options.maxPages === 1 ? 1 : 2;
     let model = initialMonitor(), closed = false, enabled = true, visible = true, terminal = false;
     let timer = null, running = false, failures = 0, cursor = null, oldest = null, initial = true;
     let nextHealth = 0, queued = false;
@@ -33,7 +34,9 @@ export function createMonitorSession(client, filters, notify, options = {}) {
             if (clock() >= nextHealth || !model.agentId) {
                 const value = statesResponse(await request((signal) => client.states({ signal })));
                 if (!active()) return;
-                const selected = filters.agentId || model.agentId || value.data[0]?.agent_id || "";
+                const selected = filters.agentId || model.agentId ||
+                    value.data.find((a) => a.device_serial === "CO2K225060027")?.agent_id ||
+                    (value.data.length === 1 ? value.data[0].agent_id : "");
                 if (selected && !value.data.some((a) => a.agent_id === selected)) throw Object.assign(new Error(), { response: { status: 404 } });
                 nextHealth = clock() + 15000;
                 publish({ agents: value.data, agentId: selected, truncated: value.meta.truncated,
@@ -41,7 +44,7 @@ export function createMonitorSession(client, filters, notify, options = {}) {
             }
             if (model.agentId) {
                 let more = false;
-                for (let page = 0; page < 2; page++) {
+                for (let page = 0; page < maxPages; page++) {
                     const value = eventsResponse(await request((signal) => client.events({ ...params(),
                         ...(!initial && cursor != null ? { after_id: cursor } : {}) }, { signal })), !initial ? cursor : null);
                     if (!active()) return;
@@ -65,7 +68,7 @@ export function createMonitorSession(client, filters, notify, options = {}) {
             }
         } finally {
             running = false; publish({ busy: false });
-            if (active()) { timer = schedule(tick, queued ? 0 : delay); queued = false; }
+            if (active()) { timer = schedule(tick, queued && !model.error ? 0 : delay); queued = false; }
         }
     }
     return {

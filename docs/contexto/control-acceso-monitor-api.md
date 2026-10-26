@@ -94,3 +94,19 @@ seguimiento por cursor y avisos de antigüedad/error. Ver
 [pantalla del monitor](control-acceso-pantalla-monitor.md) para alcance,
 validación y vista previa ficticia. Sin habilitar bandera ni desplegar a
 producción; la instalación continua de caseta sigue siendo un paso separado.
+
+## Nombres en las lecturas — 2026-10-26
+
+Usuario confirma mostrar nombre completo en la tarjeta y lista, sin domicilio
+ni otros datos del vecino. GET /eventos añade neighbor_name y neighbor_status
+(single/none/multiple), resueltos en lote desde tags.codigo/tag_vecino/vecinos.
+Asociación actual al consultar; no atribución histórica de quién portaba el tag.
+Comparación exacta de cadenas y uniqueStrict: 00111 no se confunde con111.
+Varias asociaciones devuelven nombre null, sin elegir arbitrariamente; sin
+asociación devuelve null/none. No se crean asociaciones ni modifican originales.
+Autorización humana y bandera existentes se mantienen; no hay ruta pública
+de display ni nuevas credenciales. No requiere migración para estos campos.
+
+Pruebas posteriores: SQLite33/244 (17ingesta+16monitor) y MySQL16/116 del monitor
+aprobadas; instancia de ensayo detenida. UI móvil y modo display detallados en
+[pantalla del monitor](control-acceso-pantalla-monitor.md). Sin despliegue.
