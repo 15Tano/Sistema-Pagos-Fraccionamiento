@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-26",
+  "scope": "local_only_no_dell_or_production_actions",
+  "python_full_suite": {
+    "tests": 564,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 151.718,
+    "log_sha256": "8a0b77653b90486814a46e92fcb25b95df14af1174ffd181c54c89f42c0476ca"
+  },
+  "extracted_package_simulation": {
+    "result": "simulation_ok",
+    "scope": "preparacion_local_sdk_api_tareas_ficticios_sqlite_dpapi_procesos_reales",
+    "parent_bits": 64,
+    "child_bits": 64,
+    "tests": 72,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "capacity": {
+      "result": "capacity_ok",
+      "responses": 2400,
+      "full_buffer_bytes": 157286400,
+      "original_sqlite_bytes": 2187264,
+      "acked_archives": 120,
+      "originals_verified": true,
+      "http_bodies_unchanged": true,
+      "reopen_does_not_requeue_acked": true,
+      "sequence_continues_after_archive": true,
+      "seconds": 27.219,
+      "meaning": "Carga sintetica local; no mide caudal real ni vida util de disco en Dell."
+    },
+    "ended_utc": "2026-10-26T09:07:42.602216+00:00",
+    "evidence": "C:\\Users\\kungl\\Documents\\San Isidro\\sistema-pagos-SanIsidro_PRUEBAS 2.0\\tools\\agente_acceso\\datos\\prep1\\registros\\preparacion_simulada_20261026_030742_602216.json"
+  },
+  "artifact": {
+    "name": "Preparacion_Operativa_2026.10.26-1.zip",
+    "bytes": 385196,
+    "entries": 150,
+    "sha256": "fc83b5e49e8204a390e0f79bff2af5bcf0233ec95d3bdf52ab813df0bd058a0a",
+    "manifest_sha256": "f5b9f0c6e948ea0b34c0ea4e83c482bfe7036d54c9d6d4d589f8a2c5902aab60",
+    "base_entries_preserved": 117
+  },
+  "dell_64_32_validation": "pending",
+  "real_date_application": "pending",
+  "installed_or_activated": false,
+  "pushed_or_deployed": false
+}

@@ -1,0 +1,607 @@
+{
+  "release": "2026.10.26-1",
+  "scope": "preparacion_local_no_instala_ni_activa",
+  "base": {
+    "name": "Servicio_Integrado_2026.10.26-2.zip",
+    "sha256": "2e8a4aed431ec6f96223c1ff4c1f6845bc0765bf66334d81b09d8d0d0e289507",
+    "entries_preserved": 117
+  },
+  "files": [
+    {
+      "name": "APLICADOR_SHA256SUMS.json",
+      "sha256": "ba71fd9a53deb35730e48462f501bf42c768a7cea7a601c6c442a38901db6e1b"
+    },
+    {
+      "name": "CIERRES_SHA256SUMS.json",
+      "sha256": "4c328dcf264684b907dde6b8eb42041cbf4b1363d8bd1a73d13e7c9705c4752c"
+    },
+    {
+      "name": "INTEGRACION_APLICADOR_SHA256SUMS.json",
+      "sha256": "de36c91b58c00f6a9ab58c5d7cd749105c16fb0d4e1b8499fbe8cf3c04f62310"
+    },
+    {
+      "name": "LEEME_APLICADOR_CANDIDATO.md",
+      "sha256": "9a0d275465b4aceb91146feb42c8c5c3aeb7f61d2cb48faad3f14b6bad764772"
+    },
+    {
+      "name": "LEEME_CIERRES.md",
+      "sha256": "f33cacd9680d2c6b6cf1ac2188be662f318c0c283116e3b16f966c3b3d28cfbb"
+    },
+    {
+      "name": "LEEME_INTEGRACION_APLICADOR.md",
+      "sha256": "63fb78fbac149ea522f724fe9288ebe03f333a675b32e398c139610f4b353e6f"
+    },
+    {
+      "name": "LEEME_PREPARACION_OPERATIVA.md",
+      "sha256": "d6e23489eae95fb5dae35464304733a54067d039af870c976ef98b29c1de23c1"
+    },
+    {
+      "name": "LEEME_PUENTE_READONLY.md",
+      "sha256": "0c75c267285bf49fec8da35281bb553e9085956bc5e6aaf54f98f873381a1bc3"
+    },
+    {
+      "name": "LEEME_RESPALDO_MDB.md",
+      "sha256": "ea751f93fa61b9826bd3288cb3e21f87e95b1633eacacfee9920278a07521fc2"
+    },
+    {
+      "name": "LEEME_RESPALDO_PROTEGIDO.md",
+      "sha256": "ba31fa845f7007208f697fd181aa195cc7c5c314eb77bcb2233901af03174f15"
+    },
+    {
+      "name": "LEEME_RESPALDO_REAL.md",
+      "sha256": "4eb7c7f76e181031dab3931bdc3c2022146b820cb94349dde996e86fc7416c02"
+    },
+    {
+      "name": "LEEME_SERVICIO_INTEGRADO.md",
+      "sha256": "7fbb102b143243f526792e6387d26b7d5d3b6ec2fe0fc24fa9bb78bd3b9dbdf1"
+    },
+    {
+      "name": "LEEME_TRANSPORTE_APLICADOR.md",
+      "sha256": "91a4a3a0f78b8200bf3b6c4a70d7920f360f6e82bda4f1f33eed01b939b3c961"
+    },
+    {
+      "name": "PUENTE_SHA256SUMS.json",
+      "sha256": "4bc3acb3bab46859018b39c6c78d5bb5ede00fbb757e5e1f7d1b1fe7156b9fde"
+    },
+    {
+      "name": "RESPALDO_MDB_SHA256SUMS.json",
+      "sha256": "d05e41b2403f67f8975e89218dfbb16eb7b27765f24a26edf08e1d50e76b5498"
+    },
+    {
+      "name": "RESPALDO_REAL_SHA256SUMS.json",
+      "sha256": "4755fb40859acf524b0c3ec08653837db31e54ac69fbc72fa198ecaeeec362ac"
+    },
+    {
+      "name": "RESPALDO_SHA256SUMS.json",
+      "sha256": "4205d2b391791f8a8c0d9541fab96b7c49ac25b1c2b1c9e7a2bfa69982e55e04"
+    },
+    {
+      "name": "SERVICIO_SHA256SUMS.json",
+      "sha256": "ab781af7f405d15c8e440623342555d9fbf00a51af752dbe438c38b80fd23c22"
+    },
+    {
+      "name": "TRANSPORTE_APLICADOR_SHA256SUMS.json",
+      "sha256": "38802cc236239d7951f14cb784ce75edf87c39154b397d557d2f18566caff0c0"
+    },
+    {
+      "name": "adaptadores_cierre.py",
+      "sha256": "1c1f08657ee17aff7efa197b0d5a3bbee2ca8f7410b9f430f9712f2ac6e73075"
+    },
+    {
+      "name": "almacen_operativo.py",
+      "sha256": "b9bbc8c075adc39ab220b09c0c8b193af64b45fd1b2f4d98f69b00a8854140b4"
+    },
+    {
+      "name": "aplicacion_vigencias.py",
+      "sha256": "2ed73096506b7da977239ebb2766a17e28f9fa9e0d5a991f14d055c15ffafc42"
+    },
+    {
+      "name": "aplicador_integrado.py",
+      "sha256": "d297bad2e4e55a5d935dca9e56c59cd9aaf690f6acd09f660d40294335a08e81"
+    },
+    {
+      "name": "archivo_cierres.py",
+      "sha256": "2e97838f2ca574ef7c704cda8c75e487e06b6e3567ee7477d232f3eabbaccf71"
+    },
+    {
+      "name": "captura_rt.py",
+      "sha256": "aaf4c429a8f39ea03da31703941ec65d439986f79ea3f30c8de22286e000886d"
+    },
+    {
+      "name": "carpeta_privada_mdb.ps1",
+      "sha256": "2094688be8c0c8a08e123574a5fa391702da7f3fde160f9ff310817c2ede5acd"
+    },
+    {
+      "name": "ciclo_operativo.py",
+      "sha256": "1fc46133446221aab2793a9e27506400ac5c2d952f8f43a7ddee2f3b32232d5d"
+    },
+    {
+      "name": "config_operativa.py",
+      "sha256": "730e95a31ad06a05dee3154ce0edc5651086bd22e97bcc87be36b117065a6bc9"
+    },
+    {
+      "name": "control_operativo.py",
+      "sha256": "17251c5f6617660751479be6d701f7cdb59dae3041505dc9801cd4dd09f9faa8"
+    },
+    {
+      "name": "coordinador.py",
+      "sha256": "bf5450bb5609bc48b64386aeedb05c20127bfd35ddff0ea48574619ddba7e615"
+    },
+    {
+      "name": "credencial.py",
+      "sha256": "06d9e15b02a58fe0b8cc3fd10f2b3e1df531f1e753df82e2b7b75fdcb998744a"
+    },
+    {
+      "name": "emisor.py",
+      "sha256": "0e7cef854b88c739274a1b2d82408bcb2c2a2629ec7cc7e10b015fabcc78359a"
+    },
+    {
+      "name": "emisor_operativo.py",
+      "sha256": "2573e39497a01776dd49d075956640ce5e496a34c188bc9a9b7a116cc6fbb5ba"
+    },
+    {
+      "name": "emisor_servicio.py",
+      "sha256": "93616e1af04bb8c023ac972e31b26914c27bca7cf435dabf4b425921169dba51"
+    },
+    {
+      "name": "ensayo_capacidad_operativa.py",
+      "sha256": "f7145e3bea096265284e85c7380e51960f11e9ab75a69c37a5b292b76e6c7d26"
+    },
+    {
+      "name": "ensayo_cierres.py",
+      "sha256": "90cd81dc8621b4ec772410b22649db1f074c391823c2d454a6e7688dbde0bab7"
+    },
+    {
+      "name": "ensayo_puente_readonly.py",
+      "sha256": "bde4e12e6c45fba61deb07057b3c239e7f661b166a4460bf70b38db197ddfaf0"
+    },
+    {
+      "name": "entregar_coordinador.py",
+      "sha256": "bd7ac50080f5ac8d78f91ea03d1e7d1c1c7dfe648a5e8d19a36a33188f51e005"
+    },
+    {
+      "name": "envio/ENVIO_SHA256SUMS.json",
+      "sha256": "573c1b1ee01436021faf8eb3067284df159b8934a99ed97a1ba52f305dae757c"
+    },
+    {
+      "name": "envio/LEEME_ENVIO_VIGILADO.md",
+      "sha256": "b1bf7d0421a0d10c7c1ecf036ef6b017a086b54ae44a4e1a589a71a8c25f49f9"
+    },
+    {
+      "name": "envio/bucle_envio.py",
+      "sha256": "8f814abd4cf421319f9d1bba6552de32acf48391809ab60a0cabe4d621d463fa"
+    },
+    {
+      "name": "envio/envio_vigilado.py",
+      "sha256": "56b9c545e077882c7b8fdf86161a1ab005606f173adef3d435be5fa6e151e9bf"
+    },
+    {
+      "name": "envio/runtime/control_operativo.py",
+      "sha256": "17251c5f6617660751479be6d701f7cdb59dae3041505dc9801cd4dd09f9faa8"
+    },
+    {
+      "name": "envio/runtime/credencial.py",
+      "sha256": "06d9e15b02a58fe0b8cc3fd10f2b3e1df531f1e753df82e2b7b75fdcb998744a"
+    },
+    {
+      "name": "envio/runtime/emisor.py",
+      "sha256": "0e7cef854b88c739274a1b2d82408bcb2c2a2629ec7cc7e10b015fabcc78359a"
+    },
+    {
+      "name": "envio/runtime/enlace_candidato.py",
+      "sha256": "b6daa663747ead2c90f802cc2a280273885a0d9f62f7ac5a516b1eb6122e0a62"
+    },
+    {
+      "name": "envio/runtime/entregar_coordinador.py",
+      "sha256": "bd7ac50080f5ac8d78f91ea03d1e7d1c1c7dfe648a5e8d19a36a33188f51e005"
+    },
+    {
+      "name": "envio/runtime/outbox.py",
+      "sha256": "f00112ac88f1b3268aac628bc4987c3f9ca7e723c22f98aadc05cb71fba012ad"
+    },
+    {
+      "name": "envio/runtime/protocolo.py",
+      "sha256": "5f43b055d0a11a2afe3e3f9cf86ec3ac2682f6c3704ee8c27c1ec69a20c266fb"
+    },
+    {
+      "name": "envio/runtime/salud_operativa.py",
+      "sha256": "d4e310d240674adc7f9ea3d5da02f140a9591a12d56ecf944a46c65adfbe19aa"
+    },
+    {
+      "name": "envio/simular_envio.py",
+      "sha256": "c6b79470356f2dc08853a0bbddecef77356cafe997e8c6b624df8afb3ecb8809"
+    },
+    {
+      "name": "envio/tests/test_envio_vigilado.py",
+      "sha256": "9673c89767d88edc224a2224b04661dfa4ac7c282d22bfff735a4f94c1cfb858"
+    },
+    {
+      "name": "envio/verificar_envio.ps1",
+      "sha256": "bb907e93c9c3aa244e478011a0f32147ba56c22cfb438bf6ce031adad7e5e09d"
+    },
+    {
+      "name": "envio/vigilancia_envio.py",
+      "sha256": "2ed92e1423608f7e6d5902ca53ec9599d6b7c2bc6a40ecb4366d5140455bdd81"
+    },
+    {
+      "name": "gestor_candidato/gt_backend.py",
+      "sha256": "3828b500dc5b346eeae9102b3991cf061550740542ddc904e1e881323df9fb36"
+    },
+    {
+      "name": "gestor_candidato/gt_guard_operativo.py",
+      "sha256": "d1f3abb2d657eb6e28b6801a16a5d34a9b44b1fc6d88429e102a9d8b318ec624"
+    },
+    {
+      "name": "gestor_candidato/mantenimiento.ps1",
+      "sha256": "95867bcb5c97885d3bfd6e2a929440cc79b3f7e4d9ed8c34b5dfae411db8bedc"
+    },
+    {
+      "name": "guardia_gestor_operativo.py",
+      "sha256": "d1f3abb2d657eb6e28b6801a16a5d34a9b44b1fc6d88429e102a9d8b318ec624"
+    },
+    {
+      "name": "instalacion_operativa.py",
+      "sha256": "ea32e69a7258c64775c71890d2bbad90caa9b4a2d34c752b60da5cb57f9866ed"
+    },
+    {
+      "name": "lanzar_cierres.ps1",
+      "sha256": "48642ec7dd847cc7f753206d90979a9ee7e25ada4ab1e3e04edc4c64d3a60440"
+    },
+    {
+      "name": "lanzar_perfil_transporte.ps1",
+      "sha256": "35f45adf60b2ec1c6ff3a4c99d1ec8120c818fece57d3f8f76fa00e7232904c1"
+    },
+    {
+      "name": "lanzar_preparacion_aplicacion.ps1",
+      "sha256": "f998203650f1703d8c0fe2d06de4aa2127b6f265fe74bd09782599f854324c4e"
+    },
+    {
+      "name": "lanzar_puente_readonly.ps1",
+      "sha256": "9babef16f39de38437a716f9200bf854e4b96860ab736dffddf91e49ae34d258"
+    },
+    {
+      "name": "lanzar_respaldo_real.ps1",
+      "sha256": "6d298407819d6aca08da0ebc40f6aa977cbff9c09eed1bdb9b1f726b2e5d5ab3"
+    },
+    {
+      "name": "lanzar_servicio_integrado.ps1",
+      "sha256": "4cd7a063691b6ce4df6eebe2f5146f2e214e84c2a72d6dc71d63a14d1c4fa366"
+    },
+    {
+      "name": "operacion_nativa.py",
+      "sha256": "62d8fa94a4ff2a22a7bc826a20d80ad17d164941c530c23611f69ce63be3554a"
+    },
+    {
+      "name": "outbox.py",
+      "sha256": "f00112ac88f1b3268aac628bc4987c3f9ca7e723c22f98aadc05cb71fba012ad"
+    },
+    {
+      "name": "paquete_servicio.py",
+      "sha256": "02b99c9e13356c65e9f66492604bed304201a473c4359a2572101d47bf334c81"
+    },
+    {
+      "name": "preparar_aplicacion.py",
+      "sha256": "e66c40748825106fac802adf6ea859a06ef1971f6d72230c125a2efc6e6b1b2a"
+    },
+    {
+      "name": "preparar_operacion.py",
+      "sha256": "7717c17f5d1419e7eb5c3807bd1d8d5acaa709a7b4ded47c96b126f75b21ecf3"
+    },
+    {
+      "name": "protocolo.py",
+      "sha256": "5f43b055d0a11a2afe3e3f9cf86ec3ac2682f6c3704ee8c27c1ec69a20c266fb"
+    },
+    {
+      "name": "puente_fechas_protegido.py",
+      "sha256": "c12d8d06aef3f669e3e6a9022e2bd7661f27abe940bb67255df54238c69781ae"
+    },
+    {
+      "name": "puente_sdk_fechas.py",
+      "sha256": "94be6c499f85506886e50621b37e7d29369c60230811606126e67c95034e6ca8"
+    },
+    {
+      "name": "puente_sdk_readonly.py",
+      "sha256": "2444036e33c8fc6cdbe022929b3a0c9995ec862f1c0ce6600112cbf195345b12"
+    },
+    {
+      "name": "recuperacion_selectiva.py",
+      "sha256": "284318358271ee73445d3aea2dce8de56cc245579c67435281c89dbbc150f663"
+    },
+    {
+      "name": "referencia_operacion/gt_backend.py",
+      "sha256": "5ded829ecd5467f4f08553baf44698d3dd21afdbbf0970a8fffe8735e5e74749"
+    },
+    {
+      "name": "referencia_operacion/iniciar_oculto.ps1",
+      "sha256": "d63567bfc5259d78505f8ffcc9e1a07c5b46b32c84ea6c49444409d08bdbbc92"
+    },
+    {
+      "name": "referencia_operacion/mantenimiento.ps1",
+      "sha256": "840c500933e644fb9545c88091a287416a018b7c3e16434d634138531b97b4f4"
+    },
+    {
+      "name": "referencia_operacion/vigilar_sync.py",
+      "sha256": "204fc781b9d632c0decc7e11122ebcf6b9d1729191467e26d3ce67ebfcc4c1cd"
+    },
+    {
+      "name": "referencia_r2/FUENTE.json",
+      "sha256": "1475752e7a6415dac1556b56073466e91054585edfbcc80d9d506d4f895d1481"
+    },
+    {
+      "name": "referencia_r2/c3_panel.py",
+      "sha256": "e3c4915c38979477e94ab55de369766446dc4e8de896b49913d298904e3dd6ed"
+    },
+    {
+      "name": "referencia_r2/c3_worker.py",
+      "sha256": "3cfb31a51fd2124d478dea434623753dd02652120eb981d8b27f8a4c571eef4c"
+    },
+    {
+      "name": "referencia_r2/sincronizar_vigencias.py",
+      "sha256": "581dfa4cd428830321e3aa879812d9d8bdc09c785b3497bb97cc39b689915e35"
+    },
+    {
+      "name": "referencia_r2/sync_runtime.py",
+      "sha256": "adf6ded72c3f87133636a342b4d284376755fb43748679fbbb4468e5ccbfa666"
+    },
+    {
+      "name": "referencia_vigencias.py",
+      "sha256": "8ad86d0110a8e1a6ada78b2e939b5cbcdd6f9839da9fd13f14aa4a6c3e17abe9"
+    },
+    {
+      "name": "respaldo_ciclo.py",
+      "sha256": "d2284a0bc74a9b29e2ee4a3b14bbbcad2d9b5727634e2c42de497ff15e074972"
+    },
+    {
+      "name": "respaldo_mdb.py",
+      "sha256": "7725b041586a736e06955bb54bca421344c8b03538e104074cb876e57a265e06"
+    },
+    {
+      "name": "respaldo_protegido.py",
+      "sha256": "141c4f0ad06055cbcdcfe41790635185c7ac9930c8d5d4ffa3387d1dcdfd04fe"
+    },
+    {
+      "name": "respaldo_real_mdb.py",
+      "sha256": "1804bb7f7ad106bde4f19771562197f46e80d5283a07fdf55de7488b2ba5c387"
+    },
+    {
+      "name": "runner_operativo.py",
+      "sha256": "d8a70f4b20ab27a21ef4ee35df1c132f4123de8b255fc5dc017823fd5360c5f8"
+    },
+    {
+      "name": "runtime/lector_eventos.py",
+      "sha256": "8e92df0ebd7de0645d53ffdcfeccaa4444418744ddc3e5c3ae5f65a9a4275eee"
+    },
+    {
+      "name": "rutas_operativas.py",
+      "sha256": "db1a90b8159df5e994abd22eaafaa1a2de6d0803ae1ef7b6c7fc651470232e41"
+    },
+    {
+      "name": "sdk_operativo.py",
+      "sha256": "60abd754c89b1eb057b148d881e201716f4004b0100511d32108d4467efcd9b4"
+    },
+    {
+      "name": "servicio_integrado.py",
+      "sha256": "0746bd882e603fe85c6b661cac17b0d7eeb46d6b52f9792ed7dbbf8538082d61"
+    },
+    {
+      "name": "servicio_integrado_dell.py",
+      "sha256": "f4dbbfaac3ed936f67dd31b53f849e0869c3b918f916f898c77eaa726903b87c"
+    },
+    {
+      "name": "sesion_operativa.py",
+      "sha256": "8b41043c6404a62fca9d116bbed770d09a6e9c0fb06ba743c2b8a7078c0a29b0"
+    },
+    {
+      "name": "simular_aplicador.py",
+      "sha256": "be9a5bbef1d17d33d4c61920b4b772c3024e2ebed56be34482f7e01adfdb773d"
+    },
+    {
+      "name": "simular_aplicador_integrado.py",
+      "sha256": "951d726c8bf5fd43b82d80e1cef0154a25db6aa409c6a12b3a71d1320dffc183"
+    },
+    {
+      "name": "simular_operacion_preparada.py",
+      "sha256": "3b472e05331e34461dff6bb34d0a70f46b2641a52665775ac7f62c6c3d4dbb4a"
+    },
+    {
+      "name": "simular_puente_readonly.py",
+      "sha256": "866ab53683b97d8354f43ea753425820753fb4060c72b5349bfe2b4eaa3ffe7d"
+    },
+    {
+      "name": "simular_respaldo.py",
+      "sha256": "f8326a30db3e3d2eb60068b554580b661aa2f7980bd66903e7303b3146341e8a"
+    },
+    {
+      "name": "simular_respaldo_mdb.py",
+      "sha256": "4ae52540acd995da73f137563e5203a47feeca44d31ab432adbfff911a51c3a3"
+    },
+    {
+      "name": "simular_respaldo_real.py",
+      "sha256": "8b6c77478c39d156e6316ac2555ed7630cd9e1908fb3e1e660ae4396308175b4"
+    },
+    {
+      "name": "simular_servicio.py",
+      "sha256": "0368feaf65b18f02bb44904a26e9b81a26cf926c6588798bf2ee2ed03cdb0309"
+    },
+    {
+      "name": "simular_transporte_aplicador.py",
+      "sha256": "e6bc5ecb293639cef3d1c787af75d581d9dff51c5eec349db0d7004ad4b8dab7"
+    },
+    {
+      "name": "tests/sdk_operativo_ficticio.py",
+      "sha256": "ad0f26251f0f3096044840930584bf4ae1007db8212ae4acf711e462b0466101"
+    },
+    {
+      "name": "tests/sdk_proceso_ficticio.py",
+      "sha256": "baa76be033589d1588d8934f462616f7c5eb601ad415dd440058ae43c126148d"
+    },
+    {
+      "name": "tests/servicio_proceso_ficticio.py",
+      "sha256": "529d0bd493a20974bb0e5f8220dc70709d9a0e731102e595aa6cb443227653aa"
+    },
+    {
+      "name": "tests/test_adaptadores_cierre.py",
+      "sha256": "a4e0c3c1deca34725c9735c591c6b9d71426adc7cbf2c056d5772746bf47e55d"
+    },
+    {
+      "name": "tests/test_agente.py",
+      "sha256": "74ab35ba4d1849b4b9e659b28a8712c793fe2a07159635e45fd07821a6c3b53b"
+    },
+    {
+      "name": "tests/test_almacen_operativo.py",
+      "sha256": "e40dc89c83e7528383567a02d27a4c40552415bbc8943139d7522fa6ef63441e"
+    },
+    {
+      "name": "tests/test_aplicacion_vigencias.py",
+      "sha256": "09fbf1dbafc1b7de26d9a5b373b75730619b011bbda467d5975d15df30029100"
+    },
+    {
+      "name": "tests/test_aplicador_integrado.py",
+      "sha256": "a6cde90c9077d1618297405e281694acf85d5f821a62d2fc8ae54ef2f04fa684"
+    },
+    {
+      "name": "tests/test_aplicador_integrado_ace.py",
+      "sha256": "9f5a0f153c506c74c72c0592f1b2bf53196c3a5f02e5ed1d3f73a0e27202c0b0"
+    },
+    {
+      "name": "tests/test_archivo_cierres.py",
+      "sha256": "c2a2084c7f280ac6cc14c60adbc0d2b62b0ab6e8872804c9f99c433c1e5746a2"
+    },
+    {
+      "name": "tests/test_ciclo_operativo.py",
+      "sha256": "e2650e1f1f70b4c2e7b17d91a25382894d39e6d03ab5d0c8d4391fecab9a9879"
+    },
+    {
+      "name": "tests/test_ciclo_operativo_ace.py",
+      "sha256": "fc249a7ca9d3a84041bf43258c559f3ea2d307ddee0322962dc45f9734c7f483"
+    },
+    {
+      "name": "tests/test_coordinador.py",
+      "sha256": "ddfac1412a45586a3ad4c5c2d063d7c88768f2f376f3a038ac96519cb7bffaf6"
+    },
+    {
+      "name": "tests/test_guardias_operativas.py",
+      "sha256": "4366cffda8319840e05ee7a55323c8f708dfe2c9e3fcd16dc01e1f6d6ef31e74"
+    },
+    {
+      "name": "tests/test_instalacion_operativa.py",
+      "sha256": "4b2a7a2fd2b89d490d813e20348d442095f903b2538f9cda29000e8c66fdb0d3"
+    },
+    {
+      "name": "tests/test_preparacion_aplicacion.py",
+      "sha256": "cf7ba2f82e4b8ec338f3ed20ecb3caa50b2b0cf8c676e38d4c2a5ab7058fe756"
+    },
+    {
+      "name": "tests/test_puente_sdk_readonly.py",
+      "sha256": "4d4ff93e32f1d31d9e852f6cb4fc132f9e971d47e82163c4d3676a1f51a2c87c"
+    },
+    {
+      "name": "tests/test_respaldo_dpapi.py",
+      "sha256": "4b7ecd03c414144d8fed593f36e84ca79fb7b617586fca01e0c69f93b2737446"
+    },
+    {
+      "name": "tests/test_respaldo_mdb.py",
+      "sha256": "4ffcf7222ec39282c444389e0dcd96c7e38a5a23dd9de4bf1f4dbca76ae87de0"
+    },
+    {
+      "name": "tests/test_respaldo_mdb_ace.py",
+      "sha256": "b7dc2a56b581ea606aee4e2c616b7306616720bf3cd5e55cb4aaa841971aa853"
+    },
+    {
+      "name": "tests/test_respaldo_protegido.py",
+      "sha256": "01ae4bc17b1df4378fb0907264deb8d231681a25cba76a4d048f3f9c8c17d8e2"
+    },
+    {
+      "name": "tests/test_respaldo_real_mdb.py",
+      "sha256": "3818dbfa22cdc82e3b8cfa8cd5ef70fa75dc6a9482cf5b45318762bef0c26481"
+    },
+    {
+      "name": "tests/test_sdk_operativo.py",
+      "sha256": "5a8031a2cd032c82f97052d8ac0cdcae11bbe52bd4b30d4da9f08399157c1ebb"
+    },
+    {
+      "name": "tests/test_servicio_dell.py",
+      "sha256": "ea05d9a32a59d3d5cfdfae14b9a2e318d28b8d8aa49baa34ccbdf30508ba3ab4"
+    },
+    {
+      "name": "tests/test_servicio_integrado.py",
+      "sha256": "2a6d7bbf627a55de810109d16cf8afb2a508a4b85c1779c630ec6c96ef9ed698"
+    },
+    {
+      "name": "tests/test_servicio_procesos.py",
+      "sha256": "9054e8e03cc16c7e9467a36fceff180b52fd6c88dd23de6e0e45d57f55a351f9"
+    },
+    {
+      "name": "tests/test_sesion_operativa.py",
+      "sha256": "0f5acbebdd773c694de81de548e81c402b9ba16a9533ad007c44b98308985926"
+    },
+    {
+      "name": "tests/test_transporte_aplicador.py",
+      "sha256": "4c45504fc7647dd20129466d041dadd411c2b4eae4057d79cf69674e0318e4ef"
+    },
+    {
+      "name": "tests/test_vigencias_candidato.py",
+      "sha256": "0e2fbc7f639cb34499a3597d0c02d797c9030a0d29b6a502f2965933e43e94f3"
+    },
+    {
+      "name": "tests/test_vigilancia_operativa.py",
+      "sha256": "7e98db8ae397a5f5d054b3e57bdc0bf3506248f3910253f8690d6fee7b44964a"
+    },
+    {
+      "name": "trabajador_controlado.py",
+      "sha256": "42e63d74dd70649e15da793c50d2dd9876bb2bc4da2feaf6abe94c871b70c920"
+    },
+    {
+      "name": "transporte_aplicador.py",
+      "sha256": "f4e9a3defbb1f15007dfada30706f18ff27777250e0f371c485b711d145a1463"
+    },
+    {
+      "name": "verificar_aplicador.ps1",
+      "sha256": "331a864376ec76682b62bfad756a40242051b598ffc14b2c1dea913c3bb9eddd"
+    },
+    {
+      "name": "verificar_cierres.ps1",
+      "sha256": "b9f48d10b528221525f7480405bdf86f24f7c295cacb12fc6df1bf9fe132e32c"
+    },
+    {
+      "name": "verificar_integracion_aplicador.ps1",
+      "sha256": "36c06fdc0cfbe657a0a6c6b92387c424fe3d517ac5561e22e688e65fe5e6063a"
+    },
+    {
+      "name": "verificar_preparacion.ps1",
+      "sha256": "03c6cd2e42e40742ac4f6fd763217e8dc9047238c50c23070bec853d0adb9c90"
+    },
+    {
+      "name": "verificar_puente_readonly.ps1",
+      "sha256": "ec6952a69b75c01b0f2ea9cfa89b8871c907256d29efbf30c120e679e8e65904"
+    },
+    {
+      "name": "verificar_respaldo.ps1",
+      "sha256": "b7308e772d6d7b9f18c564444268479e121145b3acdfe9b34e7b3d7d9e63ede1"
+    },
+    {
+      "name": "verificar_respaldo_mdb.ps1",
+      "sha256": "4145d38f2956c86068825f5662cda024f52af06276bfb90f93dc837bff86b4b6"
+    },
+    {
+      "name": "verificar_respaldo_real.ps1",
+      "sha256": "da8ab6d1c1d6070cff67be6bc4a364bd65dbbad1566a6d6654813df1778a1e91"
+    },
+    {
+      "name": "verificar_servicio.ps1",
+      "sha256": "9e479a5fc127990f75bd970c0975bf39021ced2bba259a7f9e7cf1399cd03eef"
+    },
+    {
+      "name": "verificar_transporte_aplicador.ps1",
+      "sha256": "f9ce690ca1060d8e7517be1892313331f99c978c4de693d1f258128018f310ec"
+    },
+    {
+      "name": "vigencias_candidato.py",
+      "sha256": "30b83ac78917ab947ae57de12d1acdcefe6e72e5d4abfc094aa68e8cdf8901f0"
+    },
+    {
+      "name": "vigilancia_operativa.py",
+      "sha256": "1bb34e731b08ffa207d4db53a69873998dd65b0ab9c2a3e3e41e065735b89dd2"
+    }
+  ]
+}

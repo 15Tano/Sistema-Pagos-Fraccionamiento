@@ -2,6 +2,9 @@
 
 # Conservar bytes del manifiesto congelado incluido en paquetes con SHA256.
 tools/agente_acceso/cierres_manifest_referencia.json binary
+# Fuentes congeladas y parches exactos usados en planes/paquetes operativos.
+tools/agente_acceso/referencia_operacion/** -text
+tools/agente_acceso/gestor_candidato/** -text
 
 *.blade.php diff=html
 *.css diff=css

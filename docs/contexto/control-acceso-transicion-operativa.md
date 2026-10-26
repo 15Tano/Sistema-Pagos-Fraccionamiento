@@ -318,3 +318,14 @@ extraido con48pruebas aprobadas. No sustituye r2 ni habilita --aplicar/--continu
 en Dell. Primero simulacion sin mantenimiento. Detalles, SHA y limites en
 control-acceso-servicio-integrado.md. Aplicacion real, instalacion/rollback,
 gestor/vigilancia, transporte definitivo y retencion siguen pendientes.
+
+## Preparacion operativa posterior — 2026-10-26
+
+La union integrada readonly ya fue aceptada en Dell, incluidos cierre, retorno r2
+y entrega359/184 sin pendientes; no repetir esa pausa. Se preparan localmente
+propiedad SDK sin mantenimiento permanente, fuentes candidatas del gestor,
+instalacion/reversion conservando r2, archivo de originales/ACK/recibos y vigilancia.
+564tests locales aprobados; nuevo paquete consolidado72tests y2400buffers.
+No hay activacion, instalacion permanente o escritura candidata real autorizada
+por estas pruebas. Aplicacion real acotada/transporte/custodia y aceptacion final
+requieren revision posterior. Documento actual:control-acceso-preparacion-operativa.md.

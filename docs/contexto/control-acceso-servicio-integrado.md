@@ -210,3 +210,13 @@ esta entrega no renueva esa certificacion. Servidor/tunel siguen siendo de
 ensayo; cierre posterior de sus ventanas no aportado. Siguen pendientes
 aplicacion candidata real, autorizacion/guard operativo, instalador/rollback,
 gestor/vigilancia, transporte definitivo y retencion, antes de operacion continua.
+
+## Preparacion consolidada local durante ausencia del usuario — 2026-10-26
+
+Preparados propietario nativo SDK, runner continuo con aceptacion obligatoria,
+almacenes nuevos comprimidos/archivos ACK, recibos archivables sin perdida,
+instalacion/reversion de biblioteca con r2 inicial, parche minimo del gestor y
+vigilancia adicional. Ninguna instalacion/activacion remota. Suite564aprobadas;
+paquete extraido con72pruebas y2400buffers ficticios conservados. Siguiente
+salida Dell: simulacion64/32 y preflight, sin mantenimiento. Detalle y limites en
+control-acceso-preparacion-operativa.md. No repetir el ensayo integrado aceptado.
