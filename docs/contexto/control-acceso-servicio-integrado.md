@@ -105,3 +105,24 @@ ni efectuada por las pruebas locales.
 Ultima evidencia real sigue siendo perfil/cierre aceptados y r2 PID14608 con
 dos ciclos correctos23:27/23:28 Mexico25oct, documentados en aplicador candidato.
 No afirmar salud actual, instalacion o escritura nueva por estos resultados.
+
+## Simulacion del servicio aprobada en Dell — 2026-10-26
+
+Usuario verifica Servicio_Integrado_2026.10.26-2 y ejecuta simular_servicio.py
+con Python64 y --python32 C:\Users\Dell\Python32\python.exe. Resultado
+simulation_ok, parent_bits64/child_bits32, tests48/failures0/errors0/skipped0,
+ended_utc2026-10-26T06:17:59.152782Z (00:17:59 Mexico26oct). Evidencia:
+C:\SanIsidro\ServicioIntegrado_20261026\registros\servicio_simulado_20261026_001759_152739.json.
+
+Queda aceptada la simulacion de esta union en arquitecturas Dell, incluidos
+procesos/SQLite/ACE/DPAPI sobre datos ficticios. No acredita lectura SDK real,
+entrega HTTP nueva, tarea instalada o salud actual del polling.
+
+Siguiente ensayo: verificar salud del tunel18881 antes de pausar; con backend
+aislado/tunel activos y otros lectores/emisores candidatos cerrados, preparar
+mantenimiento por gestor y ejecutar lanzar_servicio_integrado.ps1 -Seconds150.
+El lanzador valida tarea/estado/exclusion y comprueba cierre propio al terminar.
+Solo tras cierre_servicio_confirmado, Terminar y reanudar por gestor y comprobar
+dos ciclos correctos nuevos. Si no hay cierre confirmado, conservar mantenimiento
+y evidencia. No tag fisico, escrituras de fechas, sustitucion DLL ni despliegue.
+Ensayo real, cierre y retorno de esta etapa todavia pendientes.
