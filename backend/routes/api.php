@@ -103,6 +103,13 @@ Route::prefix('control-acceso/agente')->middleware(['control-acceso.agente', 'th
     Route::post('lotes', [\App\Http\Controllers\Api\ControlAccessAgentController::class, 'batch']);
 });
 
+// Lectura humana del monitor; habilitacion explicita, roles comprobados en backend.
+Route::prefix('control-acceso/monitor')->middleware(['auth:sanctum',
+    \App\Http\Middleware\AuthorizeControlAccessMonitor::class, 'throttle:120,1'])->group(function () {
+    Route::get('estado', [\App\Http\Controllers\Api\ControlAccessMonitorController::class, 'state']);
+    Route::get('eventos', [\App\Http\Controllers\Api\ControlAccessMonitorController::class, 'events']);
+});
+
 Route::get('/ping', function () {
     return response()->json([
         'status' => 'ok',

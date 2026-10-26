@@ -4,6 +4,12 @@
 Sin despliegue, migraciones en bases existentes ni conexión del polling instalado.
 Diseño general: [control-acceso-diseno-integracion.md](control-acceso-diseno-integracion.md).
 
+Actualizacion2026-10-26: consultas humanas de estado/eventos implementadas y
+probadas localmente, deshabilitadas por defecto y sin despliegue. Contrato y
+evidencia en [monitor](control-acceso-monitor-api.md). La ingesta v1 permanece
+compatible y no modifica /api/vencimientos. Las menciones posteriores a una
+consulta futura describen el alcance original de esta primera entrega.
+
 ## Rutas y credenciales
 
 | Método y ruta | Función |
