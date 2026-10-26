@@ -378,3 +378,84 @@ gestor, fuente/rutas fijas y credencial DPAPI existente en memoria, cierre y
 recibo verificables. Preparar/probar esa unión antes de pedir pausa en Dell.
 La obtención/validación de copia real, recuperación operativa y aplicación del
 candidato siguen pendientes; no nuevas escrituras autorizadas por estas salidas.
+
+## Lanzador de respaldo real preparado — 2026-10-25 México
+
+Usuario indica seguir con la entrada real del respaldo. Implementada en fuentes
+nuevas respaldo_real_mdb.py/lanzar_respaldo_real.ps1, con todas las dependencias
+MDB1 intactas. No se ha ejecutado operación nueva en Dell, SDK/API o producción.
+
+Rutas fijas: paquete C:\SanIsidro\RespaldoReal_20261025, MDB instalada y plan
+readonly anterior de12230693 en AplicadorCandidato_20261025/sesióna4230256.
+Se verifica el hash709d7809...58416 completo ya aceptado; no argumento de
+origen/destino/clave/force/aplicar. El plan histórico solo coteja identidad y
+fechas en la copia; no prueba API actual ni autoriza aplicación de su vigencia.
+Si Access cambió, no forzar escritura/restauración para obtener coincidencia.
+
+--preflight sin mantenimiento: x64/carpeta exacta, hashes r2 instalados, archivo
+de plan y metadatos/tamaños de MDB/credencial/lock, capacidad del almacén. No
+abre bytes MDB ni descifra credencial; no consulta SDK/API ni acredita clave/
+esquema real o salud de polling. No crea estado operativo. Salida preflight_ok
+pendiente de Dell, para revisar antes de pedir pausa por gestor.
+
+Operación futura: bajo lock propio y sync.lock instalado, mantenimiento del
+gestor, tarea Disabled/Enabledfalse, protocol2/stopped y PID previo ausente.
+Bloquea otros lectores y revisiones/ledger SDK pendientes. Reutiliza copia
+exclusiva/ACL/validación MDB ya aceptada, sin abrir C3. El lanzador descifra solo
+access-password.dpapi; padre la retira del entorno y usa en memoria, limpia
+SANISIDRO_* antes de auxiliares. No carga token API. No credenciales en argv,
+JSON o errores. No cambia polling, vigilancia, gestor, MDB original, outbox o ACK.
+
+Parada ligada a PID/UUID; Ctrl+C de Python solicita parada cooperativa entre
+bloques. Límite180s cooperativo, no plazo duro para IO/ODBC bloqueados ni mata
+procesos. Resultado propio persiste fase/éxito/error_type/cause_type/etapa sin
+mensajes ODBC privados; restaura handler SIGINT. Hasta64sesiones, sin borrado.
+stopped solo indica fin de esa ejecución, no comprobación final de recursos.
+
+Después de salir Python, PowerShell limpia BSTR/entorno y llama automáticamente
+--verificar-cierre con UUID fresco de ese lanzamiento. Rechaza estado/recibo
+anterior aunque este intento fallara antes de crear estado. Verificador exige
+padre ausente (incluye PID reutilizado), mantenimiento/exclusión, otros lectores
+ausentes, fuente obtenible en exclusivo y recibo/hash de copia iguales. No pide
+capacidad para otra copia al verificar la última admitida. Guarda cierre_final.json
+con identidad, hash de resultado, checked_utc, source_handle_free y backup_verified;
+también imprime cierre_respaldo_confirmado. Prueba puntual antes de reanudar.
+Otro run requiere prueba final anterior vinculada, incluso si estaba stopped.
+
+Si el respaldo falla pero el cierre se acredita, backup_verified=false: permite
+reanudar por gestor sin alegar respaldo obtenido, pues origen nunca se escribió
+y no se abrió SDK. Si no hay cierre confirmado, conservar mantenimiento y
+evidencia; no borrar estados/locks ni repetir a ciegas. No habilita tareas por
+código. Después de cierre: Terminar y reanudar por gestor y dos ciclos nuevos.
+
+32tests nuevos:28controles con dependencias/copia/tareas/inspección sustituidas
+y4PowerShell/DPAPI nativos con una credencial ficticia y una copia de prueba
+del lanzador. Cubren referencia/x64/rutas, hash/aprobación ajenos, tarea activa,
+PID/lector/revisión/ledger, limpieza de entorno, copia fallida, Ctrl+C/parada
+vigente u obsoleta/límite, reintento sin prueba final, UUID repetido/ajeno, padre
+vivo/reutilizado, copia alterada, fuente ocupada, lock/estado cambiado, resultado
+parcial, cierre persistido y capacidad agotada tras última copia. Lanzador prueba
+secreto solo en el primer proceso/sin argv, mismo UUID al verificar, clave ya
+retirada, fallo de copia preservado aunque cierre0, fallo de cierre y ausencia
+de credencial sin lanzar ni verificar un run viejo. Ningún dato/servicio de caseta.
+
+Suite final397tests en70.270s, fallos0/errores0/omisiones0, incluidas365previas.
+AST Python y parser WinPS de ambas fuentes aprobados. Suite fuera del sandbox
+por pruebas previas loopback/DPAPI; no caseta ni producción.
+
+Respaldo_Real_MDB_2026.10.25-1.zip:80archivos,204275bytes, SHA256
+5c5857b2c23c05d93ca41bb4e5621ffa0703a1642a9a8bfc791864c442f6f74e.
+Incluye73archivos MDB1 byte por byte, seis nuevos y manifiesto79fuentes. ZIP/
+rutas/hashes/dependencias verificados. Extraído en
+datos/aceptacion_respaldo_real_20261025_r1: verificadorPS correcto,
+simulation_ok/32tests/failures0/errors0/skipped0,
+ended_utc2026-10-26T02:57:35.054413Z (=25oct20:57México). No sobrescribir ZIP.
+
+Siguiente paso Dell: verificar/simular y --preflight sin mantenimiento, SDK,
+SSH o credenciales reales para la simulación; preflight solo metadatos/plan.
+Compartir ambas salidas antes de coordinar pausa y lanzamiento real. Guía
+LEEME_RESPALDO_REAL.md con comandos, parada y comprobación manual de respaldo
+si el lanzador se interrumpe. Simulación/preflight Dell, respaldo real/cierre/
+retorno aún pendientes; no se acredita salud actual de r2 con pruebas locales.
+Aplicación autorizada/recuperación operativa, runner continuo, gestor/vigilancia,
+UI/endpoints nuevos y despliegue siguen pendientes.
