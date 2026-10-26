@@ -137,3 +137,22 @@ Transporte HTTPS definitivo, enlace/gestor permanente, capacidad/retencion y
 despliegue del backend siguen siendo etapas separadas no autorizadas por crear
 este paquete. Monitor API local existe con bandera desactivada; pantalla y
 altas/recuperaciones web aun no se implementan en esta etapa.
+
+## Simulacion Dell64/32 y preflight aprobados — 2026-10-26
+
+Usuario verifica Piloto Vigencias2 y ejecuta simulacion con Python64 padre y
+Python32 hijo: simulation_ok,36tests/failures0/errors0/skipped0,
+ended_utc2026-10-26T18:23:37.922984Z. Evidencia:
+C:\SanIsidro\PilotoVigencias_20261026\registros\piloto_simulado_20261026_122337_922929.json.
+Preflight_ok/elevated=true/dates_applied=false/tasks_changed=false y
+maintenance_required_for_pilot=true. Segun el codigo, acredita ruta, dependencias,
+elevacion y ocho hashes instalados; no SDK/API/MDB/credenciales reales ni salud
+nueva del polling/backend. No se aplicaron fechas por estos comandos.
+
+Siguiente autorizado: piloto del tag12230693, con pausa por gestor instalado,
+lanzador exacto de la guia y consentimiento solo ante plan con diferencia real.
+Sin SSH ni tag fisico. El lanzador valida parada y verifica cierre automaticamente.
+Reanudar solo tras cierre_piloto_confirmado/safe_to_resume=true y comprobar dos
+ciclos nuevos. Salida real, cierre y retorno de esta pausa todavia pendientes.
+No repetir simulacion/preflight por esta aceptacion ni atribuir una escritura
+a no_changes. Si el plan no es claro, ENTER cancela y se revisa la evidencia.
