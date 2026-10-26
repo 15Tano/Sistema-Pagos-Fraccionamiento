@@ -1,0 +1,294 @@
+{
+  "release": "2026.10.25-1",
+  "scope": "Copia MDB exclusiva y validacion; solo pruebas ficticias, sin CLI de caseta.",
+  "files": [
+    {
+      "name": "APLICADOR_SHA256SUMS.json",
+      "sha256": "ba71fd9a53deb35730e48462f501bf42c768a7cea7a601c6c442a38901db6e1b"
+    },
+    {
+      "name": "CIERRES_SHA256SUMS.json",
+      "sha256": "4c328dcf264684b907dde6b8eb42041cbf4b1363d8bd1a73d13e7c9705c4752c"
+    },
+    {
+      "name": "LEEME_APLICADOR_CANDIDATO.md",
+      "sha256": "9a0d275465b4aceb91146feb42c8c5c3aeb7f61d2cb48faad3f14b6bad764772"
+    },
+    {
+      "name": "LEEME_CIERRES.md",
+      "sha256": "f33cacd9680d2c6b6cf1ac2188be662f318c0c283116e3b16f966c3b3d28cfbb"
+    },
+    {
+      "name": "LEEME_PUENTE_READONLY.md",
+      "sha256": "0c75c267285bf49fec8da35281bb553e9085956bc5e6aaf54f98f873381a1bc3"
+    },
+    {
+      "name": "LEEME_RESPALDO_MDB.md",
+      "sha256": "ea751f93fa61b9826bd3288cb3e21f87e95b1633eacacfee9920278a07521fc2"
+    },
+    {
+      "name": "LEEME_RESPALDO_PROTEGIDO.md",
+      "sha256": "ba31fa845f7007208f697fd181aa195cc7c5c314eb77bcb2233901af03174f15"
+    },
+    {
+      "name": "PUENTE_SHA256SUMS.json",
+      "sha256": "4bc3acb3bab46859018b39c6c78d5bb5ede00fbb757e5e1f7d1b1fe7156b9fde"
+    },
+    {
+      "name": "RESPALDO_SHA256SUMS.json",
+      "sha256": "4205d2b391791f8a8c0d9541fab96b7c49ac25b1c2b1c9e7a2bfa69982e55e04"
+    },
+    {
+      "name": "adaptadores_cierre.py",
+      "sha256": "1c1f08657ee17aff7efa197b0d5a3bbee2ca8f7410b9f430f9712f2ac6e73075"
+    },
+    {
+      "name": "aplicacion_vigencias.py",
+      "sha256": "2ed73096506b7da977239ebb2766a17e28f9fa9e0d5a991f14d055c15ffafc42"
+    },
+    {
+      "name": "captura_rt.py",
+      "sha256": "aaf4c429a8f39ea03da31703941ec65d439986f79ea3f30c8de22286e000886d"
+    },
+    {
+      "name": "carpeta_privada_mdb.ps1",
+      "sha256": "2094688be8c0c8a08e123574a5fa391702da7f3fde160f9ff310817c2ede5acd"
+    },
+    {
+      "name": "control_operativo.py",
+      "sha256": "17251c5f6617660751479be6d701f7cdb59dae3041505dc9801cd4dd09f9faa8"
+    },
+    {
+      "name": "coordinador.py",
+      "sha256": "bf5450bb5609bc48b64386aeedb05c20127bfd35ddff0ea48574619ddba7e615"
+    },
+    {
+      "name": "ensayo_cierres.py",
+      "sha256": "90cd81dc8621b4ec772410b22649db1f074c391823c2d454a6e7688dbde0bab7"
+    },
+    {
+      "name": "ensayo_puente_readonly.py",
+      "sha256": "bde4e12e6c45fba61deb07057b3c239e7f661b166a4460bf70b38db197ddfaf0"
+    },
+    {
+      "name": "envio/ENVIO_SHA256SUMS.json",
+      "sha256": "573c1b1ee01436021faf8eb3067284df159b8934a99ed97a1ba52f305dae757c"
+    },
+    {
+      "name": "envio/LEEME_ENVIO_VIGILADO.md",
+      "sha256": "b1bf7d0421a0d10c7c1ecf036ef6b017a086b54ae44a4e1a589a71a8c25f49f9"
+    },
+    {
+      "name": "envio/bucle_envio.py",
+      "sha256": "8f814abd4cf421319f9d1bba6552de32acf48391809ab60a0cabe4d621d463fa"
+    },
+    {
+      "name": "envio/envio_vigilado.py",
+      "sha256": "56b9c545e077882c7b8fdf86161a1ab005606f173adef3d435be5fa6e151e9bf"
+    },
+    {
+      "name": "envio/runtime/control_operativo.py",
+      "sha256": "17251c5f6617660751479be6d701f7cdb59dae3041505dc9801cd4dd09f9faa8"
+    },
+    {
+      "name": "envio/runtime/credencial.py",
+      "sha256": "06d9e15b02a58fe0b8cc3fd10f2b3e1df531f1e753df82e2b7b75fdcb998744a"
+    },
+    {
+      "name": "envio/runtime/emisor.py",
+      "sha256": "0e7cef854b88c739274a1b2d82408bcb2c2a2629ec7cc7e10b015fabcc78359a"
+    },
+    {
+      "name": "envio/runtime/enlace_candidato.py",
+      "sha256": "b6daa663747ead2c90f802cc2a280273885a0d9f62f7ac5a516b1eb6122e0a62"
+    },
+    {
+      "name": "envio/runtime/entregar_coordinador.py",
+      "sha256": "bd7ac50080f5ac8d78f91ea03d1e7d1c1c7dfe648a5e8d19a36a33188f51e005"
+    },
+    {
+      "name": "envio/runtime/outbox.py",
+      "sha256": "f00112ac88f1b3268aac628bc4987c3f9ca7e723c22f98aadc05cb71fba012ad"
+    },
+    {
+      "name": "envio/runtime/protocolo.py",
+      "sha256": "5f43b055d0a11a2afe3e3f9cf86ec3ac2682f6c3704ee8c27c1ec69a20c266fb"
+    },
+    {
+      "name": "envio/runtime/salud_operativa.py",
+      "sha256": "d4e310d240674adc7f9ea3d5da02f140a9591a12d56ecf944a46c65adfbe19aa"
+    },
+    {
+      "name": "envio/simular_envio.py",
+      "sha256": "c6b79470356f2dc08853a0bbddecef77356cafe997e8c6b624df8afb3ecb8809"
+    },
+    {
+      "name": "envio/tests/test_envio_vigilado.py",
+      "sha256": "9673c89767d88edc224a2224b04661dfa4ac7c282d22bfff735a4f94c1cfb858"
+    },
+    {
+      "name": "envio/verificar_envio.ps1",
+      "sha256": "bb907e93c9c3aa244e478011a0f32147ba56c22cfb438bf6ce031adad7e5e09d"
+    },
+    {
+      "name": "envio/vigilancia_envio.py",
+      "sha256": "2ed92e1423608f7e6d5902ca53ec9599d6b7c2bc6a40ecb4366d5140455bdd81"
+    },
+    {
+      "name": "lanzar_cierres.ps1",
+      "sha256": "48642ec7dd847cc7f753206d90979a9ee7e25ada4ab1e3e04edc4c64d3a60440"
+    },
+    {
+      "name": "lanzar_preparacion_aplicacion.ps1",
+      "sha256": "f998203650f1703d8c0fe2d06de4aa2127b6f265fe74bd09782599f854324c4e"
+    },
+    {
+      "name": "lanzar_puente_readonly.ps1",
+      "sha256": "9babef16f39de38437a716f9200bf854e4b96860ab736dffddf91e49ae34d258"
+    },
+    {
+      "name": "outbox.py",
+      "sha256": "f00112ac88f1b3268aac628bc4987c3f9ca7e723c22f98aadc05cb71fba012ad"
+    },
+    {
+      "name": "preparar_aplicacion.py",
+      "sha256": "e66c40748825106fac802adf6ea859a06ef1971f6d72230c125a2efc6e6b1b2a"
+    },
+    {
+      "name": "protocolo.py",
+      "sha256": "5f43b055d0a11a2afe3e3f9cf86ec3ac2682f6c3704ee8c27c1ec69a20c266fb"
+    },
+    {
+      "name": "puente_fechas_protegido.py",
+      "sha256": "c12d8d06aef3f669e3e6a9022e2bd7661f27abe940bb67255df54238c69781ae"
+    },
+    {
+      "name": "puente_sdk_fechas.py",
+      "sha256": "94be6c499f85506886e50621b37e7d29369c60230811606126e67c95034e6ca8"
+    },
+    {
+      "name": "puente_sdk_readonly.py",
+      "sha256": "2444036e33c8fc6cdbe022929b3a0c9995ec862f1c0ce6600112cbf195345b12"
+    },
+    {
+      "name": "recuperacion_selectiva.py",
+      "sha256": "284318358271ee73445d3aea2dce8de56cc245579c67435281c89dbbc150f663"
+    },
+    {
+      "name": "referencia_r2/FUENTE.json",
+      "sha256": "1475752e7a6415dac1556b56073466e91054585edfbcc80d9d506d4f895d1481"
+    },
+    {
+      "name": "referencia_r2/c3_panel.py",
+      "sha256": "e3c4915c38979477e94ab55de369766446dc4e8de896b49913d298904e3dd6ed"
+    },
+    {
+      "name": "referencia_r2/c3_worker.py",
+      "sha256": "3cfb31a51fd2124d478dea434623753dd02652120eb981d8b27f8a4c571eef4c"
+    },
+    {
+      "name": "referencia_r2/sincronizar_vigencias.py",
+      "sha256": "581dfa4cd428830321e3aa879812d9d8bdc09c785b3497bb97cc39b689915e35"
+    },
+    {
+      "name": "referencia_r2/sync_runtime.py",
+      "sha256": "adf6ded72c3f87133636a342b4d284376755fb43748679fbbb4468e5ccbfa666"
+    },
+    {
+      "name": "referencia_vigencias.py",
+      "sha256": "8ad86d0110a8e1a6ada78b2e939b5cbcdd6f9839da9fd13f14aa4a6c3e17abe9"
+    },
+    {
+      "name": "respaldo_mdb.py",
+      "sha256": "7725b041586a736e06955bb54bca421344c8b03538e104074cb876e57a265e06"
+    },
+    {
+      "name": "respaldo_protegido.py",
+      "sha256": "141c4f0ad06055cbcdcfe41790635185c7ac9930c8d5d4ffa3387d1dcdfd04fe"
+    },
+    {
+      "name": "runtime/lector_eventos.py",
+      "sha256": "8e92df0ebd7de0645d53ffdcfeccaa4444418744ddc3e5c3ae5f65a9a4275eee"
+    },
+    {
+      "name": "simular_aplicador.py",
+      "sha256": "be9a5bbef1d17d33d4c61920b4b772c3024e2ebed56be34482f7e01adfdb773d"
+    },
+    {
+      "name": "simular_puente_readonly.py",
+      "sha256": "866ab53683b97d8354f43ea753425820753fb4060c72b5349bfe2b4eaa3ffe7d"
+    },
+    {
+      "name": "simular_respaldo.py",
+      "sha256": "f8326a30db3e3d2eb60068b554580b661aa2f7980bd66903e7303b3146341e8a"
+    },
+    {
+      "name": "simular_respaldo_mdb.py",
+      "sha256": "4ae52540acd995da73f137563e5203a47feeca44d31ab432adbfff911a51c3a3"
+    },
+    {
+      "name": "tests/test_adaptadores_cierre.py",
+      "sha256": "a4e0c3c1deca34725c9735c591c6b9d71426adc7cbf2c056d5772746bf47e55d"
+    },
+    {
+      "name": "tests/test_aplicacion_vigencias.py",
+      "sha256": "09fbf1dbafc1b7de26d9a5b373b75730619b011bbda467d5975d15df30029100"
+    },
+    {
+      "name": "tests/test_preparacion_aplicacion.py",
+      "sha256": "cf7ba2f82e4b8ec338f3ed20ecb3caa50b2b0cf8c676e38d4c2a5ab7058fe756"
+    },
+    {
+      "name": "tests/test_puente_sdk_readonly.py",
+      "sha256": "4d4ff93e32f1d31d9e852f6cb4fc132f9e971d47e82163c4d3676a1f51a2c87c"
+    },
+    {
+      "name": "tests/test_respaldo_dpapi.py",
+      "sha256": "4b7ecd03c414144d8fed593f36e84ca79fb7b617586fca01e0c69f93b2737446"
+    },
+    {
+      "name": "tests/test_respaldo_mdb.py",
+      "sha256": "4ffcf7222ec39282c444389e0dcd96c7e38a5a23dd9de4bf1f4dbca76ae87de0"
+    },
+    {
+      "name": "tests/test_respaldo_mdb_ace.py",
+      "sha256": "b7dc2a56b581ea606aee4e2c616b7306616720bf3cd5e55cb4aaa841971aa853"
+    },
+    {
+      "name": "tests/test_respaldo_protegido.py",
+      "sha256": "01ae4bc17b1df4378fb0907264deb8d231681a25cba76a4d048f3f9c8c17d8e2"
+    },
+    {
+      "name": "tests/test_vigencias_candidato.py",
+      "sha256": "0e2fbc7f639cb34499a3597d0c02d797c9030a0d29b6a502f2965933e43e94f3"
+    },
+    {
+      "name": "trabajador_controlado.py",
+      "sha256": "42e63d74dd70649e15da793c50d2dd9876bb2bc4da2feaf6abe94c871b70c920"
+    },
+    {
+      "name": "verificar_aplicador.ps1",
+      "sha256": "331a864376ec76682b62bfad756a40242051b598ffc14b2c1dea913c3bb9eddd"
+    },
+    {
+      "name": "verificar_cierres.ps1",
+      "sha256": "b9f48d10b528221525f7480405bdf86f24f7c295cacb12fc6df1bf9fe132e32c"
+    },
+    {
+      "name": "verificar_puente_readonly.ps1",
+      "sha256": "ec6952a69b75c01b0f2ea9cfa89b8871c907256d29efbf30c120e679e8e65904"
+    },
+    {
+      "name": "verificar_respaldo.ps1",
+      "sha256": "b7308e772d6d7b9f18c564444268479e121145b3acdfe9b34e7b3d7d9e63ede1"
+    },
+    {
+      "name": "verificar_respaldo_mdb.ps1",
+      "sha256": "4145d38f2956c86068825f5662cda024f52af06276bfb90f93dc837bff86b4b6"
+    },
+    {
+      "name": "vigencias_candidato.py",
+      "sha256": "30b83ac78917ab947ae57de12d1acdcefe6e72e5d4abfc094aa68e8cdf8901f0"
+    }
+  ]
+}

@@ -282,3 +282,75 @@ aislada; después unión del transporte de aprobación/aplicación y recuperaci�
 operativa. Mantener vigencias bajo autoridad de API, sin restaurar fechas antiguas
 ni probar escrituras en un tag sin diferencias. No aplicación real autorizada
 por estas salidas; preservar ZIP/publicaciones previas.
+
+## Respaldo completo MDB candidato y validación local — 2026-10-25 México
+
+Usuario indica continuar tras aceptar snapshot DPAPI en Dell. Se prepara y
+prueba biblioteca separada respaldo_mdb.py; ninguna nueva pausa ni consulta a
+caseta, SDK, API o producción. No hay CLI de respaldo/restauración real todavía.
+
+Diseño: el futuro padre conserva sync.lock/mantenimiento y pasa guard. Fuente
+abierta con CreateFileW GENERIC_READ/OPEN_EXISTING/share0, como el respaldo del
+gestor revisado. Fallo por archivo abierto no cierra procesos ni hace fallback
+compartido. Copia completa por bloques1MiB a UUID nuevo con ACL privada desde
+creación (usuario actual/SYSTEM, herencia deshabilitada y verificación), fsync,
+recuentos/tamaño y SHA256 de copia cotejado contra bytes leídos en exclusivo.
+El handle se cierra antes de validar copia; fuente no abierta con ODBC.
+
+ACE readonly/autocommitfalse abre solo la copia. Comprueba columnas mínimas y
+COUNT(*) de USERINFO/CHECKINOUT/acc_levelset/acc_levelset_emp/personnel_issuecard
+y compara identidad/fechas del tag contra snapshot del plan. Rollback y close
+obligatorios, hash MDB igual antes/después. Recibo copy_verified exclusivo/fsync
+al final; fallos conservan copia incompleta y no permiten devolver confirmación.
+Plan copiado antes de callbacks; no aprobación ni fechas/C3/relaciones alteradas.
+La copia conserva todas las tablas por igualdad de bytes, pero se consultan solo
+las cinco indicadas. No se certifica integridad de todas las páginas ni ensayo
+de restauración integral/conciliación operativa.
+
+La MDB completa permanece como archivo Access bajo ACL, sin cifrado DPAPI
+adicional de todo el archivo. Snapshot selectivo previo sí cifrado DPAPI.
+No confundir ACL con cifrado de disco, portabilidad ni respaldo externo. El
+archivo contiene datos personales: no versionar/subir/copiar como evidencia.
+Máximo512MiB por MDB,32respaldos/2GiB y reserva64MiB; incompletos conservados y
+contabilizados, sin borrado automático. Retención operativa aún por definir.
+
+Dos incompatibilidades se reprodujeron y corrigieron solo en fuentes nuevas:
+
+- ACE local interpreta Dbq y PWD envueltos en llaves literalmente al abrir
+  MDB ficticia con contraseña. Nuevo conector usa ruta simple validada y PWD
+  literal; rechaza separadores/control/espacios externos no representables.
+  Contraseña nunca en argumentos/logs de operación, errores ODBC se sustituyen
+  por error genérico. No prueba variantes. r2/gestor congelados intactos; este
+  hallazgo no demuestra fallo en caseta ni certifica su credencial real.
+- Get-Acl no autocargó Microsoft.PowerShell.Security en proceso WinPS lanzado
+  desde Python bajo este host. Se usa Directory.GetAccessControl .NET para
+  verificar DACL, sin depender de esa autocarga. Auxiliares no heredan SANISIDRO_*.
+
+18tests ficticios y7nativos nuevos. Nativos con Win32/ACL/ACE/ODBC y MDB propia
+creada por ADOX con contraseña conocida ficticia, dos usuarios, permisos e
+historial: hash fuente/copia conservado, cinco tablas legibles, otro usuario e
+historial presentes, conexión readonly rechaza UPDATE, fuente ocupada bloquea,
+handle exclusivo impide nuevo lector/escritor y se libera, schema/contraseña
+incorrectos no confirman, destino existente no sobrescrito. No datos reales.
+Suite final365pruebas en68.505s, fallos0/errores0/omisiones0. Ejecución ampliada
+para casos previos de loopback/DPAPI; nuevos casos nativos también en sandbox.
+AST nuevo y parser WinPS de ambos scripts aprobados.
+
+Respaldo_MDB_2026.10.25-1.zip:73archivos,183938bytes, SHA256
+5c61899f824895a2ff1daeae6e4ecc0a370b7baadb24ce28124dbf11c0b7c99e.
+65archivos de Respaldo_Protegido1 completos e intactos, siete nuevos y manifiesto
+propio de72fuentes. Hashes/rutas/bytes verificados. Extraído en
+datos/aceptacion_respaldo_mdb_20261025_r1: verificador PS correcto,
+simulation_ok/18tests ended_utc2026-10-26T02:28:10.468450Z,
+ace_ok/7tests ended_utc2026-10-26T02:28:31.834253Z (=25oct20:28México);
+cero fallos/errores/omisiones. No sobrescribir publicación.
+
+Siguiente: Dell, carpeta nueva C:\SanIsidro\RespaldoMDB_20261025, verificador,
+simular_respaldo_mdb.py y --comprobar-ace con Python64 ya inventariado
+C:\Users\Dell\AppData\Local\Python\pythoncore-3.14-64\python.exe. No usar Python32
+para ACE ni instalar driver/SDK. Sin mantenimiento/SSH/tag/cerrar ZKAccess para
+esta prueba, solo MDB ficticias con limpieza propia y registros resumidos.
+LEEME_RESPALDO_MDB.md contiene pasos exactos; salida Dell pendiente. No lanzar
+scripts históricos incluidos. Revisión/aceptación real de MDB, unión al padre,
+aplicación autorizada/recuperación y transición continua siguen pendientes.
+No nueva evidencia de salud del polling por ejecutar pruebas locales.
