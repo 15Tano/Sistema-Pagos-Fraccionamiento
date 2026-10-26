@@ -209,3 +209,13 @@ evidencia la salud del backend de ensayo ni afirmar aplicacion candidata real.
 Siguiente: preparar piloto de aplicacion existente-only con plan fresco,
 respaldo/proteccion y consentimiento del alcance. Mantener polling normal hasta
 que haya un lanzador revisado. No repetir simulacion/preflight ni pausar ahora.
+
+## Piloto acotado preparado localmente — 2026-10-26
+
+Usuario pide siguiente paso y tiempo; se prepara lanzador por tag con plan fresco,
+respaldo anterior al consentimiento y confirmacion de frase/hash completo. Noop
+sin escribir si las fechas coinciden. Reutiliza aplicador protegido y DLL actual,
+sin RT/SSH/instalacion/tareas nuevas. Suite600aprobada. Guia y detalle vigentes en
+control-acceso-piloto-vigencias.md; primero nueva simulacion Dell64/32/preflight
+sin mantenimiento. No ejecutar una aplicacion por inferir aceptacion de las72
+pruebas anteriores; solo el plan real y consentimiento autorizan su alcance.

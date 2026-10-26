@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-26",
+  "scope": "local_only_no_caseta_or_production_actions",
+  "full_suite_before_fixture_path_adjustment": {
+    "tests": 600,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 195.606,
+    "log_sha256": "3a4dcee083faa3d16ccb07e045464aa3cf57c2cab22dff9d174ea470e1a71e5c"
+  },
+  "extracted_package_simulation": {
+    "result": "simulation_ok",
+    "scope": "piloto_ficticio_sin_sdk_red_datos_instalados_tareas",
+    "parent_bits": 64,
+    "child_bits": 64,
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "ended_utc": "2026-10-26T18:15:41.664196+00:00",
+    "evidence": "C:\\Users\\kungl\\Documents\\San Isidro\\sistema-pagos-SanIsidro_PRUEBAS 2.0\\tools\\agente_acceso\\datos\\piloto2\\registros\\piloto_simulado_20261026_121541_664196.json"
+  },
+  "artifact": {
+    "name": "Piloto_Vigencias_2026.10.26-2.zip",
+    "bytes": 417225,
+    "entries": 163,
+    "sha256": "4cfe4062655d6da51be3cc7501d6bf303d98d043598ba7fcf98f22a9aa5dfa76",
+    "manifest_sha256": "f0bade43b65ba515dd6f34616a40f1e2bc9a40e58e18ed49d9526c8ca17114b9",
+    "base_entries_preserved": 150
+  },
+  "base_entries_preserved_byte_for_byte": 150,
+  "dell_simulation": "pending",
+  "real_application": "pending",
+  "installed_or_activated": false,
+  "pushed_or_deployed": false
+}
