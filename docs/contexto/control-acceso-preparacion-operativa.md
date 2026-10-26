@@ -180,3 +180,32 @@ de contrato para construir la pantalla en su etapa de interfaz. No afirmar que
 esta preparación completa la operación instalada, pantalla, altas/recuperaciones
 o despliegue de producción. No hay estimación porcentual fiable del proyecto
 completo a partir del número de paquetes o pruebas.
+
+## Simulacion y preflight aprobados en Dell — 2026-10-26
+
+Usuario verifica Preparacion Operativa1 y ejecuta con Python64/32 instalados:
+simulation_ok,72tests/failures0/errors0/skipped0,
+ended_utc2026-10-26T17:35:05.622785Z. Evidencia:
+C:\SanIsidro\PreparacionOperativa_20261026\registros\preparacion_simulada_20261026_113505_622727.json.
+2400buffers completos/157286400bytes logicos, SQLite2195456bytes,120archivosACK,
+originales verificados/cuerpos intactos/reapertura sin reencolar/secuencia
+continua. Carga157.806s; no es medicion de caudal real del controlador.
+
+Preflight readonly: las seis fuentes r2 coinciden. Ambos archivos del gestor
+coinciden, incluido gt_backend.py5ded829ecd5467f4f08553baf44698d3dd21afdbbf0970a8fffe8735e5e74749;
+queda resuelta la confirmacion remota de ese hash. SanIsidro-Vigencias Running
+y SanIsidro-Vigilancia Ready, ambas habilitadas; actions_verified/same_user/
+highest/interactive true en ambas. Vigencias protocol2/PID13936/phaseidle,
+consecutive_errors0/last_error_typenull, last_ok17:34:35.957944Z y heartbeat
+17:34:35.957966Z. No se aportan aqui dos lineas de log nuevas; el preflight no
+las necesita al no haber pausado/reanudado. Espacio libre1928787902464bytes.
+
+installed_link/production_config_exists/activation_record_exists false:
+preparacion no instalada ni activada. can_activate=false es el bloqueo previsto,
+no un fallo de simulacion. dates_applied/tasks_changed/credential_read false.
+No SDK/red/MDB/credenciales reales en estas pruebas. No actualizar con esta
+evidencia la salud del backend de ensayo ni afirmar aplicacion candidata real.
+
+Siguiente: preparar piloto de aplicacion existente-only con plan fresco,
+respaldo/proteccion y consentimiento del alcance. Mantener polling normal hasta
+que haya un lanzador revisado. No repetir simulacion/preflight ni pausar ahora.
