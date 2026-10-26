@@ -191,3 +191,19 @@ Ahora Terminar y reanudar por gestor y comprobar dos ciclos nuevos. Retorno r2
 todavia no aportado; no afirmar salud actual a partir de este piloto ni renovar
 la salud del emisor/backend. No repetir esta pausa ni alterar fechas para probar
 una escritura. Aplicacion candidata ante diferencia natural sigue pendiente.
+
+## Retorno de r2 confirmado; pausa del piloto concluida — 2026-10-26
+
+Usuario aporta SanIsidro-Vigencias Running (Enabled no incluido en esta consulta),
+protocol2/PID17588/run_started2026-10-26T18:30:18.208674Z, phaseidle,
+consecutive_errors0/last_error_typenull, last_ok18:31:25.764636Z y heartbeat
+18:31:25.764657Z. Dos ciclos nuevos correctos12:30:22.165 y12:31:25.765 Mexico:
+API838/Accesschanges0/C3changes0/not_found4/absent_api_unchanged116.
+Parada previa12:28:29.681; retorno posterior al cierre piloto18:29:18.901367Z.
+
+Aceptados piloto real no_changes, cierre final y retorno r2 con dos ciclos.
+No repetir esta pausa/lectura. No hubo Approval, respaldo nuevo ni escritura
+candidata; una diferencia natural sigue siendo necesaria para acreditar esa
+ruta. No modificar fechas/pagos para fabricar la prueba. La salida no consulta
+vigilancia, cola o backend y no renueva su certificacion. No instalacion o
+activacion permanente por esta aceptacion; mantener polling normal.
