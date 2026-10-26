@@ -354,3 +354,27 @@ LEEME_RESPALDO_MDB.md contiene pasos exactos; salida Dell pendiente. No lanzar
 scripts históricos incluidos. Revisión/aceptación real de MDB, unión al padre,
 aplicación autorizada/recuperación y transición continua siguen pendientes.
 No nueva evidencia de salud del polling por ejecutar pruebas locales.
+
+## Aceptación del respaldo MDB ficticio en Dell — 2026-10-25 México
+
+Usuario verifica Respaldo_MDB_2026.10.25-1 y ejecuta ambas comprobaciones con
+Python64 ya instalado. simulation_ok/18pruebas, failures0/errors0/skipped0,
+ended_utc2026-10-26T02:32:17.017068Z; ace_ok/7pruebas, mismos ceros,
+ended_utc2026-10-26T02:32:30.207368Z (=25oct20:32México). Evidencias:
+
+- C:\SanIsidro\RespaldoMDB_20261025\registros\simulacion_mdb_20261025_203217_017027.json
+- C:\SanIsidro\RespaldoMDB_20261025\registros\ace_mdb_20261025_203230_207329.json
+
+Aceptadas simulación y pruebas nativas ACE/Win32/ACL en Dell sobre MDB propios
+ficticios, incluida contraseña ficticia, igualdad fuente/copia, exclusión,
+lectura de las cinco tablas y rechazo de UPDATE en conexión readonly. No se
+abrió/cambió Database_PRO.mdb instalada, consultó SDK/API, leyó credencial real
+ni alteró tareas. No es aún respaldo de caseta ni aceptación de la credencial/
+esquema/tamaño reales. No requiere otra simulación ni mantenimiento para cerrar
+esta etapa. No renueva evidencia remota de salud del polling.
+
+Siguiente trabajo: entrada real de respaldo bajo mantenimiento/sync.lock del
+gestor, fuente/rutas fijas y credencial DPAPI existente en memoria, cierre y
+recibo verificables. Preparar/probar esa unión antes de pedir pausa en Dell.
+La obtención/validación de copia real, recuperación operativa y aplicación del
+candidato siguen pendientes; no nuevas escrituras autorizadas por estas salidas.
