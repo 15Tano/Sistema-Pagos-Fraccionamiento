@@ -198,3 +198,64 @@ suite completa, capacidad/retención del almacén, documentación y eventual ZIP
 No afirmar esta pieza terminada ni probada en Dell. Trabajo nuevo permanece
 en archivos locales sin commit de implementación; este checkpoint sí documenta
 la pausa. No reanudar hasta indicación del usuario.
+
+## Respaldo protegido local terminado y paquete preparado — 2026-10-25 México
+
+Usuario autoriza continuar después del traslado. Se retoma solo trabajo local;
+ninguna nueva pausa, prueba, tarea o conexión a Dell/C3/producción en este tramo.
+El estado remoto más reciente sigue siendo el polling PID7264 con dos ciclos
+correctos18:40:52/18:41:56. Las pruebas locales no acreditan su salud actual.
+
+Implementación nueva, sin modificar fuentes/ZIP publicados:
+
+- respaldo_protegido.Store guarda snapshot selectivo DPAPI CurrentUser: siete
+  campos user, permisos userauthorize y plan con fechas/identidad Access. No
+  incluye MDB completa, historial ni membresías Access. Password solo cifrado
+  o en memoria; manifiesto público vincula serial/card/UUID/plan y hash del
+  cifrado. Roundtrip antes de guardar, fsync exclusivo y reapertura desde disco.
+- ProtectedDatesPanel guarda snapshot y enlace durable antes del Set del
+  binding candidato; fallos de cifrado/disco impiden alcanzar escritura SDK.
+  Hook probado con SDK ficticio; no enlazado al run_scoped_worker anterior ni
+  al polling. Futuro padre requiere sync.lock/gate, transporte de autorización
+  y recibo de cierre comprobado antes de continuar. No hay CLI de escritura.
+- recuperacion_selectiva.review vuelve a autenticar el snapshot y compara
+  identidad/campos protegidos/permisos actuales. Si cambian, bloquea. Si solo
+  difieren fechas propone plan nuevo contra API actual, incluida vencida. No
+  restaura fecha vieja ni aplica/crea/repara niveles/emite Approval/resuelve
+  marcadores pendientes. Es revisión de conciliación, no restaurador operativo.
+- Admisión hasta1024snapshots/256MiB, reserva64MiB, snapshot1MiB/manifest8KiB.
+  Rutas reparse/junction/symlink se rechazan también en ancestros. Sin borrado
+  automático: incompletos cuentan y se conservan. Límite/contenido ajeno/disco
+  insuficiente bloquean antes del Set. Requiere escritor único bajo bloqueo;
+  no instala una política de retención ni sustituye copia portátil externa.
+
+Corregido descubrimiento duplicado: fixtures se importan como módulo;31casos
+nuevos ficticios y3DPAPI nativos,34nuevos reales en el conteo. Estos últimos
+comprueban cifrado no determinista/roundtrip, reapertura desde proceso nuevo del
+mismo usuario y corrupción aun con hash público actualizado. No se probó otra
+cuenta/equipo/reinstalación Windows. Datos exclusivamente ficticios, ningún
+Password de caseta. No prometer recuperación portátil con este respaldo.
+
+Suite completa340pruebas,67.332s, fallos0/errores0/omisiones0; contiene las306
+anteriores. Ejecución local ampliada por pruebas previas HTTP loopback/DPAPI;
+sin producción/caseta. AST de fuentes nuevas y parser Windows PowerShell OK.
+
+Respaldo_Protegido_2026.10.25-1.zip:65archivos,165098bytes, SHA256
+728439c25f564b622ecd8abf06d195363ae2feec220a5cd2b483d2851e7e665b.
+Incluye56archivos idénticos de Aplicador_Candidato2, ocho nuevos y manifiesto
+propio de64fuentes. ZIP/manifest/rutas/dependencias comprobados byte por byte.
+Extraído en datos/aceptacion_respaldo_20261025_r1: verificador PS aprobado,
+simulation_ok/31tests ended_utc2026-10-26T01:52:38.649099Z y dpapi_ok/3tests
+01:52:39.930906Z (=25oct19:52México), cero fallos/errores/omisiones.
+
+Siguiente: descargar y ejecutar verificar_respaldo.ps1, simular_respaldo.py y
+--comprobar-dpapi en Dell, carpeta nueva C:\SanIsidro\RespaldoProtegido_20261025.
+Sin mantenimiento, SSH, SDK, MDB, credenciales instaladas o cambio de tareas.
+LEEME_RESPALDO_PROTEGIDO.md contiene comandos exactos. Salida Dell pendiente.
+No ejecutar lanzadores históricos incluidos para esta aceptación.
+
+Siguen pendientes respaldo consistente MDB, recuperación operativa revisada,
+transporte/launcher de aplicación autorizada y transición continua/gestor/
+vigilancia. Antes de escribir realmente se requiere un alcance concreto con
+diferencia y aprobación; no provocar cambios en12230693, cuyo plan coincidía.
+UI/endpoints nuevos y despliegue quedan fuera de esta entrega.
