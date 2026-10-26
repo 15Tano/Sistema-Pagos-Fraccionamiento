@@ -259,3 +259,26 @@ transporte/launcher de aplicación autorizada y transición continua/gestor/
 vigilancia. Antes de escribir realmente se requiere un alcance concreto con
 diferencia y aprobación; no provocar cambios en12230693, cuyo plan coincidía.
 UI/endpoints nuevos y despliegue quedan fuera de esta entrega.
+
+## Aceptación del respaldo en Dell — 2026-10-25 México
+
+Usuario comparte verificación correcta de Respaldo_Protegido_2026.10.25-1,
+simulation_ok/31pruebas y dpapi_ok/3pruebas; en ambas failures0/errors0/skipped0.
+Simulación ended_utc2026-10-26T02:09:02.949939Z y DPAPI02:09:04.282394Z
+(=25oct20:09México). Evidencias:
+
+- C:\SanIsidro\RespaldoProtegido_20261025\registros\simulacion_respaldo_20261025_200902_949888.json
+- C:\SanIsidro\RespaldoProtegido_20261025\registros\dpapi_respaldo_20261025_200904_282346.json
+
+Queda aceptada compatibilidad en Python32 de Dell: protección DPAPI nativa y
+reapertura por un proceso nuevo del mismo usuario, usando únicamente datos
+ficticios. SDK/cifrado sustituidos en las31simulaciones. No se abrió MDB/C3,
+leyeron credenciales instaladas o cambiaron tareas/polling. Estas salidas no
+actualizan la evidencia de salud del polling, no prueban otra cuenta/equipo ni
+restauración real. No requiere mantenimiento ni repetir la aceptación.
+
+Siguiente etapa pendiente: respaldo consistente de MDB y validación de su copia
+aislada; después unión del transporte de aprobación/aplicación y recuperación
+operativa. Mantener vigencias bajo autoridad de API, sin restaurar fechas antiguas
+ni probar escrituras en un tag sin diferencias. No aplicación real autorizada
+por estas salidas; preservar ZIP/publicaciones previas.
