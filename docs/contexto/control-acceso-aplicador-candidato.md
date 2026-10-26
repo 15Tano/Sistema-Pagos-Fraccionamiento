@@ -459,3 +459,29 @@ si el lanzador se interrumpe. Simulación/preflight Dell, respaldo real/cierre/
 retorno aún pendientes; no se acredita salud actual de r2 con pruebas locales.
 Aplicación autorizada/recuperación operativa, runner continuo, gestor/vigilancia,
 UI/endpoints nuevos y despliegue siguen pendientes.
+
+## Simulación y preflight del lanzador aceptados en Dell — 2026-10-25 México
+
+Usuario verifica Respaldo_Real_MDB_2026.10.25-1 y comparte simulation_ok,
+32tests/failures0/errors0/skipped0, ended_utc2026-10-26T03:03:23.989304Z
+(=25oct21:03México). Evidencia:
+C:\SanIsidro\RespaldoReal_20261025\registros\simulacion_respaldo_real_20261025_210323_989259.json.
+Se aceptan controles y lanzador con credencial DPAPI ficticia en Dell.
+
+--preflight devuelve preflight_ok, card12230693 y hash de plan exacto
+709d7809d4259fb89847a2f5ef68aa15af1f69f1f3f6da9a4123fd3be2d58416.
+source_bytes70127616 (aprox66.88MiB), source_opened=false, credential_read=false,
+maintenance_required_for_backup=true. Quedan comprobadas rutas/archivos/plan/
+metadatos/capacidad en esa consulta, sin abrir bytes MDB ni descifrar credencial.
+No acredita contenido/esquema/clave reales, cierre o salud actual del polling.
+
+Siguiente paso indicado al usuario: cerrar ZKAccess/otros lectores y preparar
+mantenimiento por gestor, esperar parada, ejecutar lanzar_respaldo_real.ps1.
+El lanzador obtiene copia/valida y después ejecuta comprobación final automática
+con UUID propio, guardando cierre_final.json. Solo cierre_respaldo_confirmado
+permite Terminar y reanudar por gestor; luego dos ciclos correctos nuevos. Si
+backup_verified=false pero cierre confirmado, reanudar conservando evidencia,
+sin afirmar respaldo obtenido. Sin cierre, conservar mantenimiento y revisar.
+No usar Ctrl+C/cerrar ventana ni otro lector durante la operación. No SDK/API/
+escritura del original. Copia real, comprobación final y retorno pendientes de
+salida del usuario; no afirmar mantenimiento iniciado por compartir preflight.
