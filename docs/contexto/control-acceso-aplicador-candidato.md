@@ -113,3 +113,55 @@ Faltan transporte de aprobación, launcher de aplicación, recuperación protegi
 prueba real autorizada, runner continuo/gestor/vigilancia y transición. No nuevos
 endpoints/pantalla o deploy en esta entrega. Última salud remota sigue siendo
 PID14524/last_ok23:46:59.902633Z; pruebas locales no la renuevan.
+
+## Simulación Dell aprobada — 2026-10-25 México
+
+Usuario verifica Aplicador_Candidato_2026.10.25-2 y ejecuta con Python32:
+simulation_ok,38pruebas/failures0/errors0/skipped0,
+ended_utc=2026-10-26T00:36:21.304002+00:00 (=25oct18:36México).
+Evidencia: C:\SanIsidro\AplicadorCandidato_20261025\registros\simulacion_aplicador_20261025_183621_303959.json.
+Sin SDK/red/DPAPI/Access/tareas reales; no aplicación o aprobación real.
+
+Siguiente operación indicada: pausa por gestor instalado y preparar alcance
+readonly del tag12230693, conocido por captura física pero sin asumir presencia
+API ni fechas actuales. Esperar FIN, verificar cierre propio antes de reanudar
+y comprobar dos ciclos. No altas/recuperación/renovación para forzar plan;
+no servidor SSH de ensayo. Plan real, cierre y retorno de esta pausa pendientes.
+
+## Plan real readonly sin cambios y retorno comprobado — 2026-10-25 México
+
+Usuario ejecuta lanzar_preparacion_aplicacion.ps1 -Tag12230693:
+plan_created=true/error_type=null/phase=stopped/approval_issued=false.
+API:2026-11-05 23:59:59; Access USERID1108, start2020-01-01 00:00:00,
+end2026-11-05 23:59:59,valid_raw=true. C3 CardNo12230693/Pin693,
+StartTime20200101/EndTime20261105. access_change=false/c3_change=false.
+No fechas que aplicar; no forzar una reescritura o cambiar pagos para probar.
+Plan SHA256:
+709d7809d4259fb89847a2f5ef68aa15af1f69f1f3f6da9a4123fd3be2d58416.
+API snapshot SHA256:
+41cb69b00f166c4e6fdca6ac0bf2ba9c0372ca98b599545fb69130324836154c.
+
+Padre PID10652/run_id=a4230256-23f4-4f6e-8e92-2eacba40c19b,
+ended_utc2026-10-26T00:39:59.731896Z. Recibos17acumulados, uno de este run:
+workera6912820-d6f6-40f7-9a57-d5ae8b7d4304/PID17224. Evidencia:
+C:\SanIsidro\AplicadorCandidato_20261025\datos\sesiones\a4230256-23f4-4f6e-8e92-2eacba40c19b.
+Confirma preparación con datos reales y cierre con recibos; no aplica cambios,
+emite aprobación, consume RT o envía a ingesta.
+
+Polling nuevo PID7264/protocol2/run_started2026-10-26T00:40:48.519232Z,
+phase=idle/consecutive_errors0/last_error_type=null,
+last_ok2026-10-26T00:41:56.150066Z. Dos ciclos correctos18:40:52.258 y
+18:41:56.151 México25oct: API838/cambios Access0/C30/no encontrados4/ausentes
+API116sin cambios. Parada anterior18:39:04.225. No se aportó tabla actual de
+tareas, no inventar Enabled/State por estos datos. Retorno de proceso y ciclos
+sí verificados; nueva vigilancia/estado de mantenimiento inactivo no aportados.
+
+Falta en la salida --verificar-cierre/cierre_puente_confirmado del preparador.
+Solicitar salida anterior/confirmación de si apareció antes de reanudar; no
+inferir ejecución ni omisión, ni pedir repetir con polling ya activo u otra
+pausa. No hay recibo final separado en esta versión: la comprobación imprime
+resultado. Dato histórico pendiente; conservar polling saludable funcionando.
+
+Comando SSH compartido devolvió /salud ensayo_listo/TEST-C3-001 y cerró sesión:
+confirma servidor de ensayo existente, no un envío de este plan. Preparación no
+necesita laboratorio/túnel ni usa ese marcador como identidad del controlador.

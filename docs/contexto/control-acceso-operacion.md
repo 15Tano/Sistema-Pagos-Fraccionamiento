@@ -792,3 +792,11 @@ en MDB ficticios). Aplicador_Candidato_2026.10.25-2.zip preparado: primero38
 pruebas ficticias en Dell sin mantenimiento; plan real readonly y autorización
 de aplicación posteriores pendientes. No nuevo estado de salud remoto ni cambio
 de tareas/polling. Detalle en control-acceso-aplicador-candidato.md.
+
+Posterior: simulación Dell38casos aprobada y plan real readonly12230693 sin
+cambios (API/Access/C3hasta5nov2026;sin aprobación). Recibo SDK de este run,
+17acumulados. Polling vuelve PID7264/protocol2/idle/errores0, ciclos correctos
+18:40:52.258/18:41:56.151 México25oct, last_ok26oct00:41:56.150066Z, API838/
+Access0/C30/no encontrados4/ausentes116. Salida de verificación final del
+preparador no aportada: solicitar confirmación histórica sin repetir pausa.
+No aplicación, envío nuevo o instalación permanente por este plan.
