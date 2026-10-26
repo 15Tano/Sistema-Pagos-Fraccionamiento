@@ -295,3 +295,16 @@ checked_utc=2026-10-25T23:45:40.454780+00:00. Es anterior al arranque del pollin
 Aceptadas comparación readonly r2/candidato de838registros, cierre final propio
 y retorno a r2 con dos ciclos correctos. No solicitar otra pausa/lectura.
 Esto no habilita aplicación candidata ni acredita operación permanente.
+
+## Aplicador local y preparación de alcance — 2026-10-25
+
+Usuario solicita trabajar, estimación30–45min para preparar/probar pieza local.
+Implementado módulo de un tag/plan confirmado y binding de fechas sin CLI de
+aplicación; respaldo/intenciones fsync, API reconsultada, comparaciones y revisión
+tras fallo parcial/reinicio. Preparador real readonly separado no emite Approval.
+43 pruebas nuevas/306totales aprobadas, incluidas5 con ACE/ODBC real en MDB
+ficticios; paquete2 extraído con38 simulaciones aprobadas. Primero simular en
+Dell sin mantenimiento, después plan readonly revisable. No fechas reales,
+tareas, SDK instalado, UI o backend modificados. Detalles, SHA y límites en
+control-acceso-aplicador-candidato.md; transporte de autorización/recuperación
+protegida/launcher de aplicación y transición aún pendientes.

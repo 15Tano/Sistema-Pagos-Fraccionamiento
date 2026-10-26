@@ -785,3 +785,10 @@ Confirmación posterior recibida: cierre_puente_confirmado para PID12404/run
 c829b806-a870-4b2e-bd96-1aeff136f05d a23:45:40.454780Z, antes del arranque
 del polling23:45:52.416609Z. Resuelto el dato faltante: puente readonly y
 retorno aceptados, sin nueva pausa. Aplicación operativa sigue sin habilitar.
+
+Siguiente avance local25oct: aplicador acotado por plan y preparador readonly,
+sin launcher de escritura,43pruebas nuevas/306totales aprobadas (5ACE/ODBC real
+en MDB ficticios). Aplicador_Candidato_2026.10.25-2.zip preparado: primero38
+pruebas ficticias en Dell sin mantenimiento; plan real readonly y autorización
+de aplicación posteriores pendientes. No nuevo estado de salud remoto ni cambio
+de tareas/polling. Detalle en control-acceso-aplicador-candidato.md.
