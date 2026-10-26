@@ -126,3 +126,45 @@ Solo tras cierre_servicio_confirmado, Terminar y reanudar por gestor y comprobar
 dos ciclos correctos nuevos. Si no hay cierre confirmado, conservar mantenimiento
 y evidencia. No tag fisico, escrituras de fechas, sustitucion DLL ni despliegue.
 Ensayo real, cierre y retorno de esta etapa todavia pendientes.
+
+## Ensayo readonly integrado real y cierre aprobados — 2026-10-26
+
+Usuario restablece servidor/tunel y aporta salud18881 ensayo_listo/TEST-C3-001
+(marcador del backend aislado). Ejecuta lanzar_servicio_integrado.ps1 -Seconds150:
+trial_passed=true, mode=readonly, phase=stopped, stop_reason=limit,
+dates_applied=false. PadrePID8332/run_id04944797-e3d4-42f3-8376-b0a4adf96dd5.
+Dos ciclos completados/errores0, ultima comparacion API838/Accesschanges0/
+C3changes0/not_found4/absent_api_unchanged116, verified0/statuscompared.
+No son dos ciclos de aplicacion candidata. PlanSHA:
+532666deaecc52b9fb0b6f91de501f4095758426f32cb9765b62d73d35f43381.
+
+Lector/almacen/emisor sin errores, sdk_gate active=null/fault=false,
+closures_confirmed=true. Ultima lectura SDK06:25:39.504455Z; lector paused
+corresponde al cierre. Cuatro recibos de trabajadores:53a2ade2-ca8b-458a-b782-
+54ebecaafd95/PID17564,6a824f9d-5e38-4869-a4b2-1ce64610b7b4/PID7056,
+e438ed21-12f0-413d-8e3b-f5892dfa842c/PID15780,
+f7a36e68-c2d1-4bfa-b6da-a8e64cb2316b/PID16388. No asignar funciones a los
+PIDs por orden del listado UUID; consultar request.json si hace falta.
+
+EmisorPID9296/run_id90f8b8f5-c533-4fa1-ab0a-0cd739f077dc,
+21mensajes ACK durante el ensayo/216idle, ultimoACK06:25:36.583116Z.
+Cola acumulada:359respuestas originales,183mensajes acked, unbatched3,
+pending_count3, paused vacio, oldest_pending06:25:36.353914Z. Las tres ultimas
+respuestas estan guardadas localmente sin agrupar, no perdidas ni confirmadas
+en backend. No afirmar cola vacia ni nuevos totales eventos/estados del servidor.
+El snapshot del emisor con process_exited=false es anterior al cierre; la
+verificacion final posterior confirma salida/recibo del hijo conforme al codigo.
+
+Evidencia:
+C:\SanIsidro\ServicioIntegrado_20261026\datos\sesiones\04944797-e3d4-42f3-8376-b0a4adf96dd5.
+Verificador automatico: cierre_servicio_confirmado para mismoPID/run,
+trial_passed=true/dates_applied=false, checked_utc2026-10-26T06:25:47.234273Z
+(00:25:47 Mexico26oct). result_sha256:
+aeb713ccb9b13afb040cae10f776466060e0ebf6607a06541ce7073dfbbbd78a.
+
+Aceptados ensayo readonly real, lecturas/envio combinados y cierre propio.
+Ahora Terminar y reanudar por gestor y comprobar tarea/estado y dos ciclos r2
+nuevos. No se ha aportado ese retorno aun. Tras comprobarlo, entregar las tres
+respuestas restantes con emisor manual existente, sin SDK ni mantenimiento,
+y comprobar segundo envio idle/originales conservados. Mantener tunel abierto.
+Instalacion permanente, aplicacion candidata real y demas pendientes continúan.
