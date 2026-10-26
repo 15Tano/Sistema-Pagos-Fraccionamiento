@@ -165,3 +165,11 @@ resultado. Dato histórico pendiente; conservar polling saludable funcionando.
 Comando SSH compartido devolvió /salud ensayo_listo/TEST-C3-001 y cerró sesión:
 confirma servidor de ensayo existente, no un envío de este plan. Preparación no
 necesita laboratorio/túnel ni usa ese marcador como identidad del controlador.
+
+Usuario reproduce después el historial de esa ventana: simulación38casos,
+SSH/salud, preparador con FIN y consulta de polling; no aparece en esa secuencia
+el comando --verificar-cierre ni su salida. No prueba si se usó otra ventana;
+no registrar cierre_puente_confirmado inexistente en la evidencia. No insistir
+en buscar/repetir ni pedir otra pausa: conservar diferencia entre recibo SDK
+del preparador + retorno correctos (verificados) y comprobación final separada
+(sin documentar). No hay error actual aportado ni razón para detener r2.
