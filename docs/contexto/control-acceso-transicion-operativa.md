@@ -308,3 +308,13 @@ Dell sin mantenimiento, después plan readonly revisable. No fechas reales,
 tareas, SDK instalado, UI o backend modificados. Detalles, SHA y límites en
 control-acceso-aplicador-candidato.md; transporte de autorización/recuperación
 protegida/launcher de aplicación y transición aún pendientes.
+
+## Union operativa local preparada — 2026-10-26
+
+Implementados planificador con prioridad de vigencias/RT serializado/emisor hijo,
+ciclo protegido con una MDB por ciclo y perfiles DPAPI por tag, y entrada Dell
+readonly con parada/verificacion final. Suite492 aprobadas; paquete integrado2
+extraido con48pruebas aprobadas. No sustituye r2 ni habilita --aplicar/--continuo
+en Dell. Primero simulacion sin mantenimiento. Detalles, SHA y limites en
+control-acceso-servicio-integrado.md. Aplicacion real, instalacion/rollback,
+gestor/vigilancia, transporte definitivo y retencion siguen pendientes.
