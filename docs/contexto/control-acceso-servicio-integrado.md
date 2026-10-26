@@ -183,3 +183,30 @@ Pendiente entregar las tres respuestas locales y confirmar cola vacia/originales
 conservados/segundo envio idle. Usar entregar_coordinador.py del paquete actual,
 mismo almacen/credencial/servidor de ensayo, sin SDK ni mantenimiento. No se
 acredita aun instalacion permanente ni aplicacion candidata real de fechas.
+
+## Entrega final confirmada; ensayo integrado concluido — 2026-10-26
+
+Usuario ejecuta dos veces entregar_coordinador.py enviar del paquete2 con
+Python64, mismo agente c8d7ccdc-991f-497c-8383-92fb52921f8a/serialCO2K225060027.
+Primera entrega:acked1/idle1. Segunda:idle1 sin nuevos envios. Ambas muestran
+184mensajes acked,359respuestas originales, unbatched0/pending_count0,
+oldest_pending=null y paused vacio. Totales ACK24estados+160lotes,
+responses_stored359/rows_stored359/events_stored257/statuses_stored102,
+responses_pending_interpretation0. Son totales acumulados del ensayo aislado,
+no359eventos nuevos ni257pasos fisicos certificados.
+
+Originales359/hashes_verified=true, cuerpos184/body_hashes_verified=true,
+originals_preserved=true y existing_messages_unchanged=true en ambas salidas.
+Manifiesto de originales:
+2a9a81b2825b2bce8aa82ab2e0cb53511c5759a89643e8422f41a86281aa1b49.
+Las tres respuestas sin agrupar anteriores quedaron entregadas en un lote.
+No consulta SQL remota independiente ni nueva escritura SDK por esta entrega.
+
+Concluidos simulacion Dell64/32, ensayo integrado readonly, cierre propio,
+retorno r2 con tres ciclos correctos y entrega final sin duplicar/cambiar
+mensajes existentes ni perder originales. No repetir esta pausa/lectura.
+Ultima salud r2 es la consulta anterior PID13936/last_ok06:30:16.802893Z;
+esta entrega no renueva esa certificacion. Servidor/tunel siguen siendo de
+ensayo; cierre posterior de sus ventanas no aportado. Siguen pendientes
+aplicacion candidata real, autorizacion/guard operativo, instalador/rollback,
+gestor/vigilancia, transporte definitivo y retencion, antes de operacion continua.

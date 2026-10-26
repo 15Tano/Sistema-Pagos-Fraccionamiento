@@ -282,3 +282,17 @@ PID12648 con dos ciclos correctos15:29:19.174/15:30:22.586 Mexico. No ACK
 adicional ni inspeccion SQL por esas lecturas; se mantienen totales300/162.
 Cierre de ventanas laboratorio/tunel no confirmado. Ensayo conjunto concluido;
 operacion continua aun sin instalar.
+
+2026-10-26, entrega final tras servicio integrado2 y retorno r2 comprobado:
+359respuestas/filas confirmadas acumuladas (257eventos/102estados,
+interpretacion pendiente0),184mensajes acked=24estados+160lotes. Primera llamada
+al emisor64 del paquete actual:acked1/idle1; segunda:idle1. Pendientes0,
+unbatched0, sin pausa. Originales359 y cuerpos184 con hashes verificados,
+originals_preserved=true/existing_messages_unchanged=true en ambas salidas.
+Manifiesto2a9a81b2825b2bce8aa82ab2e0cb53511c5759a89643e8422f41a86281aa1b49.
+Las tres respuestas del final de captura se enviaron en un lote. No nuevos
+eventos SDK ni inspeccion SQL independiente por estas llamadas. El servicio
+readonly real y su cierre estan aprobados; r2 habia vuelto con tres ciclos
+correctos PID13936/last_ok06:30:16.802893Z. Detalle en
+control-acceso-servicio-integrado.md. Ensayo concluido; aplicacion candidata real
+y operacion permanente siguen pendientes. Cierre de ventanas SSH no confirmado.
