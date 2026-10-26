@@ -606,3 +606,27 @@ confiables probadas no equivalen a esos adaptadores instalados. No aplicación
 real ni restauración autorizada por estas pruebas. Runner/gestor/vigilancia,
 retención de índices, UI/endpoints y despliegue siguen pendientes. Última salud
 remota continúa PID18024/last_ok03:08:18.366814Z y dos ciclos21:07/21:08México.
+
+## Unión y conciliación ficticia aceptadas en Dell — 2026-10-25 México
+
+Usuario verifica Integracion_Aplicador_2026.10.25-1 y comparte ambas pruebas
+con Python64. simulation_ok/25tests/failures0/errors0/skipped0,
+ended_utc2026-10-26T04:48:33.286200Z; lab_reconciliation_ok/1test, mismos ceros,
+ended_utc2026-10-26T04:48:39.959835Z (=25oct22:48México). Evidencias:
+
+- C:\SanIsidro\IntegracionAplicador_20261025\registros\integracion_simulada_20261025_224833_286157.json
+- C:\SanIsidro\IntegracionAplicador_20261025\registros\conciliacion_ace_20261025_224839_959798.json
+
+Aceptada unión de contratos y conciliación en otra MDB ficticia con ACE/Win32/
+ACL/DPAPI nativos; SDK/API siempre sustituidos, sin MDB/credenciales instaladas,
+pausa o modificación de tareas. El intento parcial y su bloqueo pertenecen al
+ensayo ficticio: no son un incidente real reportado en caseta ni requieren
+desbloquear el polling instalado. Evidencia anterior de copia real/cierre y dos
+ciclos r2 sigue aceptada, sin actualizar su salud por estas pruebas.
+
+Siguiente etapa: transporte concreto padre/x86, lectura del perfil completo con
+snapshot DPAPI y cierre acreditado, conservando TTL/aprobación original y gate.
+Preparar/probar en aislamiento antes de otra operación real. Política autorizada
+de resolución de bloqueos y launcher de aplicación siguen pendientes. No hay
+escritura/restauración real autorizada por estas salidas; no forzar diferencias
+en12230693. Mantener r2 como quedó y no repetir mantenimiento por aceptar ZIP1.
