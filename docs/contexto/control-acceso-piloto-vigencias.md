@@ -156,3 +156,38 @@ Reanudar solo tras cierre_piloto_confirmado/safe_to_resume=true y comprobar dos
 ciclos nuevos. Salida real, cierre y retorno de esta pausa todavia pendientes.
 No repetir simulacion/preflight por esta aceptacion ni atribuir una escritura
 a no_changes. Si el plan no es claro, ENTER cancela y se revisa la evidencia.
+
+## Piloto real sin cambios y cierre confirmados — 2026-10-26
+
+Usuario ejecuta lanzar_piloto_vigencias.ps1 -Tag12230693. Paquete2/preflight
+elevado correctos; PID15656/run_idd0b12171-eb70-4b9e-85ea-620ad13259ec.
+Plan: API2026-11-05 23:59:59, Access mismo fin/inicio2020-01-01/USERID1108/
+valid_rawtrue; C3 CardNo12230693/Pin693/StartTime20200101/EndTime20261105.
+SerialCO2K225060027, access_change/c3_change false. PlanSHA:
+709d7809d4259fb89847a2f5ef68aa15af1f69f1f3f6da9a4123fd3be2d58416.
+APIsha41cb69b00f166c4e6fdca6ac0bf2ba9c0372ca98b599545fb69130324836154c.
+
+statusno_changes/phasestopped/dates_appliedfalse/approval_issuedfalse,
+components_verified vacio y backup_verifiedfalse. Es la salida prevista para
+coincidencia: no se solicita consentimiento ni se crea un nuevo respaldo,
+Set o UPDATE. No interpretar backup_verifiedfalse como respaldo fallido.
+No acredita la ruta de escritura ni validacion de un respaldo nuevo.
+
+Un recibo SDK de este piloto: workere1b43051-47c4-4ec1-8899-0d864c17b85e,
+PID7812/closureSHA51b61cfeefa444c1ec7aa2d405e8ea0cb09d0b1ecde663db3c588f9ec854f9b5.
+sdk_closedtrue/tasks_changedfalse; ended_utc2026-10-26T18:29:13.788470Z.
+Evidencia:C:\SanIsidro\PilotoVigencias_20261026\datos\sesiones\d0b12171-eb70-4b9e-85ea-620ad13259ec.
+
+Verificador posterior del mismo lanzador: cierre_piloto_confirmado,
+safe_to_resumetrue/source_handle_freetrue/dates_appliedfalse,
+checked_utc2026-10-26T18:29:18.901367Z, mismoPID/run; resultSHA
+0bef1bd4a96571384238961292d6ce3e0d83597da70dd5eb15ee763c4ba0cce2.
+Conforme al codigo, solo despues del cierre/transacciones verificadas retira
+su marca exacta. No revisar/eliminar manualmente revision_pendiente por verla
+en el resultado anterior al cierre.
+
+Aceptados lectura real del piloto, coincidencia de fechas y cierre final.
+Ahora Terminar y reanudar por gestor y comprobar dos ciclos nuevos. Retorno r2
+todavia no aportado; no afirmar salud actual a partir de este piloto ni renovar
+la salud del emisor/backend. No repetir esta pausa ni alterar fechas para probar
+una escritura. Aplicacion candidata ante diferencia natural sigue pendiente.
