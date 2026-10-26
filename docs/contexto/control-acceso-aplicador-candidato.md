@@ -485,3 +485,51 @@ sin afirmar respaldo obtenido. Sin cierre, conservar mantenimiento y revisar.
 No usar Ctrl+C/cerrar ventana ni otro lector durante la operación. No SDK/API/
 escritura del original. Copia real, comprobación final y retorno pendientes de
 salida del usuario; no afirmar mantenimiento iniciado por compartir preflight.
+
+## Respaldo MDB real, cierre y retorno aceptados — 2026-10-25 México
+
+Usuario ejecuta lanzar_respaldo_real.ps1 y comparte backup_verified=true,
+phase=stopped/error_type=null/approval_issued=false/sdk_opened=false.
+Padre PID7692/run_id=d1ce96a9-3eed-416e-b248-266cc36a3118,
+ended_utc2026-10-26T03:06:33.467170Z (=25oct21:06:33México).
+Evidencia en Dell:
+C:\SanIsidro\RespaldoReal_20261025\datos\sesiones\d1ce96a9-3eed-416e-b248-266cc36a3118.
+
+Copia privada:
+C:\SanIsidro\RespaldoReal_20261025\datos\mdb_reales\4f7e033d-0a4b-43a9-af2b-8547b93e7876\Database_PRO_antes.mdb.
+backup_id4f7e033d-0a4b-43a9-af2b-8547b93e7876,
+created_utc2026-10-26T03:06:31.107871Z,70127616bytes, statuscopy_verified,
+SHA256e90d11faf5c1704cb394c174cc02b74da34e72d0a7ec56d200f1b37c63f8610e.
+Contexto serialCO2K225060027/card12230693/plan_sha256
+709d7809d4259fb89847a2f5ef68aa15af1f69f1f3f6da9a4123fd3be2d58416.
+El hash seleccionado Access es
+643bfc0f995ed02b745c2bb81f355a81b8aa26f462433afa7724295ca29034d8.
+
+Lectura readonly de copia: USERINFO951, CHECKINOUT178794, acc_levelset1,
+acc_levelset_emp950, personnel_issuecard950. Copia/bytes y cinco tablas/tag
+validados con credencial existente, sin cambiar origen ni abrir SDK/API.
+No inferir usuarios sin permiso ni defectos de integridad a partir de951/950;
+son recuentos, no auditoría relacional individual. CHECKINOUT tampoco certifica
+cruces físicos ni completitud de eventos C3. Mantener archivo con datos personales
+en Dell, no subirlo como evidencia. Restauración/recuperación aún no ensayada.
+
+El verificador automático devuelve cierre_respaldo_confirmado para mismo PID/
+run_id, backup_verified=true/source_handle_free=true/sdk_opened=false,
+checked_utc2026-10-26T03:06:39.079998Z. Hash del resultado:
+f72e14b0d3b24f63a17f6d7636237be016c8cdb51a227b1312685bba95195710.
+Según código verificado queda cierre_final.json en esa sesión. Comprobación
+final anterior a reanudación, sin pendiente histórico de salida en esta etapa.
+
+Retorno r2: PID18024/protocol2/run_started2026-10-26T03:07:08.824617Z,
+phaseidle/consecutive_errors0/last_error_typenull,
+last_ok2026-10-26T03:08:18.366814Z. Dos ciclos nuevos correctos21:07:12.943 y
+21:08:18.368 México25oct, API838/cambios Access0/C30/no encontrados4/ausentes
+API116sin cambios. Parada ordenada previa21:06:04.735. Se acepta respaldo real,
+cierre final y retorno con dos ciclos; no repetir pausa/backup. No tabla nueva
+de tareas ni vigilancia aportada; no inventar Enabled/State o estado del monitor.
+
+Siguiente trabajo: unir los respaldos MDB/selectivo DPAPI al transporte del
+aplicador y revisar/ensayar recuperación selectiva antes de escribir. El plan
+conocido de12230693 sigue sin diferencia que justifique reescribirlo; no cambiar
+fechas/pagos para forzar ensayo. No autorización de aplicación real por obtener
+respaldo. Runner continuo, gestor/vigilancia, UI/endpoints y despliegue pendientes.
