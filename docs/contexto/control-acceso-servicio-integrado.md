@@ -168,3 +168,18 @@ nuevos. No se ha aportado ese retorno aun. Tras comprobarlo, entregar las tres
 respuestas restantes con emisor manual existente, sin SDK ni mantenimiento,
 y comprobar segundo envio idle/originales conservados. Mantener tunel abierto.
 Instalacion permanente, aplicacion candidata real y demas pendientes continúan.
+
+## Retorno de r2 comprobado tras servicio integrado — 2026-10-26
+
+Usuario aporta SanIsidro-Vigencias Running/Enabled=true, protocol2/PID13936,
+run_started2026-10-26T06:28:05.254541Z, phaseidle, consecutive_errors0,
+last_error_typenull y last_ok06:30:16.802893Z. Tres ciclos nuevos correctos:
+00:28:09.337,00:29:12.971 y00:30:16.804 Mexico26oct; API838/Accesschanges0/
+C3changes0/not_found4/absent_api_unchanged116. Parada previa00:22:58.142.
+
+Quedan aceptados ensayo integrado readonly, cierre final propio y retorno r2.
+No repetir pausa/SDK por esta etapa. No nueva evidencia de vigilancia aportada.
+Pendiente entregar las tres respuestas locales y confirmar cola vacia/originales
+conservados/segundo envio idle. Usar entregar_coordinador.py del paquete actual,
+mismo almacen/credencial/servidor de ensayo, sin SDK ni mantenimiento. No se
+acredita aun instalacion permanente ni aplicacion candidata real de fechas.
