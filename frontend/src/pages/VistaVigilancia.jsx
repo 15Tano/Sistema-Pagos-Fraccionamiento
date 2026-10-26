@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import api from "../lib/axios";
 
@@ -197,6 +198,7 @@ const EstadoPago = ({ alCorriente }) => {
 
 export default function VistaVigilancia() {
     const logout = useAuthStore((state) => state.logout);
+    const role = useAuthStore((state) => state.user?.role);
 
     const [vecinoSearch, setVecinoSearch] = useState("");
     const [vecinoResults, setVecinoResults] = useState([]);
@@ -324,6 +326,10 @@ export default function VistaVigilancia() {
             </header>
 
             <main className="relative z-10 flex flex-col gap-4 w-full max-w-[540px] mx-auto pt-24">
+                {["admin", "vigilancia"].includes(role) && <Link to="/control-acceso"
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/60 backdrop-blur-xl px-5 py-4 text-stone-700 shadow-sm">
+                    <span><span className="block text-sm font-bold">Monitor de caseta</span><span className="block mt-1 text-xs text-stone-500">Lecturas de tags y estado del controlador</span></span><span aria-hidden="true">→</span>
+                </Link>}
                 {/* Buscador */}
                 <div className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] p-6">
                     <label className="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-3 ml-1">

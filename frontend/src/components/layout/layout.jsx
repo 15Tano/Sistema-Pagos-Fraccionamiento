@@ -81,6 +81,12 @@ const NAV_ITEMS = [
         ),
     },
     {
+        to: "/control-acceso", label: "Control de acceso", soloAdmin: true, excludeMobileNav: true,
+        icon: <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>,
+    },
+    {
         to: "/historico",
         label: "Histórico",
         icon: (
@@ -404,7 +410,7 @@ export default function Layout({ children }) {
             <nav className="md:hidden fixed bottom-4 inset-x-4 z-20 flex items-center justify-around px-2 py-2.5 bg-white/5 backdrop-blur-sm border-t border-l border-white/80 border-r border-b border-white/30 shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-[2rem]">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
-                {navItems.map((item) => (
+                {navItems.filter((item) => !item.excludeMobileNav).map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}

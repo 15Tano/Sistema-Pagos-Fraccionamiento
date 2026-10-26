@@ -2,7 +2,7 @@
 
 2026-10-26. Usuario autoriza avanzar de forma autonoma en preparacion y pruebas
 locales mientras esta ausente; despliegue e instalacion real se revisan despues.
-No se construye aun la pantalla. Se reutiliza Laravel/Sanctum existente y las
+La entrega inicial no incluía pantalla. Se reutiliza Laravel/Sanctum existente y las
 cinco tablas de ingesta; la API sigue siendo autoridad exclusiva de vigencias.
 
 ## Acceso y habilitacion
@@ -86,3 +86,11 @@ cuando web.php headless devuelve404. No se modifico ese test ni la ruta raiz;
 detalle previo ya documentado en ensayo-mysql. No presentar la suite general
 como totalmente aprobada. Despliegue y validacion con cuentas humanas reales
 siguen pendientes; no declarar la pantalla ni la ingesta de produccion instaladas.
+
+## Pantalla local posterior — 2026-10-26
+
+Primera consulta React preparada sobre estos GET, con sesión humana, filtros,
+seguimiento por cursor y avisos de antigüedad/error. Ver
+[pantalla del monitor](control-acceso-pantalla-monitor.md) para alcance,
+validación y vista previa ficticia. Sin habilitar bandera ni desplegar a
+producción; la instalación continua de caseta sigue siendo un paso separado.

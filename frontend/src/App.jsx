@@ -14,6 +14,7 @@ import GuestView from "./pages/GuestView.jsx";
 import RegistroAccesoVecino from "./pages/RegistroAccesoVecino";
 import VistaVigilancia from "./pages/VistaVigilancia";
 import Cortes from "./pages/Cortes";
+import ControlAcceso from "./pages/ControlAcceso";
 
 const PrivateRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, user } = useAuthStore();
@@ -126,6 +127,9 @@ function App() {
                 />
 
                 <Route path="/vigilancia" element={<VistaVigilancia />} />
+                <Route path="/control-acceso" element={
+                    <PrivateRoute allowedRoles={["admin", "vigilancia"]}><ControlAcceso /></PrivateRoute>
+                } />
 
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
