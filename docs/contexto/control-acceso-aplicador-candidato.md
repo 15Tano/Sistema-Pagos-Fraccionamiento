@@ -630,3 +630,75 @@ Preparar/probar en aislamiento antes de otra operación real. Política autoriza
 de resolución de bloqueos y launcher de aplicación siguen pendientes. No hay
 escritura/restauración real autorizada por estas salidas; no forzar diferencias
 en12230693. Mantener r2 como quedó y no repetir mantenimiento por aceptar ZIP1.
+
+## Transporte concreto y recorrido readonly preparados — 2026-10-25 México
+
+Usuario pide continuar y expresa frustración por la duración. Se agrupa en una
+misma entrega el transporte concreto, la prueba entre procesos y el lanzador de
+lectura real con cierre automático, reutilizando las publicaciones anteriores.
+No nueva operación real en Dell ni escritura/pausa en caseta durante desarrollo.
+
+transporte_aplicador.Transport proporciona read_child/apply_child concretos
+para el aplicador integrado. run_closed_worker crea/recoge solo su hijo, filtra
+SANISIDRO_*, verifica respuesta/recibo y guarda ACK antes de liberar gate.
+Scope viaja en grant.dpapi CurrentUser vinculado a plan/SHA/UUID/operación con
+instante original de aprobación: no renovar TTL60s al rehidratar en el hijo.
+Padre consume C3 al despachar; worker exige bundle/intención y mantiene cuatro
+campos de escritura. Sin CLI que emita aprobación ni launcher humano de aplicación.
+
+ProfilePanel hereda binding readonly; no enlaza SetDeviceData. Lee user completo
+y userauthorize de un tag, verifica serial/hash/plan, cifra snapshot antes de
+persistir respuesta pública, llama Disconnect/cierra y termina proceso. Padre
+reabre DPAPI antes de ACK. profile_operation.json separado mantiene compatibilidad
+con ledger genérico, sin hacer pasar perfil por inventario de cuatro campos.
+Serie incorrecta, cierre incierto, respuesta/operación alteradas o falta de ACK
+impiden nuevos turnos. SDK/APP privados no se imprimen ni van en argv/logs.
+
+Ruta real readonly: C:\SanIsidro\TransporteAplicador_20261025, Python64 y trabajador
+C:\Users\Dell\Python32\python.exe. --preflight sin mantenimiento valida rutas/
+referencia instalada/plan/ledger sin SDK. lanzar_perfil_transporte.ps1 genera
+UUID, captura y después verifica cierre tras terminar el padre. Usa mantenimiento
+del gestor/sync.lock, tarea Disabled/protocol2 stopped/PID ausente, no otros lectores.
+Lee perfil del12230693 según plan histórico709d7809...58416, no RT, API o MDB,
+no aplica fechas. Snapshot en DATA/perfiles y recibos en ledger existente; no
+outbox/ACK de ingesta alterados. Perfil distinto al plan no se fuerza/restaura.
+
+Estado/resultado propios por UUID; hasta64sesiones, sin borrar evidencias.
+Verificador comprueba identidad/PIDs/recibos/snapshot y persiste cierre_final.json
+con cierre_transporte_confirmado. Solo entonces reanudar por gestor y dos ciclos
+nuevos. Si lectura falla pero cierre se confirma, se puede reanudar sin afirmar
+perfil obtenido. Fault/incompleto bloquea; no reset/borrar locks/matar PIDs.
+Timeout120s del hijo latches gate/cierre_inseguro al interrumpirse; SIGINT del
+padre permite concluir turno antes de salir, no cancelación nativa inmediata.
+
+21tests nuevos con procesos/DPAPI reales y SDK/API/MDB ficticios: perfil cifrado
+y sin datos privados públicos, arquitectura del hijo, entorno sin secretos,
+inventario aceptado por padre, aplicación completa simulada con mismo TTL,
+grant ausente/cifrado/otro UUID/vencido, operación alterada, guard, serie/cierre
+fallidos, preflight, captura readonly/prueba persistida, resultado/cifrado cambiado,
+PID vivo/reutilizado y rechazo de run previo sin cierre. Fixture SDK solo en
+tests/sdk_proceso_ficticio.py, ninguna bandera de fixtures en CLI de producción.
+Un test de preflight falló inicialmente por reemplazar EXPECTED mientras su
+fixture construía un plan con esa referencia: corregido preparando plan antes
+del parche, sin relajar controles del producto.
+
+Suite final444tests en102.487s, failures0/errors0/skipped0, incluidas423previas.
+AST y ambos scripts WinPS verificados. Suite ampliada por casos previos loopback/
+DPAPI; ningún servicio/dato real de caseta. Procesos hijos locales de64bits:
+NO acreditar Python32 local ni DLL real por estos fixtures.
+
+Transporte_Aplicador_2026.10.25-1.zip:95archivos,245689bytes, SHA256
+12ddba273e71fce75e19defab9b33fd02a170d15551ad1056bf8794a0c7b45d9.
+87archivos previos íntegros, siete nuevos y manifiesto94fuentes. ZIP/rutas/bytes/
+hashes comprobados, extraído bajo datos/t1: verificador PS y simulation_ok,
+21tests/failures0/errors0/skipped0, parent_bits64/child_bits64,
+ended_utc2026-10-26T05:15:37.791308Z (=25oct23:15México). No sobrescribir ZIP.
+
+Siguiente en Dell: comprobar con --python32 apuntando al ejecutable32 instalado,
+esperar parent_bits64/child_bits32 y --preflight. Después de ambas salidas buenas,
+misma carpeta/paquete incluye recorrido readonly real: cerrar lectores, preparar
+mantenimiento, lanzar_perfil_transporte.ps1, cierre automático, reanudar y dos
+ciclos. No otro paquete necesario para esa lectura. LEEME_TRANSPORTE_APLICADOR.md
+con todos los comandos. Aceptación32/64 Dell y perfil real/cierre/retorno pendientes.
+No aplicación real, resolución de bloqueos, runner permanente, UI/endpoints o
+despliegue por esta entrega. Última salud remota continúa r2 PID18024/21:08México.
