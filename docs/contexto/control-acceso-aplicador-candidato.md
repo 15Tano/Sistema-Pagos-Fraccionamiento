@@ -702,3 +702,50 @@ ciclos. No otro paquete necesario para esa lectura. LEEME_TRANSPORTE_APLICADOR.m
 con todos los comandos. Aceptación32/64 Dell y perfil real/cierre/retorno pendientes.
 No aplicación real, resolución de bloqueos, runner permanente, UI/endpoints o
 despliegue por esta entrega. Última salud remota continúa r2 PID18024/21:08México.
+
+## Transporte64/32 y perfil C3 reales aceptados — 2026-10-25 México
+
+Usuario verifica Transporte_Aplicador1 y comparte simulation_ok/21tests,
+parent_bits64/child_bits32, failures0/errors0/skipped0,
+ended_utc2026-10-26T05:25:20.935149Z (=25oct23:25México), evidencia:
+C:\SanIsidro\TransporteAplicador_20261025\registros\transporte_simulado_20261025_232520_935103.json.
+Aceptada prueba entre arquitecturas con SDK/API/MDB ficticios y DPAPI/procesos
+reales. Preflight_ok/card12230693/plan709d7809...58416, sdk_connected=false,
+dates_applied=false, maintenance_required_for_capture=true.
+
+Después ejecuta lanzar_perfil_transporte.ps1, profile_verified=true/error_type
+null/phase=stopped/dates_applied=false/stop_requested=false. Padre PID18320,
+run_idc081b5bd-2990-4f66-839e-38ea3f566e63,
+ended_utc2026-10-26T05:26:12.821789Z. Evidencia:
+C:\SanIsidro\TransporteAplicador_20261025\datos\sesiones\c081b5bd-2990-4f66-839e-38ea3f566e63.
+
+Snapshot b8a1a439-be90-4e15-8071-3704da79f03c,
+captured_utc2026-10-26T05:26:10.106867Z; en DATA/perfiles bajo el coordinador,
+cifrado DPAPI. CardNo12230693/Pin693/StartTime20200101/EndTime20261105,
+plan_sha256709d7809d4259fb89847a2f5ef68aa15af1f69f1f3f6da9a4123fd3be2d58416.
+permission_count1 indica una fila de autorizaciones, NO una sola pluma ni un
+defecto de permisos; contenido de esa fila no aportado. No inferir ni reparar
+niveles/puertas a partir del conteo. Perfil completo/permisos quedan protegidos
+en snapshot, sin imprimir Password/Group. No pedir subir ni descifrar ese archivo.
+
+Recibo de este run: worker92b65aa6-94c0-4e2b-9d55-da55ac7ef756/PID17488,
+closure_sha2564f2e1c4dccd844a10e194cbc3b809776a6d898e3c5a50183e4665563fc0f36f6.
+Validado recorrido concreto padre64/hijo32/DLL instalada, captura readonly,
+persistencia DPAPI, Disconnect/salida/ACK/gate. No se aplicaron fechas, consumió
+RT, consultó API o modificó MDB/outbox. No prueba autorización/vigencia API
+actual, mapa de permisos correcto, reloj o paso físico por esta captura.
+
+Comprobación automática cierre_transporte_confirmado para mismo PID/run,
+profile_verified=true/dates_applied=false,
+checked_utc2026-10-26T05:26:18.303043Z, result_sha256
+5aa29f41733df78298cc46e371e1a7c63b689301a9d5d65466a9588839a6f612.
+Prueba final persistida según código comprobado, anterior al retorno de r2.
+
+Polling nuevo PID14608/protocol2/run_started2026-10-26T05:26:57.092452Z,
+phaseidle/consecutive_errors0/last_error_typenull,
+last_ok2026-10-26T05:28:04.423403Z. Dos ciclos correctos23:27:01.132 y
+23:28:04.424 México25oct, API838/cambios Access0/C30/no encontrados4/ausentes
+API116sin cambios. Parada previa23:25:51.831. Aceptados perfil/cierre y retorno;
+no repetir pausa o lectura. No nueva tabla tareas/estado vigilancia aportados,
+no inventar Enabled/State/monitor. No aplicación SDK nueva real probada todavía.
+Operación continua/resolución de bloqueos/instalación/UI/endpoints pendientes.
