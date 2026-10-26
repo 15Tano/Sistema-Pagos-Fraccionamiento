@@ -173,3 +173,28 @@ no registrar cierre_puente_confirmado inexistente en la evidencia. No insistir
 en buscar/repetir ni pedir otra pausa: conservar diferencia entre recibo SDK
 del preparador + retorno correctos (verificados) y comprobación final separada
 (sin documentar). No hay error actual aportado ni razón para detener r2.
+
+## Pausa solicitada por traslado — 2026-10-25 México
+
+Usuario pide pausar el trabajo porque debe trasladarse. Se detiene el desarrollo;
+estimación comunicada15–25min pendientes para terminar/verificar la nueva pieza
+local, excluyendo instalación. No tareas/ensayos activos iniciados en Dell por
+este tramo. Dejar polling como quedó; no nueva pausa operativa ni prueba.
+
+WIP local sin publicar: respaldo_protegido.py, recuperacion_selectiva.py,
+puente_fechas_protegido.py y tests/test_respaldo_protegido.py. Snapshot selectivo
+DPAPI con registro/permisos C3 completos y fechas Access; manifiesto público
+solo con hash de cifrado/contexto, sin Password/plaintext. Hook guarda y verifica
+snapshot antes del Set; recuperación genera plan nuevo contra API actual y
+bloquea identidad/campos protegidos/permisos distintos. No restauración ni CLI
+de escritura, ninguna DLL/C3 real contactada. ZIP2 y fuentes publicadas intactos.
+
+Ejecución inicial de test_respaldo_protegido.py mostró33casos OK, pero10son
+BindingTests importados de otra prueba: NO contarlos como nuevos. Pendiente
+importar el módulo de fixtures en lugar de importar la clase TestCase para
+evitar descubrimiento duplicado. Son23casos nuevos preliminares, con cifrado
+y SDK ficticios. Falta revisión final, pruebas DPAPI nativas con datos ficticios,
+suite completa, capacidad/retención del almacén, documentación y eventual ZIP.
+No afirmar esta pieza terminada ni probada en Dell. Trabajo nuevo permanece
+en archivos locales sin commit de implementación; este checkpoint sí documenta
+la pausa. No reanudar hasta indicación del usuario.
