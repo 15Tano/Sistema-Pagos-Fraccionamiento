@@ -533,3 +533,76 @@ aplicador y revisar/ensayar recuperación selectiva antes de escribir. El plan
 conocido de12230693 sigue sin diferencia que justifique reescribirlo; no cambiar
 fechas/pagos para forzar ensayo. No autorización de aplicación real por obtener
 respaldo. Runner continuo, gestor/vigilancia, UI/endpoints y despliegue pendientes.
+
+## Unión local de respaldos/aplicador y conciliación aislada — 2026-10-25 México
+
+Usuario autoriza continuar. Se implementa aplicador_integrado.py en fuentes
+nuevas; no se inicia otra operación en Dell ni se cambia código/ZIP publicado.
+prepare_bundle vincula copia MDB verificada y snapshot DPAPI del perfil completo/
+permisos C3 con hash de un mismo plan. Copia antes de Approval, sin reiniciar
+TTL. Bundle.check reabre/descifra, verifica referencias UUID, recibo/copia/hash,
+identidad/fechas Access y alcance. Rutas vienen del padre confiable, no del JSON.
+
+BundledDatesPanel coteja campos completos/permisos actuales contra el perfil
+protegido antes del Set, deja referencia durable y conserva payload de cuatro
+campos. run_worker exige plan/respaldo/intención/operación exactos y únicos antes
+de construir el panel; reutiliza core.worker/ABI/serial/cierres aceptados. Perfil
+privado no se escribe fuera del cifrado. No nueva CLI para escribir en caseta.
+
+execute reutiliza aplicacion_vigencias.execute con API nueva por componente.
+Respaldo doble obligatorio si hay cambios; plan sin cambios solo hace lectura
+con cierre, sin forzar copia completa/escritura. Rechaza Approval consumida o
+verificada previamente y verifica de nuevo TTL después del hash de MDB grande.
+Callbacks confiables deben devolver ClosedWorker producido por run_closed_worker
+y carpeta propia con operación/UUID de esta transacción, respuesta/hash, cierre
+y ACK durable antes de liberar gate. Se comprueba PID/salida/gate/liberación y
+vínculo del snapshot antes de actualizar Access. Booleanos/hashes no autentican
+al operador ni reemplazan transporte. Gate/lock operativo siguen a cargo del padre.
+
+Índice transaction.json y resultados originales conservados. check_runs revisa
+todas las transacciones anteriores para impedir eludir un fallo con otro UUID.
+Corte/fallo parcial bloquea nuevos intentos; no reset/borrado de evidencia.
+review_recovery genera propuesta contra API actual, incluso vencida, bloquea
+identidad/permisos/campos privados cambiados o API ausente y mantiene
+retry_authorized=false/approval_issued=false. No resuelve marcas operativas.
+
+26pruebas nuevas:25 con servicios/cifrado/SDK/MDB sustituidos y1 ensayo compuesto
+con ACE/Win32/ACL/DPAPI nativos en MDB ficticios propios y SDK/API ficticios.
+Cubren respaldos alterados/ajenos/faltantes, TTL/replay, ACK/PID/UUID/gate,
+cierre fallido, C3-only/Access-only/sin cambios, perfil modificado antes del Set,
+API cambiante, fallo parcial Access, reinicio y revisión de recuperación.
+
+Ensayo nativo: actualiza C3 ficticio a noviembre y simula fallo anterior a
+escritura Access. MDB de origen ficticia conserva octubre; revisión propone
+diciembre según API nueva. Se clona a OTRA MDB ficticia y se ensaya allí el plan
+nuevo con aprobación ficticia, respaldos reales y AccessDates SQL real. Acceso
+y C3 ficticio quedan en diciembre; otro usuario, membresías e historial conservados.
+La evidencia y bloqueo del intento original permanecen intactos. Demuestra la
+conciliación en laboratorio, NO una excepción de reintento en origen bloqueado.
+Ninguna MDB/credencial/lector de caseta fue usada por estas pruebas.
+
+Suite final423pruebas en110.231s, failures0/errors0/skipped0, incluidas397previas.
+AST nuevo y parser WinPS aprobados. Suite ampliada por casos previos loopback/
+DPAPI; sin producción/caseta. No nuevas pausas ni validación de salud remota.
+
+Integracion_Aplicador_2026.10.25-1.zip:87archivos,223809bytes, SHA256
+c8ef5cc90c533725dd816f6dcab6a1f99b338ee7d946423e2162c43d67fbed5c.
+Contiene80archivos de Respaldo_Real_MDB1 íntegros, seis nuevos y manifiesto86
+fuentes. Bytes/rutas/hashes comprobados. Extraído bajo datos/i1 para limitar
+longitud de rutas de los fixtures ACE: verificador PS correcto,
+simulation_ok/25tests ended_utc2026-10-26T04:44:29.926082Z y
+lab_reconciliation_ok/1test ended_utc2026-10-26T04:44:44.113577Z
+(=25oct22:44México), cero fallos/errores/omisiones. No sobrescribir ZIP.
+
+Siguiente: verificar/simular ambas pruebas en Dell con Python64/ACE ya instalado,
+carpeta C:\SanIsidro\IntegracionAplicador_20261025. Sin mantenimiento, SSH, SDK,
+API, MDB instalada o respaldo real anterior. LEEME_INTEGRACION_APLICADOR.md con
+comandos exactos; salida Dell pendiente. No lanzar scripts históricos incluidos.
+
+Pendiente transporte concreto padre/x86 conservando aprobación/TTL originales,
+lectura de perfil completo con cierre acreditado y política/autorización de
+resolución de bloqueos antes de una recuperación operativa. Las interfaces
+confiables probadas no equivalen a esos adaptadores instalados. No aplicación
+real ni restauración autorizada por estas pruebas. Runner/gestor/vigilancia,
+retención de índices, UI/endpoints y despliegue siguen pendientes. Última salud
+remota continúa PID18024/last_ok03:08:18.366814Z y dos ciclos21:07/21:08México.
