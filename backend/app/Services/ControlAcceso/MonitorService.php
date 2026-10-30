@@ -128,6 +128,37 @@ class MonitorService
             'stale_after_seconds' => config('control_acceso.monitor_stale_seconds')]];
     }
 
+    private function rowsQuery(string $agentId)
+    {
+        return DB::table('control_acceso_filas as f')
+            ->join('control_acceso_respuestas as r', 'r.id', '=', 'f.respuesta_id')
+            ->join('control_acceso_lotes as l', 'l.id', '=', 'r.lote_id')
+            ->where('r.agent_id', $agentId)->where('f.kind', 'event')
+            ->select(['f.id', 'f.ordinal', 'f.device_time_raw', 'f.card_no', 'f.pin', 'f.door_id', 'f.event_code',
+                'f.direction', 'f.verification', 'r.response_id', 'r.source', 'r.captured_started_utc',
+                'r.captured_ended_utc', 'l.received_at_utc']);
+    }
+
+    public function current(array $filters): array
+    {
+        $agent = DB::table('control_acceso_agentes')->where('id', $filters['agent_id'])->first(['id', 'device_serial']);
+        abort_unless($agent, 404);
+        $query = $this->rowsQuery($agent->id)->where('r.source', 'rt')
+            ->whereNotNull('f.card_no')->whereNotIn('f.card_no', ['', '0']);
+        $rows = collect();
+        // Dos búsquedas LIMIT 1 con índice por puerta; no recorre ni pagina el historial.
+        foreach (isset($filters['door_id']) ? [$filters['door_id']] : ['1', '2'] as $door) {
+            $row = (clone $query)->where('f.door_id', $door)->orderByDesc('f.id')->first();
+            if ($row) { $rows->push($row); }
+        }
+        $data = $this->eventData($agent, $rows->sortBy(fn ($row) => (int) $row->id)->values());
+
+        return ['data' => $data, 'meta' => ['server_time_utc' => CarbonImmutable::now('UTC')->toISOString(),
+            'order' => 'server_row_id_ascending', 'current_only' => true, 'has_more' => false,
+            'first_id' => $data[0]['id'] ?? null, 'last_id' => $data ? $data[count($data) - 1]['id'] : null,
+            'physical_passage_confirmed' => false]];
+    }
+
     public function events(array $filters): array
     {
         $agent = DB::table('control_acceso_agentes')->where('id', $filters['agent_id'])->first(['id', 'device_serial']);
@@ -135,27 +166,60 @@ class MonitorService
         $limit = (int) ($filters['limit'] ?? 50);
         $after = $filters['after_id'] ?? null;
         $before = $filters['before_id'] ?? null;
-        $query = DB::table('control_acceso_filas as f')
-            ->join('control_acceso_respuestas as r', 'r.id', '=', 'f.respuesta_id')
-            ->join('control_acceso_lotes as l', 'l.id', '=', 'r.lote_id')
-            ->where('r.agent_id', $agent->id)->where('f.kind', 'event')
+        $query = $this->rowsQuery($agent->id)
             ->when(($filters['source'] ?? 'rt') !== 'all', fn ($q) => $q->where('r.source', $filters['source'] ?? 'rt'))
             ->when(isset($filters['door_id']), fn ($q) => $q->where('f.door_id', $filters['door_id']))
             ->when(isset($filters['card_no']), fn ($q) => $q->where('f.card_no', $filters['card_no']))
+            ->when(isset($filters['date_from']), fn ($q) => $q->where('r.captured_ended_utc', '>=',
+                CarbonImmutable::createFromFormat('!Y-m-d', $filters['date_from'], 'America/Mexico_City')->utc()->format('Y-m-d H:i:s')))
+            ->when(isset($filters['date_to']), fn ($q) => $q->where('r.captured_ended_utc', '<',
+                CarbonImmutable::createFromFormat('!Y-m-d', $filters['date_to'], 'America/Mexico_City')->addDay()->utc()->format('Y-m-d H:i:s')))
+            ->when(isset($filters['result']), function ($q) use ($filters) {
+                return match ($filters['result']) {
+                    'authorized' => $q->where('f.event_code', 0),
+                    'repeated' => $q->where('f.event_code', 20),
+                    'review' => $q->whereNotIn('f.event_code', [0, 20]),
+                };
+            })
             ->when($after !== null, fn ($q) => $q->where('f.id', '>', $after))
-            ->when($before !== null, fn ($q) => $q->where('f.id', '<', $before))
-            ->select(['f.id', 'f.ordinal', 'f.device_time_raw', 'f.card_no', 'f.pin', 'f.door_id', 'f.event_code',
-                'f.direction', 'f.verification', 'r.response_id', 'r.source', 'r.captured_started_utc',
-                'r.captured_ended_utc', 'l.received_at_utc']);
+            ->when($before !== null, fn ($q) => $q->where('f.id', '<', $before));
+        if (isset($filters['q'])) {
+            // Buscar en todos los registros consultables, no solo en la página cargada.
+            // EXISTS evita multiplicar lecturas si el tag tiene varias asociaciones actuales.
+            $term = trim($filters['q']);
+            $literal = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $term);
+            if (preg_match('/\A[0-9]+\z/', $term)) {
+                $query->whereRaw("f.card_no LIKE ? ESCAPE '!'", [$literal.'%']);
+            } else {
+                $query->whereExists(function ($names) use ($literal) {
+                    $names->selectRaw('1')->from('tags as st')
+                        ->join('tag_vecino as stv', 'stv.tag_id', '=', 'st.id')
+                        ->join('vecinos as sv', 'sv.id', '=', 'stv.vecino_id')
+                        ->whereColumn('st.codigo', 'f.card_no')
+                        ->whereRaw("sv.nombre LIKE ? ESCAPE '!'", ['%'.$literal.'%']);
+                });
+            }
+        }
         $rows = ($after !== null ? $query->orderBy('f.id') : $query->orderByDesc('f.id'))->limit($limit + 1)->get();
         $more = $rows->count() > $limit;
         $rows = $rows->take($limit);
         if ($after === null) {
             $rows = $rows->reverse();
         }
+        $data = $this->eventData($agent, $rows);
+
+        return ['data' => $data, 'meta' => ['server_time_utc' => CarbonImmutable::now('UTC')->toISOString(),
+            'order' => 'server_row_id_ascending', 'initial_latest' => $after === null && $before === null,
+            'has_more' => $more, 'first_id' => $data[0]['id'] ?? null,
+            'last_id' => $data ? $data[count($data) - 1]['id'] : $after,
+            'physical_passage_confirmed' => false]];
+    }
+
+    private function eventData(object $agent, $rows): array
+    {
         $cards = $rows->pluck('card_no')->filter(fn ($card) => is_string($card) && $card !== '' && $card !== '0')->uniqueStrict()->values()->all();
         $names = $this->neighborNames($cards);
-        $data = $rows->values()->map(fn ($row) => [
+        return $rows->values()->map(fn ($row) => [
             'id' => (string) $row->id, 'response_id' => $row->response_id, 'ordinal' => (int) $row->ordinal,
             'source' => $row->source, 'device_time_raw' => $row->device_time_raw,
             'card_no' => $row->card_no, 'pin' => $row->pin, 'door_id' => $row->door_id,
@@ -168,10 +232,5 @@ class MonitorService
             ...($names[$row->card_no] ?? ['neighbor_name' => null, 'neighbor_status' => 'none']),
         ])->all();
 
-        return ['data' => $data, 'meta' => ['server_time_utc' => CarbonImmutable::now('UTC')->toISOString(),
-            'order' => 'server_row_id_ascending', 'initial_latest' => $after === null && $before === null,
-            'has_more' => $more, 'first_id' => $data[0]['id'] ?? null,
-            'last_id' => $data ? $data[count($data) - 1]['id'] : $after,
-            'physical_passage_confirmed' => false]];
     }
 }

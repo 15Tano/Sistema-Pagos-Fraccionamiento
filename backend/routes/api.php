@@ -108,6 +108,9 @@ Route::prefix('control-acceso/monitor')->middleware(['auth:sanctum',
     \App\Http\Middleware\AuthorizeControlAccessMonitor::class, 'throttle:120,1'])->group(function () {
     Route::get('estado', [\App\Http\Controllers\Api\ControlAccessMonitorController::class, 'state']);
     Route::get('eventos', [\App\Http\Controllers\Api\ControlAccessMonitorController::class, 'events']);
+    Route::get('actual', [\App\Http\Controllers\Api\ControlAccessMonitorController::class, 'current']);
+    Route::get('configuracion', [\App\Http\Controllers\Api\ControlAccessMonitorController::class, 'settings']);
+    Route::patch('configuracion', [\App\Http\Controllers\Api\ControlAccessMonitorController::class, 'updateSettings']);
 });
 
 Route::get('/ping', function () {
