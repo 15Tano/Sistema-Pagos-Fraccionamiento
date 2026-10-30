@@ -224,7 +224,13 @@ class RTClient:
         finally:
             self.thread.join(timeout=1)
             for stream in (self.process.stdin, self.process.stdout):
-                stream.close()
+                try:
+                    stream.close()
+                except OSError:
+                    # Un hijo que rechazo el permiso puede cerrar stdin antes
+                    # de recibir close. Aun asi liberar todos nuestros handles;
+                    # su codigo/recibo siguen determinando si el SDK cerro.
+                    pass
             self.stderr.close()
 
 

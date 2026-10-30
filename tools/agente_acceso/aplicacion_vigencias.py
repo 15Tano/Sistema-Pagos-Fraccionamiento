@@ -12,6 +12,7 @@ import uuid
 
 import vigencias_candidato as core
 from referencia_vigencias import load_reference
+from referencia_vigencias import validate_api as validate_reference_api
 
 START = dt.datetime(2020, 1, 1)
 
@@ -56,7 +57,7 @@ def access_snapshot(row):
 
 def api_values(rows):
     # Mismas reglas y fuente r2; ninguna vigencia inventada por el candidato.
-    return load_reference().validate_api(rows)
+    return validate_reference_api(rows)
 
 
 def make_plan(card, rows, access, c3):

@@ -21,7 +21,7 @@ from trabajador_controlado import SDKGate
 
 MAX_BYTES=128*1024*1024
 APP_ID=0x53494C41
-NAMES={'request.json','operation.json','profile_operation.json','response.json','closed.json',
+NAMES={'request.json','operation.json','r2_operation.json','profile_operation.json','response.json','closed.json',
        'parent_ack.json','grant.dpapi','owner_grant.dpapi','protected_backup.json','write_attempt.json'}
 
 
@@ -106,6 +106,9 @@ class LedgerArchive:
         if not isinstance(gate,SDKGate) or gate.active is not None or gate.fault:
             raise PermissionError('Archivar solo con SDK libre y cerrado.')
         integrated.check_runs(transactions);core.check_operations(self.ledger)
+        if any(self.ledger.glob('*/r2_operation.json')):
+            from produccion_r2 import check_ledger
+            check_ledger(self.ledger)
         folders=list(self.ledger.iterdir()) if self.ledger.exists() else []
         if not folders: return False
         workers={}

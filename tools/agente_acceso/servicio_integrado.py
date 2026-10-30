@@ -23,13 +23,17 @@ class StopUnconfirmed(RuntimeError):
 
 
 class Service:
+    version = VERSION
+
     def __init__(self, cycle, box, rt_factory, sender, gate, *, applying=False,
                  guard=lambda: None, stop=lambda: False, publish=lambda state: None,
                  publish_official=lambda state: None, observed=lambda: None,
                  before_rt=lambda: None, clock=time.monotonic, sleep=time.sleep,
-                 utc=now, cycle_interval=60, rt_interval=1, state_interval=30):
+                 utc=now, cycle_interval=60, rt_interval=1, state_interval=30,
+                 tick_interval=.25):
         if (not isinstance(gate, SDKGate) or type(applying) is not bool or
-                cycle_interval < 1 or rt_interval < .2 or state_interval < 1):
+                cycle_interval < 1 or rt_interval < .2 or state_interval < 1 or
+                not .05 <= tick_interval <= .25):
             raise ValueError('Configuracion operativa invalida.')
         if hasattr(cycle, 'applying') and cycle.applying is not applying:
             raise ValueError('El modo del ciclo debe coincidir antes de iniciar procesos.')
@@ -38,6 +42,7 @@ class Service:
         self.observed, self.before_rt = observed, before_rt
         self.clock, self.sleep, self.utc = clock, sleep, utc
         self.intervals = cycle_interval, rt_interval, state_interval
+        self.tick_interval = tick_interval
         self.rt, self.paused = None, False
         started = utc()
         self.official = {'protocol': 2, 'pid': os.getpid(), 'run_started_utc': started,
@@ -169,6 +174,10 @@ class Service:
             self.close_rt()
         else:
             self.state['sdk'] = {'last_ok_utc': item['ended_utc'], 'last_error_code': None}
+        return item
+
+    def form_batch(self):
+        self.box.build_batch()
 
     def queue_state(self):
         # Readonly nunca presenta una comparacion candidata como vigencias aplicadas.
@@ -178,8 +187,8 @@ class Service:
         allowed = set(self.official)
         snapshot = {key: val for key, val in value.items() if key in allowed}
         health = self.box.health()
-        self.box.enqueue_state({'reported_at_utc': self.utc(), 'agent_version': VERSION,
-            'worker_version': VERSION, 'pid': os.getpid(), 'vigencias': snapshot,
+        self.box.enqueue_state({'reported_at_utc': self.utc(), 'agent_version': self.version,
+            'worker_version': self.version, 'pid': os.getpid(), 'vigencias': snapshot,
             'sdk': dict(self.state['sdk']), 'reader': dict(self.state['reader']),
             'sender': {'pending_count': health['pending_count'], 'oldest_pending_at_utc': health['oldest_pending_utc']}})
 
@@ -216,7 +225,7 @@ class Service:
                     continue
                 if self.clock() >= next_batch and not self.paused:
                     try:
-                        self.box.build_batch()
+                        self.form_batch()
                     except Exception as exc:
                         self.storage_fault(exc)
                     next_batch = self.clock() + 5
@@ -232,7 +241,7 @@ class Service:
                     next_rt = self.clock() + self.intervals[1]
                 self.state['phase'] = 'idle'
                 self.emit()
-                self.sleep(min(.25, max(0, min(deadline, next_cycle) - self.clock())))
+                self.sleep(min(self.tick_interval, max(0, min(deadline, next_cycle) - self.clock())))
             self.state['stop_reason'] = self.state['stop_reason'] or 'limit'
         except CycleInterrupted:
             self.state['stop_reason'] = 'requested'
