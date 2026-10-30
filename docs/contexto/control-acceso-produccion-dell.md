@@ -117,3 +117,19 @@ truncamiento. No modifica el ZIP/release instalado. Copia entregable:
 output/prueba-boton-20261030/Revisar_Boton_20261030.py,
 SHA25617e5db6cf5747d686258a13b33f3ae96e350268324af551562bba79e017e13c7.
 Transferencia a Dell y pulsacion fisica todavia pendientes.
+
+### Reanudacion permanente aceptada
+
+Usuario aporta estado tras Terminar y reanudar: nuevo PID9340,
+run_ide84dfa03-fb79-43d6-93d6-abde5bc9eebd, inicio2026-10-30T21:17:54.383204Z.
+Dos ciclos correctos,0errores, ultimo21:19:04.501708Z con API841, cambios0/0,
+no encontrados4 y ausentes114 sin cambios. RT status_observed reciente21:19:15,
+gate rt sin fault, errores lector/almacen/emisor nulos, emisor PID5560 vivo y
+52ACK en nueva sesion, ultimo21:19:14.277844Z. Cola caliente6capturas recientes
+sin agrupar (mas antigua21:19:11.679017Z), no bloqueada; capacidad sin avisos.
+
+Despliegue y ciclo de mantenimiento/parada/reanudacion del servicio permanente
+aceptados por estas salidas. No queda pendiente instalar otro coordinador ni activar
+el aplicador candidato. No se comprobo arranque tras apagado de este nuevo servicio,
+retencion a largo plazo, rechazo por fecha ni latencia fisica. HDMI/tags/boton siguen
+pendientes de visita. Script de boton listo, transferencia solicitada; sin pulsacion aun.

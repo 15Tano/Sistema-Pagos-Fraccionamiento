@@ -206,3 +206,10 @@ Paquete permanente final preparado y probado conservando motor r2 original, sin 
 aplicador candidato. Detalle y SHA en control-acceso-produccion-dell.md. Instalacion
 Dell, parada/reanudacion y pruebas fisicas siguen pendientes; no confundir web publicada
 con flujo continuo aceptado. Boton y HDMI permanecen en el plan de visita17:30.
+
+Actualizacion remota posterior: instalacion43c51f89 en Dell aceptada; primer arranque
+PID6912 con dos ciclos correctos/70ACK y usuario confirma lecturas en web real.
+Mantenimiento por gestor y cierre libre confirmados, seguido de reanudacion PID9340
+con otros dos ciclos correctos,52ACK, RT reciente y sin errores. Flujo permanente
+operativo, sin activar aplicador candidato: conserva motor r2 original. Detalle en
+control-acceso-produccion-dell.md. Pendientes fisicos: boton, HDMI y tag→pantalla.
