@@ -68,3 +68,52 @@ revisar eventos crudos del intervalo, incluyendo card vacio/0. Preferir evidenci
 lector unico en produccion; no abrir ZKAccess u otro SDK en paralelo. No controla
 plumas ni confirma paso fisico. Ajustar clasificacion despues segun evidencia.
 HDMI entrada/salida y latencia fisica hasta pantalla pendientes para visita17:30.
+
+## Instalacion remota confirmada — 2026-10-30
+
+Usuario transfirio ZIP PC→servidor→Dell y verifico SHA/manifiesto. Configurar devolvio
+production_credential_and_https_verified,422esperado, sin eventos ficticios ni SDK.
+Preflight real: seis fuentes r2, gestor, tareas y SDK coincidentes; PID11852,
+last_ok_utc2026-10-30T21:09:12.349934Z. Sin cambios de tareas por estas comprobaciones.
+
+Plan generado en mantenimiento:
+54ee858124db56c8326396050f3b683e2de3d7ef2765726013e370193d9a8f8c.
+Instalacion aplicada por ese hash devolvio production_activated_waiting_for_manager_resume,
+installation_id43c51f89-9576-4dd2-9445-d48db8b7b92c,
+release59bf55874a0101e3c049be8d1add3285e08e5c56db4e16a58aed3f913f658dfc,
+dates_engine=r2_reference_unchanged, dates_applied=false y tasks_changed=false.
+Respaldo y plan bajo ZKSync/instalaciones/43c51f89-9576-4dd2-9445-d48db8b7b92c.
+Instalado/activado no acredita servicio en ejecucion: falta cerrar/reabrir gestor,
+Terminar y reanudar, dos ciclos nuevos, envio/web y prueba de parada/reanudacion.
+Boton y HDMI siguen pendientes, sin codigo supuesto ni otro lector en paralelo.
+
+### Primer arranque real confirmado
+
+Salida --estado aportada por usuario: PID6912, run_iddd001d82-064e-44e9-bad6-eb7e60d2f9f1,
+inicio2026-10-30T21:13:16.958228Z, heartbeat21:14:37.145764Z. Dos ciclos completados,
+0errores; ultimo21:14:26.658149Z: API841, cambios Access0/C30, no encontrados4 y
+ausentes114 sin cambios. Motor r2 original en modo apply; no escritura por no haber
+diferencias. RT status_observed, SDK reciente, sin errores lector/almacen/emisor,
+gate activo rt y sin fault. closures_confirmed=false mientras corre es esperable,
+no evidencia de cierre fallido. Emisor PID15232 vivo,70outcomes acked y ACK reciente
+21:14:35.574833Z. Cola caliente3respuestas sin agrupar recientes, no bloqueada;
+no confundir conteo caliente con total historico archivado. Capacidad sin avisos.
+
+Arranque de produccion y entrega HTTPS confirmados. Pendientes comprobacion humana
+de web, mantenimiento/parada/reanudacion del nuevo servicio y HDMI/boton fisicos.
+
+Usuario confirma despues que la web real ya muestra lecturas. Recorrido C3→Dell→API
+de produccion→web acreditado, sin medir aun presentacion fisica hasta pantalla.
+Parada por gestor seguida de --verificar-cierre devolvio production_closure_confirmed,
+safe_to_resume=true, sin abrir SDK ni cambiar tareas. Reanudacion posterior solicitada;
+su resultado aun pendiente. No repetir instalacion ni crear otro agente.
+
+Prueba fisica preparada en docs/PRUEBA_CASETA_20261030.md. Revisor adicional
+tools/agente_acceso/revisar_boton_produccion.py lee originales SQLite en modo readonly,
+sin SDK/red/credenciales, incluyendo eventos sin card. Salida oculta tag/PIN y no
+atribuye significado a codigos.7pruebas aprobadas con fixtures, incluida lectura WAL
+con escritor activo, original alterado, ventana por reloj PC, identidad ajena y
+truncamiento. No modifica el ZIP/release instalado. Copia entregable:
+output/prueba-boton-20261030/Revisar_Boton_20261030.py,
+SHA25617e5db6cf5747d686258a13b33f3ae96e350268324af551562bba79e017e13c7.
+Transferencia a Dell y pulsacion fisica todavia pendientes.
