@@ -258,7 +258,7 @@ export default function VistaVigilancia() {
     };
 
     return (
-        <VigilanciaLayout active="search" onLogout={handleLogout} showTabs={["admin", "vigilancia"].includes(role)}>
+        <VigilanciaLayout active="search" onLogout={handleLogout} adminReturn={role === "admin"} showTabs={["admin", "vigilancia"].includes(role)}>
             <div className="flex flex-col gap-4 w-full max-w-[540px] mx-auto">
                 {/* Buscador */}
                 <div className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] p-6">

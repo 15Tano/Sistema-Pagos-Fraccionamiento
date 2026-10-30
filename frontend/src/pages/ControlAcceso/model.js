@@ -8,6 +8,14 @@ export function mergeRows(previous, incoming, maximum = 400) {
     for (const row of incoming) map.set(row.id, row);
     return [...map.values()].sort((a, b) => compareIds(b.id, a.id)).slice(0, maximum);
 }
+export function replaceCurrentRows(previous, incoming) {
+    // Un snapshot repetido no es una lectura nueva: conserva referencias y el temporizador del display.
+    return mergeRows([], incoming, 2).map((row) => {
+        const old = previous.find((value) => value.id === row.id);
+        return old && Object.keys(old).length === Object.keys(row).length &&
+            Object.keys(row).every((key) => old[key] === row[key]) ? old : row;
+    });
+}
 export function statesResponse(value) {
     if (!Array.isArray(value?.data) || !Number.isFinite(Date.parse(value?.meta?.server_time_utc)) ||
         value.data.some((a) => !uuid(a?.agent_id))) throw new Error("invalid_response");
@@ -31,6 +39,22 @@ export function eventsResponse(value, after, before = null) {
     const last = value.data.at(-1)?.id ?? after ?? null;
     if (value.meta.last_id !== last || value.meta.first_id !== (value.data[0]?.id ?? null) ||
         (value.meta.has_more && !value.data.length)) throw new Error("invalid_response");
+    return value;
+}
+export function monitorPermissions(value) {
+    return { can_view_history: value?.can_view_history === true, can_manage_history: value?.can_manage_history === true };
+}
+export function monitorSettingsResponse(value) {
+    if (typeof value?.data?.history_for_guards !== "boolean" || !Number.isInteger(value?.data?.revision) ||
+        value.data.revision < 1 || value.data.revision > 2147483647) throw new Error("invalid_response");
+    return value.data;
+}
+export function currentResponse(value) {
+    eventsResponse(value, null);
+    const doors = value.data.map((row) => row.door_id);
+    if (value.meta.current_only !== true || value.meta.has_more || value.data.length > 2 ||
+        new Set(doors).size !== doors.length || value.data.some((row) => row.source !== "rt" ||
+            !["1", "2"].includes(row.door_id) || !row.card_no || row.card_no === "0")) throw new Error("invalid_response");
     return value;
 }
 export function errorInfo(error) {

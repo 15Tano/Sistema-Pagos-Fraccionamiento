@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { errorInfo, eventsResponse, mergeRows } from "../model";
+import { readingHistoryParams } from "../readingFilters";
 
 // Búsquedas históricas explícitas: no abren otro seguimiento ni sustituyen la última lectura.
 export function useReadingHistory(client, agentId, filters, enabled) {
@@ -12,8 +13,7 @@ export function useReadingHistory(client, agentId, filters, enabled) {
         let closed = false, busy = false, oldest = null, rows = [];
         const controllers = new Set();
         const query = JSON.parse(key);
-        const params = { agent_id: query.agentId, source: query.source, limit: 50,
-            ...(query.door ? { door_id: query.door } : {}), ...(query.card ? { card_no: query.card } : {}) };
+        const params = readingHistoryParams(query.agentId, query);
         async function load(older = false) {
             if (closed || busy || (older && !oldest)) return;
             busy = true;
@@ -36,6 +36,6 @@ export function useReadingHistory(client, agentId, filters, enabled) {
         Promise.resolve().then(() => load());
         return () => { closed = true; controllers.forEach((c) => c.abort()); owner.current = null; };
     }, [client, agentId, key, revision, enabled]);
-    const state = snapshot.key === key ? snapshot : { rows: [], loading: enabled && Boolean(agentId), more: false, error: null };
+    const state = enabled && snapshot.key === key ? snapshot : { rows: [], loading: enabled && Boolean(agentId), more: false, error: null };
     return { ...state, refresh: () => setRevision((r) => r + 1), older: () => owner.current?.older() };
 }

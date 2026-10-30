@@ -9,7 +9,8 @@ const STAMP = '2026-10-26T18:30:00Z';
 const NOW = Date.parse(STAMP);
 const agent = () => ({ agent_id: AGENT, reporting_status: 'reciente', received_at_utc: STAMP, reported_at_utc: STAMP,
     vigencias_status: 'correcto', vigencias: { last_ok_utc: STAMP, heartbeat_utc: STAMP } });
-const states = () => ({ data: [agent()], meta: { server_time_utc: STAMP, truncated: false } });
+const states = () => ({ data: [agent()], meta: { server_time_utc: STAMP, truncated: false,
+    permissions: { can_view_history: true, can_manage_history: true } } });
 const row = (id) => ({ id: String(id), source: 'rt', event_code: 0, card_no: '0012230693', pin: '693', door_id: '1',
     door_label: 'Entrada', device_time_raw: '2026-10-26 12:29:59', direction: '0', verification: '4',
     captured_ended_utc: STAMP, received_at_utc: STAMP });
@@ -194,7 +195,7 @@ test('un lote atrasado no se vuelve lectura nueva por recibirse ahora', () => {
 
 test('el controlador físico conocido se elige sin selector ni depender del orden de agentes de ensayo', async (t) => {
     const physical = { ...agent(), device_serial: 'CO2K225060027' };
-    const h = harness(t, () => page(['1']), {}, () => ({ data: [{ ...agent(), agent_id: '00000000-0000-4000-8000-000000000099', device_serial: 'TEST-C3-001' }, physical], meta: { server_time_utc: STAMP } }));
+    const h = harness(t, () => page(['1']), {}, () => ({ data: [{ ...agent(), agent_id: '00000000-0000-4000-8000-000000000099', device_serial: 'TEST-C3-001' }, physical], meta: { server_time_utc: STAMP, permissions: { can_view_history: true, can_manage_history: true } } }));
     await h.start(); assert.equal(h.calls[0].params.agent_id, AGENT);
 });
 

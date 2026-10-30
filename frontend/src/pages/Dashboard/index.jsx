@@ -8,6 +8,7 @@ import AvisosAdmin from "./components/AvisosAdmin";
 import AuditLogs from "./components/AuditLogs";
 import { formatFechaCorta } from "./helpers/formatFecha";
 import EncuestasAdmin from "./components/EncuestasAdmin";
+import VigilanciaShortcut from "./components/VigilanciaShortcut";
 
 export default function Dashboard() {
     const [stats, setStats] = useState(null);
@@ -53,6 +54,7 @@ export default function Dashboard() {
 
     if (loading)
         return (
+            <>{user?.role === "admin" && <div className="mb-5"><VigilanciaShortcut /></div>}
             <div className="flex items-center justify-center h-64">
                 <div className="flex items-center gap-3">
                     <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin drop-shadow-md" />
@@ -60,11 +62,12 @@ export default function Dashboard() {
                         Cargando estadísticas...
                     </span>
                 </div>
-            </div>
+            </div></>
         );
 
     if (error)
         return (
+            <>{user?.role === "admin" && <div className="mb-5"><VigilanciaShortcut /></div>}
             <div className="flex flex-col items-center justify-center h-64 gap-4 p-6 bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2rem] shadow-[0_8px_32px_rgba(0,0,0,0.04)] max-w-sm mx-auto mt-10">
                 <p className="text-red-500 text-sm font-bold text-center drop-shadow-sm">
                     {error}
@@ -75,7 +78,7 @@ export default function Dashboard() {
                 >
                     Reintentar
                 </button>
-            </div>
+            </div></>
         );
 
     if (esCapturista)
@@ -107,6 +110,7 @@ export default function Dashboard() {
 
     return (
         <div className="flex flex-col gap-5 h-full pb-20 md:pb-0">
+            {user?.role === "admin" && <VigilanciaShortcut />}
             {/* ── KPI Cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Recaudado */}

@@ -7,7 +7,7 @@ import ControlAccessPanel from "./components/ControlAccessPanel";
 export default function ControlAcceso({ vigilancia = false }) {
     const role = useAuthStore((s) => s.user?.role);
     const logout = useAuthStore((s) => s.logout);
-    const content = <ControlAccessPanel client={monitorClient} />;
+    const content = <ControlAccessPanel key={role} client={monitorClient} />;
     if (role === "admin" && !vigilancia) return <Layout>{content}</Layout>;
-    return <VigilanciaLayout active="readings" onLogout={logout}>{content}</VigilanciaLayout>;
+    return <VigilanciaLayout active="readings" onLogout={logout} adminReturn={role === "admin"}>{content}</VigilanciaLayout>;
 }
