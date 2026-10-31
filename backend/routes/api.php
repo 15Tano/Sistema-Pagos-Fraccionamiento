@@ -18,7 +18,8 @@ use App\Http\Controllers\CorteCajaController;
 
 
 // ─── AUTH (públicas) ──────────────────────────────────────────────
-Route::middleware('throttle:5,1')->post('/login', [AuthController::class, 'login']);
+// Contador exclusivo: el tráfico del agente no debe consumir intentos de login.
+Route::middleware('throttle:5,1,login:')->post('/login', [AuthController::class, 'login']);
 Route::post('/capturista/verify-pin', [CapturistaController::class, 'verifyPin']);
 Route::post('/vecinos/registro-acceso', [VecinoAccesoController::class, 'store']);
 Route::post('/vecinos/eliminar-acceso', [VecinoAccesoController::class, 'destroy']);
