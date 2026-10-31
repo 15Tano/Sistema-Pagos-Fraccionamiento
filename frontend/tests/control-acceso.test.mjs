@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setImmediate } from 'node:timers/promises';
 import { createMonitorSession } from '../src/pages/ControlAcceso/monitorSession.js';
-import { mergeRows, rowId, eventsResponse, reporting, cycleLabel, deviceText, utcText, neighborText, eventPresentation, displayReading, displayDoor } from '../src/pages/ControlAcceso/model.js';
+import { mergeRows, rowId, eventsResponse, reporting, cycleLabel, deviceText, utcText, neighborText, eventPresentation, displayReading, displayDoor, displayStatus } from '../src/pages/ControlAcceso/model.js';
 
 const AGENT = '00000000-0000-4000-8000-000000000001';
 const STAMP = '2026-10-26T18:30:00Z';
@@ -185,6 +185,29 @@ test('display admite solo lectura RT fresca de la pluma fijada y con seguimiento
     assert.equal(displayReading({ ...candidate, captured_ended_utc: null }, NOW, options), null);
     assert.equal(displayReading(candidate, NOW - 5000, options), null);
     assert.equal(displayReading(null, NOW, options), null);
+});
+
+test('display distingue recuperación del lector y del navegador de falta de comunicación', () => {
+    assert.equal(displayStatus({ available: true, readerState: 'catching_up' }), 'recovering');
+    assert.equal(displayStatus({ available: true, readerState: 'status_observed', catchingUp: true }), 'recovering');
+    assert.equal(displayStatus({ available: true, readerState: 'status_observed' }), 'ready');
+    for (const readerState of ['catching_up', 'status_observed', 'paused', 'unknown', undefined]) {
+        assert.equal(displayStatus({ available: false, readerState, catchingUp: true }), 'offline');
+    }
+    for (const readerState of ['paused', 'unknown', undefined]) {
+        assert.equal(displayStatus({ available: true, readerState }), 'offline');
+    }
+});
+
+test('recuperación nunca admite una autorización, aunque la captura sea reciente', () => {
+    for (const health of [{ available: true, readerState: 'catching_up' },
+        { available: true, readerState: 'status_observed', catchingUp: true }]) {
+        const ready = displayStatus(health) === 'ready';
+        assert.equal(displayReading(row('1'), NOW, { door: '1', ready }), null);
+    }
+    const ready = displayStatus({ available: true, readerState: 'status_observed' }) === 'ready';
+    assert.equal(displayReading(row('1'), NOW, { door: '1', ready })?.id, '1');
+    assert.equal(displayReading(row('1'), NOW + 8000, { door: '1', ready }), null);
 });
 
 test('un lote atrasado no se vuelve lectura nueva por recibirse ahora', () => {

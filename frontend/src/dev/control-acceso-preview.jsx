@@ -43,7 +43,7 @@ function demoClient(scenario, role) {
                 reporting_status: scenario === "stale" ? "sin_reporte_reciente" : "reciente", received_at_utc: stamp, reported_at_utc: stamp,
                 vigencias_status: scenario === "stale" ? "sin_confirmar" : "correcto",
                 vigencias: { last_ok_utc: stamp, heartbeat_utc: stamp, phase: "idle", consecutive_errors: 0 },
-                reader: { state: "status_observed", checked_at_utc: stamp },
+                reader: { state: scenario === "recovering" ? "catching_up" : "status_observed", checked_at_utc: stamp },
                 sender: { pending_count: scenario === "stale" ? 24 : 0, oldest_pending_at_utc: stamp } }],
                 meta: { server_time_utc: iso(time), truncated: false, permissions: permissions(role) } };
         },
@@ -104,7 +104,7 @@ export default function Preview() {
         <span>Demostración · datos y permisos ficticios; el ajuste se reinicia al recargar</span>
         <select aria-label="Rol de demostración" className="rounded-lg border border-amber-200 bg-white/70 p-1" value={role} onChange={(event) => setRole(event.target.value)}><option value="admin">Administración</option><option value="vigilancia">Vigilancia</option></select>
         <div className="flex flex-wrap gap-2"><select aria-label="Escenario de demostración" className="rounded-lg border border-amber-200 bg-white/70 p-1" value={scenario} onChange={(e) => setScenario(e.target.value)}>
-            <option value="normal">Funcionando</option><option value="review">Lectura por revisar</option><option value="stale">Sin reportes recientes</option><option value="empty">Sin datos</option><option value="error">Error de conexión</option><option value="disabled">No disponible</option></select>
+            <option value="normal">Funcionando</option><option value="recovering">Recuperando lecturas</option><option value="review">Lectura por revisar</option><option value="stale">Sin reportes recientes</option><option value="empty">Sin datos</option><option value="error">Error de conexión</option><option value="disabled">No disponible</option></select>
             <button type="button" className="rounded-lg bg-white/70 px-2 py-1" onClick={() => client.capture("1")}>Simular entrada</button>
             <button type="button" className="rounded-lg bg-white/70 px-2 py-1" onClick={() => client.capture("2")}>Simular salida</button>
             <button type="button" className="rounded-lg bg-white/70 px-2 py-1" onClick={() => client.capture("1", 20)}>Simular repetida</button></div>

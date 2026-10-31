@@ -10,14 +10,16 @@ import { useDisplayReading } from "../hooks/useDisplayReading";
 const STATUS_PULSE = { opacity: [.6, 1, .6], scale: [1, 1.22, 1] };
 const STILL_STATUS = { opacity: 1, scale: 1 };
 
-export default function ReadingDisplay({ row: latest, now, door, ready, catchingUp, onClose }) {
+export default function ReadingDisplay({ row: latest, now, door, ready, recovering = false, catchingUp, onClose }) {
     const reducedMotion = useReducedMotion();
     const row = useDisplayReading(latest, now, door, ready, catchingUp);
     const outcome = eventPresentation(row?.event_code);
-    const displayReason = row ? "shown" : !ready ? "not_ready" : catchingUp ? "catching_up" : !latest ? "empty"
+    const displayReason = row ? "shown" : recovering ? "catching_up" : !ready ? "not_ready" : catchingUp ? "catching_up" : !latest ? "empty"
         : latest.door_id !== door ? "other_door" : !displayReading(latest, now, { door, ready, catchingUp }) ? "freshness_or_non_tag" : "awaiting_commit";
     const label = door === "2" ? "Salida" : "Entrada";
     const active = ready && !catchingUp;
+    const idleTitle = ready ? "Presente su tag" : recovering ? "Actualizando lecturas" : "Solicite apoyo a vigilancia";
+    const idleMessage = ready ? "Su lectura aparecerá aquí." : recovering ? "Espere un momento." : "Las lecturas no están actualizadas.";
     const success = row?.event_code === 0;
     const greeting = success ? door === "2" ? "¡Hasta pronto!" : "¡Bienvenido a casa!"
         : row?.event_code === 20 ? "Una lectura a la vez" : "Estamos para ayudarte";
@@ -54,7 +56,7 @@ export default function ReadingDisplay({ row: latest, now, door, ready, catching
         <DisplayAtmosphere reducedMotion={reducedMotion} />
         <header className="ac-display-header"><div className="ac-display-brand"><ShieldCheck size={20} /><span>SAN ISIDRO</span></div>
             <span className="ac-display-door">{door === "2" ? <ArrowUpRight size={17} /> : <ArrowDownLeft size={17} />}{label}</span></header>
-        <div className="ac-display-stage"><Motion.div key={row?.id || (ready ? "idle" : "offline")}
+        <div className="ac-display-stage"><Motion.div key={row?.id || (ready ? "idle" : recovering ? "recovering" : "offline")}
             className={`ac-display-body ac-display-scene ${row ? "ac-scene-has-reading" : "ac-scene-waiting"}`}
             data-ac-reading={row?.id} data-ac-surface="display"
             initial={reducedMotion ? false : { y: row ? 32 : 8, z: row ? -100 : 0, rotateX: row ? 10 : 0, scale: row ? .9 : 1, filter: row ? "blur(8px)" : "blur(0px)" }}
@@ -78,8 +80,8 @@ export default function ReadingDisplay({ row: latest, now, door, ready, catching
             </> : <div className="ac-scene-wait-content">
                 <DisplayScanner active={active} reducedMotion={reducedMotion} />
                 {active && <p className="ac-scene-eyebrow">{door === "2" ? "Nos vemos pronto" : "Tu hogar te espera"}</p>}
-                <Motion.h1 initial={textEntrance} animate={{ opacity: 1, y: 0 }} transition={textTransition}>{ready ? "Presente su tag" : "Solicite apoyo a vigilancia"}</Motion.h1>
-                <Motion.p className="ac-display-message" initial={textEntrance} animate={{ opacity: 1, y: 0 }} transition={textTransition}>{ready ? "Su lectura aparecerá aquí." : "Las lecturas no están actualizadas."}</Motion.p>
+                <Motion.h1 initial={textEntrance} animate={{ opacity: 1, y: 0 }} transition={textTransition}>{idleTitle}</Motion.h1>
+                <Motion.p className="ac-display-message" initial={textEntrance} animate={{ opacity: 1, y: 0 }} transition={textTransition}>{idleMessage}</Motion.p>
             </div>}
             {row && <div className="ac-display-duration" aria-hidden="true" />}
         </Motion.div></div>
@@ -87,7 +89,7 @@ export default function ReadingDisplay({ row: latest, now, door, ready, catching
             <Motion.span key={active ? "active" : "inactive"} className="ac-display-status-dot" aria-hidden="true"
                 initial={reducedMotion ? false : STILL_STATUS} animate={active && !reducedMotion ? STATUS_PULSE : STILL_STATUS}
                 transition={active && !reducedMotion ? { duration: 2.6, repeat: Infinity, ease: "easeInOut" } : { duration: 0 }} />
-            {active ? "Sistema activo" : catchingUp && ready ? "Actualizando lecturas" : "Sin datos recientes"}
+            {active ? "Sistema activo" : recovering || catchingUp && ready ? "Actualizando lecturas" : "Sin datos recientes"}
         </div>
     </section>, document.body);
 }

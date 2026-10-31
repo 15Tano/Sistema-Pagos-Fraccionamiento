@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, Check, ChevronDown, Clock3, CloudCheck, CreditCard, Pause, Play, Radio, RefreshCw, Repeat2, ShieldCheck, Wifi } from "lucide-react";
-import { ageText, cycleLabel, deviceText, eventPresentation, neighborText, reporting, timeText, utcText } from "../model";
+import { ageText, cycleLabel, deviceText, displayStatus, eventPresentation, neighborText, reporting, timeText, utcText } from "../model";
 import ReadingCard from "./ReadingCard";
 import ReadingDisplay from "./ReadingDisplay";
 import ReadingFilters from "./ReadingFilters";
@@ -39,13 +39,14 @@ export default function ControlAccessView({ monitor, gate, onGate, history, hist
     const cycle = online && monitor.automatic ? cycleLabel(agent, monitor.now) : "Sin confirmar";
     const knownGate = agent?.device_serial === "CO2K225060027";
     const readerReady = agent?.reader?.state === "status_observed";
-    const ready = online && monitor.automatic && knownGate && readerReady && !locked && !monitor.loading;
+    const displayState = displayStatus({ available: online && monitor.automatic && knownGate && !locked && !monitor.loading,
+        readerState: agent?.reader?.state, catchingUp: monitor.catchingUp });
     const pending = agent?.sender?.pending_count;
     const rows = locked ? [] : historyActive ? history.rows : monitor.rows;
     const busy = historyActive ? history.loading : monitor.loading;
     const error = monitor.error || historyActive && history.error;
     const more = historyActive ? history.more : monitor.olderMore && rows.length < 400;
-    if (displayMode) return <ReadingDisplay door={displayMode} ready={ready}
+    if (displayMode) return <ReadingDisplay door={displayMode} ready={displayState === "ready"} recovering={displayState === "recovering"}
         row={current} now={monitor.now} catchingUp={monitor.catchingUp} onClose={onCloseDisplay} />;
 
     return <div className="acceso-monitor">

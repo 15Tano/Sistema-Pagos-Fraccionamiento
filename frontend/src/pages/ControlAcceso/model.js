@@ -124,6 +124,11 @@ export function eventPresentation(code) {
 }
 
 export const displayDoor = (value) => value === "entrada" ? "1" : value === "salida" ? "2" : "";
+export function displayStatus({ available, readerState, catchingUp = false }) {
+    if (!available) return "offline";
+    if (readerState === "catching_up" || (readerState === "status_observed" && catchingUp)) return "recovering";
+    return readerState === "status_observed" ? "ready" : "offline";
+}
 export function displayReading(row, now, { door, ready, catchingUp = false }) {
     if (!ready || catchingUp || !["1", "2"].includes(door) || row?.door_id !== door || row.source !== "rt" ||
         !row.card_no || row.card_no === "0") return null;
