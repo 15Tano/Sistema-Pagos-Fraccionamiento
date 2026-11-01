@@ -93,6 +93,43 @@ No hay terminal de la app adjunta al chat. No se ejecutaron respaldo, ensayo rem
 script de despliegue, migración, aplicación ni activación del scheduler en producción.
 La autorización persiste; falta resolver acceso autenticado, no otra confirmación.
 
+### Preflight y respaldo comunicados por el usuario — 2026-10-31 México
+
+Sesión SSH del usuario disponible; ejecución remota mediante bloques que comparte
+y devuelve. Repo remoto limpio en refactor-headless, seis commits hasta3b7a6f7;
+diff backend limitado a retención. Migraciones productivas hasta2026_10_30 aplicadas.
+Servidor MariaDB10.11.14 (Ubuntu24.04), cache database, timezoneUTC,13GB disponibles.
+Cron de sanisidro-back ejecuta artisan schedule:run cada minuto; root sin entrada.
+Ensayo previo local MySQL8.4 no certifica por sí solo compatibilidad MariaDB.
+
+Acceso MariaDB root por socket sin contraseña rechazado1045. Alternativa usando
+la configuración Laravel y archivo cliente temporal privado produjo respaldo:
+`/root/backups-sanisidro/retencion-20261101-043736-4a7bc9/sanisidro-db.sql.gz`,
+7.03MiB. Salida del usuario confirma dump exitoso, gzip -t y generación SHA256;
+archivo cliente temporal eliminado en finally. Sin credenciales en documentación.
+Esto verifica generación/compresión, NO restaurabilidad todavía. Creación de base
+separada, restauración de ensayo, despliegue, migración y activación pendientes.
+
+### Restauración aislada confirmada por salida del usuario — 2026-10-31 México
+
+SHA256 del dump coincide. CloudPanel no admite --help en esta instalación;
+db:add con nombres anteriores fue rechazado sin crear base. Sintaxis consultada
+en documentación oficial; nombres alfanuméricos cortos aceptados. Base y usuario
+exclusivos `sicar5502802b`, carpeta `/root/ensayo-retencion-5502802b`, conexión
+localhost por127.0.0.1. Credenciales solo en cliente.cnf privado de root, no aquí.
+Restauración completada con ese usuario limitado:41706filas/29257estados y
+CHECK TABLE QUICK de filas, estados, respuestas y lotes devuelveOK. Esto verifica
+restauración del respaldo en MariaDB10.11.14, todavía sin aplicar retención.
+
+Preparado ejecutor `tools/retencion/ensayar.php` fuera del backend desplegado:
+exige ruta /root/ensayo-retencion-XXXXXXXX, backend sin.env/cache de configuración,
+base/usuario sicarXXXXXXXX y MariaDB coincidentes. Usa dependencias de su propia
+copia; nunca comparte vendor/bootstrap con producción. Migra solo la nueva
+migración. Compara plan/aplicación y estado/display; simula+100días solo con reloj
+PHP, limpia por tandas hasta quedar idle y prueba ACK/rechazo409 con fixture nuevo.
+No publica HTTP, no ejecuta workers ni envía comunicaciones. Lint y rechazo fuera
+de carpeta aislada comprobados localmente; resultado real del ensayo pendiente.
+
 ## Verificación local
 
 SQLite en memoria y MySQL8.4.13 aislado con helper que exige puerto33379, datadir,
