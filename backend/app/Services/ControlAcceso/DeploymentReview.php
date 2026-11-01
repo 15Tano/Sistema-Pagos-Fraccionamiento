@@ -16,13 +16,14 @@ class DeploymentReview
         '2026_10_23_210000_create_control_acceso_ingestion_tables',
         '2026_10_26_070000_add_control_acceso_monitor_indexes',
         '2026_10_30_010000_create_control_acceso_monitor_settings',
+        '2026_10_31_230000_add_control_acceso_retention_markers',
     ];
 
     private const COLUMNS = [
         'control_acceso_agentes' => ['id', 'device_serial', 'nombre', 'token_hash', 'revoked_at'],
-        'control_acceso_estados' => ['id', 'agent_id', 'session_id', 'sequence', 'reported_at_utc', 'received_at_utc', 'payload', 'ack', 'content_sha256'],
+        'control_acceso_estados' => ['id', 'agent_id', 'session_id', 'sequence', 'reported_at_utc', 'received_at_utc', 'payload', 'ack', 'content_sha256', 'retention_pruned_at_utc'],
         'control_acceso_lotes' => ['id', 'agent_id', 'batch_id', 'session_id', 'sequence', 'content_sha256', 'received_at_utc', 'ack'],
-        'control_acceso_respuestas' => ['id', 'lote_id', 'agent_id', 'response_id', 'source', 'sdk_return_code', 'raw_payload_base64', 'sha256', 'payload_bytes', 'captured_started_utc', 'captured_ended_utc', 'pc_local_time', 'windows_timezone', 'parse_status', 'parse_reason', 'parser_version'],
+        'control_acceso_respuestas' => ['id', 'lote_id', 'agent_id', 'response_id', 'source', 'sdk_return_code', 'raw_payload_base64', 'sha256', 'payload_bytes', 'captured_started_utc', 'captured_ended_utc', 'pc_local_time', 'windows_timezone', 'parse_status', 'parse_reason', 'parser_version', 'retention_pruned_at_utc'],
         'control_acceso_filas' => ['id', 'respuesta_id', 'ordinal', 'kind', 'device_time_raw', 'time_second', 'card_no', 'pin', 'door_id', 'event_code', 'direction', 'verification', 'raw_fields'],
         'control_acceso_monitor_configuracion' => ['id', 'historial_vigilancia', 'revision', 'updated_by', 'created_at', 'updated_at'],
         'tags' => ['id', 'codigo'], 'vecinos' => ['id', 'nombre'],
@@ -31,6 +32,8 @@ class DeploymentReview
     ];
 
     private const INDEXES = [
+        'ca_retention_estados' => ['control_acceso_estados', ['agent_id', 'retention_pruned_at_utc', 'id']],
+        'ca_retention_respuestas' => ['control_acceso_respuestas', ['agent_id', 'retention_pruned_at_utc', 'id']],
         'ca_states_monitor' => ['control_acceso_estados', ['agent_id', 'reported_at_utc', 'id']],
         'ca_responses_monitor' => ['control_acceso_respuestas', ['agent_id', 'source', 'id']],
         'ca_rows_monitor' => ['control_acceso_filas', ['kind', 'id']],

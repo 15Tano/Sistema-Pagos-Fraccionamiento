@@ -6,6 +6,7 @@ La documentación permanente de este proyecto está en `docs/contexto/`. Al come
 
 | Documento | Fecha del contexto | Uso |
 | --- | --- | --- |
+| [Retención de Lecturas](docs/contexto/control-acceso-retencion.md) | 2026-10-31 | Retención local 7 días técnicos/90 eventos, SQLite81/MySQL27 aprobadas. Despliegue autorizado, pendiente por acceso SSH rechazado. |
 | [Overview](docs/contexto/overview.md) | 2026-09-27 | Propósito, roles, stack, arquitectura, diseño e infraestructura. |
 | [Ways Of Working](docs/contexto/ways-of-working.md) | 2026-09-15 | Preferencias del usuario para diseño, diagnóstico, cambios, Git y despliegues. |
 | [Learnings](docs/contexto/learnings.md) | 2026-09-15 | Aprendizajes técnicos y precauciones del proyecto. |

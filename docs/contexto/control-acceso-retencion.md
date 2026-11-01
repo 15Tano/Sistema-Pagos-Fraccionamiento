@@ -1,0 +1,109 @@
+# Retención del monitor de acceso
+
+## Decisión y diagnóstico — 2026-10-31
+
+Usuario autoriza empezar la implementación de la propuesta de 7 días técnicos y
+90 días de eventos. Posteriormente confirma «Si» al despliegue y activación:
+despliegue y primera limpieza autorizados, sin pedir otra aprobación por el mismo
+alcance. Ejecución remota pendiente por acceso SSH rechazado.
+
+Consultas de producción aportadas por el usuario: 38,987 filas status/255 y
+1,539 eventos (1,124 código 0, 387 código 20 y 28 código 27). No atribuir paso
+físico a estos registros. SHOW TABLE STATUS suma aproximadamente 91.9 MiB de
+datos e índices: estados 47.6, respuestas 23.1, filas 11.6, lotes 9.5. Son muestras
+de momentos distintos; Rows es estimado. El motor reportado es InnoDB, pero la
+versión exacta del servidor de producción no fue consultada.
+
+## Implementación local
+
+- Retención calculada con CarbonImmutable UTC y fecha de RECEPCIÓN del servidor,
+  no reloj C3 ni captura del PC. Umbral estricto: exactamente 7/90 días se conserva.
+- Estados: a los 7 días reemplaza payload por `{}`, conservando identidad,
+  hash y ACK original. Excepción permanente para el último reporte de cada agente,
+  ordenado por reported_at_utc e id, igual que el monitor.
+- Filas status: elimina las mayores de 7 días. Filas event: mayores de 90 días.
+  Conserva la última lectura RT válida por agente y puerta 1/2 con los mismos
+  predicados del display. IDs sobrevivientes nunca se renumeran.
+- Respuestas: retira raw_payload_base64 solo después de 7 días y si ya no quedan
+  filas asociadas. Una respuesta mixta mantiene los bytes completos mientras
+  sobreviva cualquier evento; respuestas vacías, errores SDK y desconocidas
+  también tienen 7 días para diagnóstico.
+- Migración aditiva `2026_10_31_230000_add_control_acceso_retention_markers` agrega
+  marcas UTC explícitas e índices para no confundir datos retirados con payloads
+  originalmente vacíos. Reversión del esquema se rechaza si ya hay marcas: recuperar
+  desde respaldo requiere una operación explícita, no reconstrucción ficticia.
+- Identidades/ACK de estados, respuestas y lotes se conservan indefinidamente.
+  Reintentos antiguos siguen devolviendo el mismo ACK y conflictos siguen dando409.
+  El ACK describe la aceptación original, no promete conservación perpetua tras
+  vencer la retención. Esta versión reduce detalle; NO acota el tamaño total ni
+  elimina todo crecimiento: los comprobantes siguen acumulándose. Un límite total
+  requerirá acordar una ventana máxima de reintentos y modificar el protocolo.
+- No realiza OPTIMIZE ni promete devolver espacio inmediatamente al sistema de
+  archivos; InnoDB puede reutilizar espacio liberado. Índices nuevos también ocupan
+  espacio. El almacenamiento y ritmo residual deben medirse después de aplicar.
+
+## Ejecución y límites
+
+Desde backend local o raíz Laravel desplegada, después de migrar:
+
+```bash
+php artisan control-acceso:retencion
+php artisan control-acceso:retencion --apply
+```
+
+Sin --apply solo consulta y calcula candidatos, incluidos los bytes que podrían
+retirarse tras eliminar las filas planificadas; no modifica tablas. Cada página
+comparte el bloqueo de agente con la ingesta y actualiza/elimina hasta500registros.
+Por defecto20páginas por fase/agente; máximo10,000candidatos por fase/agente/ejecución.
+Los conteos son acotados a esa ejecución, no totales de la base. Si hay más,
+repetir; las corridas son idempotentes. El plan es una muestra, no una reserva
+de los IDs: al aplicar se vuelve a comprobar elegibilidad bajo bloqueo. No cambia
+el programa de Dell ni la frecuencia de captura.
+
+Tarea Laravel horaria con withoutOverlapping, apagada por defecto:
+`CONTROL_ACCESO_RETENTION_ENABLED=false`. Habilitar a true solo después de
+validar el primer plan y la primera aplicación. La bandera controla el scheduler;
+la aplicación manual exige --apply y funciona independientemente de ella.
+Comprobar cron/schedule:run y cache compartida real para el mutex en producción.
+
+## Despliegue pendiente
+
+1. Revisar diff y publicar solo archivos de esta función por el flujo Git habitual.
+2. Inspeccionar SELECT VERSION(), respaldo recuperable de la base, cron y cache.
+3. Ensayar migración/comando en una base separada; nunca probar --apply con el
+   .env de producción apuntando a su base desde una carpeta de ensayo.
+4. Autorización de despliegue y activación recibida. Usar
+   /root/deploy-sanisidro.sh; no modificar código del docroot a mano.
+5. Migrar, ejecutar `php artisan control-acceso:revisar-despliegue` y plan readonly;
+   comprobar monitor/ACK. Aplicar primera tanda revisada y medir nuevamente.
+6. Habilitar tarea, reconstruir cache de configuración por el flujo de despliegue
+   y verificar ejecución real y estado del monitor después de una hora.
+
+Con solo dos días de operación normalmente no habrá detalle elegible todavía.
+No se aplicó migración ni limpieza de producción. Publicación Git se registra
+por separado: nunca equivale a backend desplegado.
+
+### Intento de despliegue autorizado — 2026-10-31
+
+Rama local refactor-headless-final siguiendo origin/refactor-headless, referencias
+remotas comprobadas antes de publicar. Se conservaron cambios ajenos sin incluirlos.
+SSH BatchMode a root@api.sanisidro.info devuelve Permission denied
+(publickey,password); no hay clave privada en ~/.ssh ni agente SSH disponible.
+No hay terminal de la app adjunta al chat. No se ejecutaron respaldo, ensayo remoto,
+script de despliegue, migración, aplicación ni activación del scheduler en producción.
+La autorización persiste; falta resolver acceso autenticado, no otra confirmación.
+
+## Verificación local
+
+SQLite en memoria y MySQL8.4.13 aislado con helper que exige puerto33379, datadir,
+server_id y marcador de ensayo. Cobertura: plan sin cambios, presupuesto de páginas,
+límites estrictos, bytes mixtos, reportes atrasados, últimas lecturas y salud del
+monitor, repetición de limpieza, ACK idéntico y conflictos después de retirar
+detalle, migración reversible antes de limpiar y bloqueo de rollback posterior.
+Resultado final: SQLite81pruebas/662aserciones (ingesta, monitor, revisión de
+despliegue y retención); MySQL27pruebas/169aserciones (retención y regresiones
+heredadas de ingesta), todas aprobadas. Formato Pint de los seis archivos nuevos
+o formateados aprobado; diff --check de los cambios rastreados sin errores. MySQL
+de ensayo detenido con helper validado al terminar, evidencia conservada. No
+certifica concurrencia InnoDB con procesos
+simultáneos ni versión/configuración de producción.

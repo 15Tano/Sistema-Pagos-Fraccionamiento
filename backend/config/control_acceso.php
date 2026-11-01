@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'retention_enabled' => env('CONTROL_ACCESO_RETENTION_ENABLED', false),
+    'retention_technical_days' => 7,
+    'retention_event_days' => 90,
     'monitor_enabled' => env('CONTROL_ACCESO_MONITOR_ENABLED', false),
     'monitor_stale_seconds' => 90,
     'monitor_vigencias_stale_seconds' => 300,
