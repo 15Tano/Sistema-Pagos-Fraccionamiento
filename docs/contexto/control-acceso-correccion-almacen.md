@@ -220,3 +220,33 @@ Instalacion de archivos confirmada. Se indica reanudar por script y observador
 readonly con corte de hora capturado ANTES de reanudar, version3 esperada, dos
 ciclos, SDK/ACK recientes y emisor vivo, hasta12min. No confundir instalacion con
 ejecucion saludable ni con drenaje de la cola; ambas aceptaciones pendientes.
+
+## Version nueva y drenaje confirmados — 2026-10-31
+
+Usuario aporta VERSION_NUEVA_CICLOS_LECTURA_Y_ENVIO_CONFIRMADOS y release3d16...903e4.
+PID16460/run_id7f90b4c8-da00-41a9-b876-ed7a80b03958, inicio01nov03:25:35.852830UTC
+(31oct21:25:35Mexico), dos ciclos/0errores/SDK03:27:00.389727UTC. Readerstatus_observed,
+sin reader_error/storage_error/gatefault. EmisorPID14968/run_ida03ae9ab-66af-4cfb-83ee-ae959ee03b5d
+vivo/24ACK/ultimo03:27:00.186235UTC. Quedaban385pendientes, por lo que esa primera
+salida acredita nueva ejecucion y entrega, sin acreditar aun vaciado.
+
+Segunda muestra del usuario del mismoPID16460 a01nov04:08:41UTC (=31oct22:08:41Mexico):
+40ciclos/0errores, ultimo04:07:54.442719UTC, API842/cambios0+0/noencontrados4/ausentes114,
+motor r2 conservado. SDK/lector04:08:41.519069UTC/status_observed, gate rt sin fault,
+sin error lector/almacen/capacidad. EmisorPID14968 vivo/1906ACK/ultimo04:08:40.844001UTC;
+outcomeacked/idle8138. Cola sin mensajes pendientes:1respuesta sin agrupar capturada
+04:08:41.804248UTC, nueva. Snapshot propio del emisor anterior muestra7respuestas
+sin agrupar desde04:08:35, tambien recientes; no son una contradiccion porque se
+publican en momentos distintos. La cola antigua se vacio y hay continuidad por
+unos43min; no afirmar cero pendientes permanente mientras se sigue capturando.
+
+sender_error conserva FileNotFoundError desde arranque como en versiones previas;
+el codigo no lo limpia tras snapshots correctos. La evidencia de envios actuales
+es ACK reciente/1906confirmaciones/proceso vivo. No se presenta el campo como un
+nuevo fallo actual ni se elimina artificialmente. Correccion de ese diagnostico
+y del boton del gestor siguen separadas, sin implementar en esta version.
+
+Se solicita Ctrl+F5 y ensayo de tag conocido en ampliada. Validacion de datos web
+y latencia fisica todavia pendientes de respuesta; no extrapolar la medicion
+sintetica del recorrido a un SLA de pantalla. Correlacion individual del original
+antiguo con archivo/ACK no consultada; no declarar ese UUID concreto verificado.
