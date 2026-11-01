@@ -124,6 +124,32 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(1,self.box.health()['responses'])
         self.assertEqual(0,self.raw.db.execute('SELECT COUNT(*) FROM archives').fetchone()[0])
 
+    def test_directory_usage_includes_all_files_and_excludes_directory_contents(self):
+        folder=self.folder/'usage';folder.mkdir()
+        (folder/'a.json.gz').write_bytes(b'abc')
+        (folder/'unrelated.bin').write_bytes(b'12345')
+        (folder/'empty').write_bytes(b'')
+        (folder/'nested').mkdir();(folder/'nested'/'file').write_bytes(b'ignored')
+        self.assertEqual(8,storage.directory_usage(folder))
+        (folder/'later').write_bytes(b'++')
+        self.assertEqual(10,storage.directory_usage(folder))
+
+    def test_unrelated_files_still_count_toward_archive_capacity(self):
+        self.capture();self.ack()
+        self.archives.root.mkdir();(self.archives.root/'other').write_bytes(b'x'*1024)
+        self.archives.max_bytes=1024
+        with self.assertRaises(OSError): self.archives.archive_one(self.box)
+        self.assertEqual(1,self.box.health()['responses'])
+        self.assertEqual(0,self.raw.db.execute('SELECT COUNT(*) FROM archives').fetchone()[0])
+
+    def test_failed_directory_scan_keeps_ack_and_hot_original(self):
+        self.capture();self.ack()
+        with patch.object(storage,'directory_usage',side_effect=PermissionError('fixture_denied')):
+            with self.assertRaises(PermissionError): self.archives.archive_one(self.box)
+        self.assertEqual(1,self.box.health()['responses'])
+        self.assertEqual('acked',self.box.db.execute('SELECT state FROM messages').fetchone()[0])
+        self.assertEqual(0,self.raw.db.execute('SELECT COUNT(*) FROM archives').fetchone()[0])
+
     def test_missing_archive_after_hot_removal_blocks_recovery_without_consuming_sdk(self):
         self.capture();self.ack();self.archives.archive_one(self.box)
         path=next((self.folder/'ack').iterdir());path.unlink()  # Unicamente temporal de prueba.

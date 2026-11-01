@@ -25,6 +25,16 @@ MAX_ARCHIVE = 8 * 1024 * 1024
 RESERVE = 64 * 1024 * 1024
 
 
+def directory_usage(path):
+    """Contar archivos con metadatos de enumeracion, sin releer cada ruta en Windows.
+
+    No cachear totales entre llamadas ni omitir errores de acceso/capacidad.
+    Los archivos de ACK son inmutables; se conservan sus verificaciones completas.
+    """
+    with os.scandir(path) as entries:
+        return sum(entry.stat().st_size for entry in entries if entry.is_file())
+
+
 def capture(box,item):
     return box.capture(item['raw'],'rt',item['sdk_return_code'],item['started_utc'],item['ended_utc'],
         response_id=item['response_id'],pc_local_time=item['pc_local_time'],windows_timezone=item['windows_timezone'])
@@ -213,7 +223,7 @@ class Archives:
             self.root.mkdir(parents=True,exist_ok=True)
             target=self.path(message['id'])
             needed=0 if target.exists() else len(packed)
-            total=sum(p.stat().st_size for p in self.root.iterdir() if p.is_file())
+            total=directory_usage(self.root)
             if total+needed>self.max_bytes or shutil.disk_usage(self.root).free<RESERVE+needed:
                 raise OSError('Archivo de ACK sin capacidad; conservar cola caliente.')
             if not target.exists():

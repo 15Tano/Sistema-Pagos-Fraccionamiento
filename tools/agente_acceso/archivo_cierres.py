@@ -15,7 +15,7 @@ import uuid
 
 import aplicador_integrado as integrated
 import vigencias_candidato as core
-from almacen_operativo import expand, RESERVE
+from almacen_operativo import expand, RESERVE, directory_usage
 from respaldo_protegido import checked_path
 from trabajador_controlado import SDKGate
 
@@ -126,7 +126,7 @@ class LedgerArchive:
         raw=core.encoded(value)
         if len(raw)>MAX_BYTES: raise ValueError('Archivo de ledger excedido.')
         packed=gzip.compress(raw,mtime=0);self.root.mkdir(exist_ok=True)
-        total=sum(p.stat().st_size for p in self.root.iterdir() if p.is_file())
+        total=directory_usage(self.root)
         if total+len(packed)>self.max_bytes or shutil.disk_usage(self.root).free<RESERVE+len(packed):
             raise OSError('Sin capacidad de archivo; no retirar recibos calientes.')
         path=self.path(key);core.durable(path,packed);digest=hashlib.sha256(packed).hexdigest()

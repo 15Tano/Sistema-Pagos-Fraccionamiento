@@ -25,7 +25,7 @@ import instalacion_operativa as install
 import operacion_nativa as native
 import respaldo_ciclo
 import sesion_operativa as ownership
-from almacen_operativo import Originals,HotOutbox,Archives
+from almacen_operativo import Originals,HotOutbox,Archives,directory_usage
 from archivo_cierres import LedgerArchive
 from ciclo_operativo import Cycle,access_inventory
 from emisor_operativo import Process
@@ -99,7 +99,7 @@ def capacity_snapshot(data):
         usage[name]=value
         if value>=limit*.8: warnings.append(name+'_80pct')
     for name,limit in (('ack_archivados',4*1024**3),('cierres_archivados',2*1024**3)):
-        path=data/name;value=sum(p.stat().st_size for p in path.iterdir() if p.is_file()) if path.exists() else 0
+        path=data/name;value=directory_usage(path) if path.exists() else 0
         usage[name]=value
         if value>=limit*.8: warnings.append(name+'_80pct')
     for name,limit in (('perfiles',1024),('mdb_respaldos',32)):
