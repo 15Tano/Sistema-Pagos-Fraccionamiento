@@ -1,4 +1,4 @@
-# Conservación automática de Lecturas, release4a
+# Conservación automática de Lecturas, release4b
 
 Preparación candidata. Instalar backend y ensayar MariaDB antes de aplicar en Dell.
 No modifica motor r2, Access, fechas, SDK, tareas de Windows ni cadencia RT.
@@ -9,6 +9,11 @@ No modifica motor r2, Access, fechas, SDK, tareas de Windows ni cadencia RT.
 - Salud normal cada30segundos, inmediata ante cambio de lector/fallo. La cola
   sustituye reportes de salud pendientes no arrendados por el más reciente,
   reservando secuencias y conservando las lecturas de vehículos.
+- Recupera automáticamente el indicador FileNotFoundError de arranque cuando el
+  snapshot validado corresponde a un emisor vivo, en fase normal, con heartbeat
+  y ACK de hasta30segundos. Conserva alertas ante fallas, bloqueos, salida del
+  proceso o falta de confirmaciones. Registra la recuperación sin editar estados
+  manualmente ni desactivar la vigilancia.
 - Estados vencidos410 se retiran de la cola con contador local, nunca se inventa
   un ACK. Lotes vehiculares vencidos se conservan bloqueados para revisión.
 - Archivos locales con ACK verificado: conservación7días y retiro automático en

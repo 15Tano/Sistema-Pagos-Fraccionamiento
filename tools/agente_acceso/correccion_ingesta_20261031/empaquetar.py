@@ -9,7 +9,7 @@ ROOT = HERE.parent
 BASE = ROOT/'Lecturas_Correccion_Almacen_2026.10.31-3.zip'
 BASE_SHA = '22647c03b7e89c464448b24eaa1df5153a23beb84bf16ec9b7ab44e0eeb3a889'
 OLD = '3d16ee4ff08a2844aaddfb8abcafae3795978e1d2e0054ee3a03ff3e7ef903e4'
-RELEASE = '2026.10.31-4a'
+RELEASE = '2026.10.31-4b'
 ADDITIONS = {'ingesta_resumida.py', 'actualizar_ingesta.py', 'LEEME_INGESTA_RESUMIDA.md',
              'tests/test_ingesta_resumida.py', 'tests/test_correccion_ingesta.py'}
 
@@ -34,7 +34,7 @@ def entries():
         raise ValueError('Manifiesto base distinto.')
     # Solo estas fuentes reutilizables se sustituyen; el runner se parchea sobre
     # los bytes reales del release3, conservando correcciones previas de Dell.
-    changed = ['sdk_operativo.py', 'servicio_integrado.py', 'emisor.py', 'tests/sdk_operativo_ficticio.py']
+    changed = ['sdk_operativo.py', 'servicio_integrado.py', 'emisor.py', 'tests/sdk_operativo_ficticio.py', 'tests/test_servicio_integrado.py']
     for name in changed:
         files[name] = (ROOT/name).read_bytes()
     value = files['runner_produccion.py']

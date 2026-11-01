@@ -4,6 +4,7 @@ El nucleo permite ejecucion continua; la entrada Dell candidata solo permite
 ensayo readonly acotado. No instala tareas ni concede autorizaciones de fechas.
 """
 import copy
+import logging
 import os
 import time
 import uuid
@@ -11,7 +12,7 @@ import uuid
 from captura_rt import UnsafeClosure, capture_in_outbox
 from coordinador import classify
 from ciclo_operativo import CycleInterrupted
-from protocolo import now
+from protocolo import now, utc as parse_utc
 from trabajador_controlado import SDKGate, UnsafeSDKClosure
 from vigencias_candidato import ReviewRequired
 
@@ -201,6 +202,21 @@ class Service:
             self.state['sender'] = self.sender.snapshot()
             if self.state['sender'].get('process_exited'):
                 self.state['sender_error'] = 'sender_exited'
+            elif (self.state.get('sender_error') == 'FileNotFoundError'
+                    and self.state['sender'].get('process_exited') is False
+                    and self.state['sender'].get('phase') in ('idle', 'rate_limited')):
+                # El lector de snapshots valida PID/run_id. Solo dar por
+                # recuperado el error de arranque si el emisor vive y ya hay
+                # actividad y ACK recientes; no ocultar fallas o colas bloqueadas.
+                try:
+                    current = parse_utc(self.utc())
+                    ages = [(current - parse_utc(self.state['sender'][key])).total_seconds()
+                            for key in ('heartbeat_utc', 'last_ack_utc')]
+                except (KeyError, TypeError, ValueError):
+                    ages = []
+                if len(ages) == 2 and all(0 <= age <= 30 for age in ages):
+                    self.state['sender_error'] = None
+                    logging.info('Emisor recuperado: snapshot activo y ACK reciente; FileNotFoundError de arranque resuelto.')
         except Exception as exc:
             # La red/emisor no es fuente ni semaforo de vigencias.
             self.state['sender_error'] = type(exc).__name__

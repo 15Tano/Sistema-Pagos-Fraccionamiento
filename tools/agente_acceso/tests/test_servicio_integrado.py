@@ -103,6 +103,42 @@ class ServiceTests(unittest.TestCase):
         self.assertGreaterEqual(result['cycle']['completed'], 3)
         self.assertEqual('RuntimeError', result['sender_error'])
 
+    def test_missing_sender_snapshot_recovers_only_with_live_fresh_sender_and_ack(self):
+        current = self.make()
+        self.sender.snapshot.side_effect = [FileNotFoundError('startup fixture'),
+            {'phase': 'idle', 'process_exited': False,
+             'heartbeat_utc': '2026-10-26T01:00:00Z', 'last_ack_utc': '2026-10-26T01:00:00Z'}]
+        current.watch_sender()
+        self.assertEqual('FileNotFoundError', current.state['sender_error'])
+        official = copy.deepcopy(current.official)
+        current.watch_sender()
+        self.assertIsNone(current.state['sender_error'])
+        self.assertEqual(official, current.official)
+
+    def test_sender_recovery_does_not_hide_fault_blocked_stale_or_missing_ack(self):
+        good = {'phase': 'idle', 'process_exited': False,
+                'heartbeat_utc': '2026-10-26T01:00:00Z', 'last_ack_utc': '2026-10-26T01:00:00Z'}
+        cases = [dict(good, phase='fault'), dict(good, phase='blocked'),
+                 dict(good, heartbeat_utc='2026-10-26T00:59:00Z'),
+                 dict(good, last_ack_utc='2026-10-26T00:59:00Z'),
+                 dict(good, last_ack_utc=None), dict(good, heartbeat_utc='bad'),
+                 dict(good, last_ack_utc='2026-10-26T01:01:00Z')]
+        for snapshot in cases:
+            with self.subTest(snapshot=snapshot):
+                current = self.make()
+                current.state['sender_error'] = 'FileNotFoundError'
+                self.sender.snapshot.return_value = snapshot
+                current.watch_sender()
+                self.assertEqual('FileNotFoundError', current.state['sender_error'])
+
+    def test_dead_sender_is_still_reported_when_snapshot_file_recovers(self):
+        current = self.make()
+        current.state['sender_error'] = 'FileNotFoundError'
+        self.sender.snapshot.return_value = {'phase': 'idle', 'process_exited': True,
+            'heartbeat_utc': '2026-10-26T01:00:00Z', 'last_ack_utc': '2026-10-26T01:00:00Z'}
+        current.watch_sender()
+        self.assertEqual('sender_exited', current.state['sender_error'])
+
     def test_disk_capacity_stops_rt_but_not_closed_vigencias(self):
         with patch.object(self.box, 'ensure_capture_capacity', side_effect=OSError('fixture full')):
             result = self.make().run(5)

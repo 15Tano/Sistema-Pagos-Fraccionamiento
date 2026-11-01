@@ -187,3 +187,55 @@ Generador usa versión4a tanto en paquete como runner; base sigue siendo Almacé
 Verificación real de capacidades y plan/instalación4a aún pendientes de salida Dell.
 Verificación del ZIP4a y sus10pruebas de instalación/reversión sobre copias
 aprobadas. No hubo cambios de código productivo Laravel ni pausa/instalación Dell.
+
+## Compatibilidad4a real confirmada en Dell — 2026-10-31 México
+
+Usuario descarga y verifica ZIP4a en
+`C:\SanIsidro\LecturasIngestaResumida_20261031_4a\paquete` con Python64 canónico.
+Salida source_update_package_verified/release2026.10.31-4a/manifiestoddbb02c4...
+sdk_opened=false. GET real autenticado devuelve retention_enabled=true,
+storage_policy=summary-v1, retry_window_days7, technical_days1, event_days90.
+HTTP415 resuelto con el encabezado explícito. Descarga y preflight correctos;
+pausa, cierre completo, plan, aplicación y reanudación de4a aún pendientes.
+
+## Aviso del emisor durante preparación — 2026-10-31 México
+
+Usuario reporta de nuevo popup «emisor de eventos requiere revisión» mientras
+esperaba instrucciones. No se recibió salida de pausa/plan ni evidencia de
+aplicación4a; se indica posponer controles y leer estado actual. Código verificado:
+vigilancia_operativa.assess dispara ese texto por sender_error; Service.watch_sender
+asigna error al fallar snapshot, pero no lo limpia al recuperar snapshots válidos.
+Contexto anterior documentó FileNotFoundError persistente con ACK posteriores;
+esto es una hipótesis para el aviso actual, no prueba de salud ni causa confirmada.
+Necesario contrastar heartbeat, error, proceso del emisor, ACK/cola y último HTTP
+actuales antes de instalar o cambiar el criterio de alerta. No borrar marcas ni
+editar estado para silenciarlo. Preparación/instalación quedan pendientes de diagnóstico.
+
+## Emisor saludable y aviso histórico confirmado — 2026-10-31 México
+
+Dos muestras del usuario01nov05:51:32/42UTC (=31oct23:51México): tareaRunning/
+Enabledtrue; padrePID16460/run_id7f90b4c8..., último ciclo05:50:48UTC/0errores,
+heartbeat/SDK recientes, reader_error/storage_error nulos. EmisorPID14968/run_id
+a03ae9ab..., process_exitedfalse, faseidle, heartbeatactual y ACK pasan5663→5670
+en10segundos (último05:51:41UTC); retry25sin incremento. Cola no bloqueada,
+pendientes8→6 recientes de pocos segundos. Se confirma que no hay parada de envío
+en estas muestras y que sender_errorFileNotFoundError se conserva indebidamente.
+
+Se prepara4b antes de instalar: Service.watch_sender recupera ese error transitorio
+solo tras snapshot validado por PID/run_id, proceso vivo, faseidle/rate_limited y
+heartbeat/ACK de hasta30segundos no futuros. No cambia vigilancia ni edita JSON
+manualmente; registra recuperación en sync.log. Conserva error antefault/blocked,
+ACK/heartbeat ausentes, antiguos o inválidos, y procesa salida como sender_exited.
+Prueba nueva reproduce error antes del parche; servicio/latencia/vigilancia56casos
+aprobados después. Se mantienen todos los cambios4a, incluido encabezadoJSON.
+Base sigue Almacén-3 porque4/4a solo se verificaron, sin instalación/pausa confirmadas.
+Backend no requiere otro despliegue por este ajuste local. Verificación, plan y
+aplicación4b en Dell siguen pendientes.
+
+Preparación4b cerrada el2026-11-01México; nombre de release conserva la familia31oct.
+ZIP4b:196entradas/508680bytes,
+SHA256`0b1d87726e911ef9c0c504dc26f55ea9a43394d1cd1f619cb89c6a37265b0b59`;
+manifiesto`4c6a8a61996a7c90306d39514b7725c5774725771f13bc9405abc333f2bec6a6`.
+Verificación y10pruebas del instalador/reversión del ZIP4b aprobadas sobre copias,
+además de56pruebas de servicio/latencia/vigilancia. No se editaron estados reales
+ni se silenció la vigilancia; no se instaló4a y base de actualización sigue3.
