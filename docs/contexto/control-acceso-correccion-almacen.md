@@ -141,3 +141,82 @@ del flujo/diagnostico; no prueban la causa exacta del rechazo inicial en cada ca
 Correccion propuesta del gestor: estado de espera explicito, comprobacion completa
 con plazo, registro diagnostico sin credenciales y actualizacion de UI solo tras
 cierre validado. No esta incluida ni implementada en el candidato de scandir.
+
+## Publicacion autorizada — 2026-10-31
+
+Commit83e444533761eb3b47a5d06c39c9378c9bb4e881 publicado en origin/refactor-headless.
+Doce rutas explicitas del paquete, pruebas, medicion y contexto; otros cambios
+locales quedan fuera. Fetch previo acredita HEAD alineado con remoto antes del commit.
+Descarga publica desde raw.githubusercontent.com por commit fijo confirmada:
+489333bytes/SHA25622647c03b7e89c464448b24eaa1df5153a23beb84bf16ec9b7ab44e0eeb3a889.
+No se promueve frontend ni se ejecuta despliegue backend por este cambio.
+
+Se indica nueva carpeta Dell C:\SanIsidro\LecturasCorreccionAlmacen_20261031,
+descarga/verificacion por hash, --verificar-paquete, verify_closed completo y
+--plan. Usuario debe terminar tags y cerrar gestor conservando mantenimiento.
+Este paso no instala ni inicia SDK/tareas; salida Dell pendiente de recibir.
+
+Usuario confirma en Dell storage_update_package_verified/release2026.10.31-3,
+manifiesto3d16ee4ff08a2844aaddfb8abcafae3795978e1d2e0054ee3a03ff3e7ef903e4,
+sdk_opened=false. Comprobacion completa rechaza mantenimiento/estado/revision en
+operacion_nativa.py:92 y el bloque aborta antes de --plan. No se aplica el paquete.
+
+Consultas posteriores: mantenimiento active=true/wasEnabled=true iniciado31oct
+21:05:02.3726334-06, estado protocol2/PID7724/run_started01nov03:06:36.686392UTC,
+phase=starting/ultimoheartbeat03:07:04.639882UTC, sin last_ok ni revision_pendiente
+del gestor. Se identifica phase distinto de stopped como bloqueo actual. Task
+contract habia pasado en esa comprobacion; no asumir que sigue igual ni que PID7724
+ya termino sin inventario. Se solicitan hora, proceso y logs antes de recuperar
+el cierre. No editar manualmente estado.json ni relajar la guardia de instalacion.
+
+Inventario del usuario31oct21:14:20Mexico: tarea Disabled/Enabled=false, sin proceso
+canonico encontrado; launcher registra salida1 a21:07:05 y sync.log PermissionError
+OPERACION NO INICIADA/INTERRUMPIDA a21:07:05.029. Ultimo cierre ordenado anterior
+20:45:55.388. El arranque fallido dejo protocol2 starting; no hay salida de plan
+ni instalacion. El tipo PermissionError no identifica por si solo su causa interna.
+
+Recuperacion indicada mediante mantenimiento.ps1 -Operacion reanudar, que comprueba
+guardia SDK antes de iniciar. Esperar ciclo y ACK de nueva ejecucion antes de otra
+pausa, dado arranque con catalogo largo observado. Luego detener y verificar cierre
+normal para obtener plan; no fabricar estado stopped ni modificar guardias.
+
+Usuario ejecuta reanudar y recibe Mantenimiento terminado; polling reanudado y
+proceso confirmado. Se entrega observador readonly de estado/operacion durante
+max12min (cada15s, progreso por minuto), sin llamadas SDK ni cambios de tareas.
+Espera nueva ejecucion posterior a21:14:20Mexico, heartbeat fresco, dos ciclos,
+captura y ACK posteriores, sin error de lector/almacen ni fault de gate. Salida
+posterior debe revisarse antes de otra pausa; el script solo observa y no instala.
+Reanudacion de control confirmada; operacion completa todavia pendiente de salida.
+
+Usuario aporta observador con CICLOS_LECTURA_Y_ENVIO_CONFIRMADOS: PID10460,
+run_id76ff2be4-a501-4ef0-81f5-54dead192926, inicio01nov03:17:03.619409UTC,
+dos ciclos/0errores/ultimo03:18:18.708137UTC; API842/cambios0+0/noencontrados4/
+ausentes114. SDK03:18:32.623486UTC, sin error lector/almacen ni gatefault. Emisor
+PID17124 vivo/5ACK/ultimo03:18:31.942623UTC. Cola358pendientes (338mensajes y20sin
+agrupar), oldest02:31:42UTC; no esperar vaciado con el archivador antiguo ni
+descartar pendientes. Captura/envio ya iniciados, suficiente para intentar parada
+ordenada del servicio completo. Se indica pausar, esperar hasta30s estado Disabled,
+verify_closed y --plan del paquete nuevo. Plan y aplicacion aun pendientes.
+
+Parada posterior y comprobacion del usuario aceptadas: Polling pausado entre
+ciclos y production_closure_confirmed/safe_to_resume=true. --plan devuelve
+purpose=storage_scan_update, base3eca...0e1a6e/destino3d16...903e4, scan_policy
+windows_scandir/cross_call_size_cache=false y motor r2 conservado. Antes coincide
+con los tres JSON instalados por Display-2. SHA de plan revisado:
+b3cd3fe482f97b02b0159c3db2efda99f46f387fadb23a23f5233e89af65ee98.
+applied=false/sdk_opened=false/tasks_changed=false. Se indica aplicar ese hash
+con mantenimiento conservado, dentro de la autorizacion ya recibida. Recibo
+de instalacion y reanudacion de version nueva todavia pendientes.
+
+Usuario aplica plan b3cd...ee98 y aporta storage_update_installed_waiting_resume,
+update_id49bcc709-0c78-4e4b-9ad7-90beed7c27c4, release3d16...903e4,
+sdk_opened=false/tasks_changed=false/dates_changed=false. Respaldo bajo
+ZKSync/actualizaciones_almacen/49bcc709-0c78-4e4b-9ad7-90beed7c27c4.
+Hashes posteriores:
+servicio-config.json=8d4b2f405c972bd9b33383dde27124ec487a1253ecaa44b36604b75c99da3547;
+activacion-integrada.json=c1f6a88c5fb2fad5a3a0cd4d34797cd330be16ced54c41e68521fef520cdc67d;
+enlace-integrado.json=aa60c52ccbee06819f8ebd613318f430296dc6d8389c57246b4bba4b830f1f57.
+Instalacion de archivos confirmada. Se indica reanudar por script y observador
+readonly con corte de hora capturado ANTES de reanudar, version3 esperada, dos
+ciclos, SDK/ACK recientes y emisor vivo, hasta12min. No confundir instalacion con
+ejecucion saludable ni con drenaje de la cola; ambas aceptaciones pendientes.
