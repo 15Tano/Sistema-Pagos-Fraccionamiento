@@ -161,7 +161,8 @@ class Service:
             self.state['reader']['state'] = 'paused'
             return
         try:
-            capture_in_outbox(self.box, item)
+            if item.get('status_summary') is not True:
+                capture_in_outbox(self.box, item)
         except Exception as exc:
             self.storage_fault(exc)
             return
@@ -173,7 +174,10 @@ class Service:
             self.state['sdk']['last_error_code'] = item['sdk_return_code']
             self.close_rt()
         else:
-            self.state['sdk'] = {'last_ok_utc': item['ended_utc'], 'last_error_code': None}
+            previous_stats = {key: value for key, value in self.state['sdk'].items() if key in (
+                'status_observations_epoch', 'statuses_observed_total', 'status_responses_total', 'status_last_observed_utc')}
+            self.state['sdk'] = {'last_ok_utc': item['ended_utc'], 'last_error_code': None,
+                **previous_stats, **item.get('status_statistics', {})}
         return item
 
     def form_batch(self):

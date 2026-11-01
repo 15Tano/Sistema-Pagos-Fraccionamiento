@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\ControlAcceso\RetentionService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class RetainControlAccess extends Command
 {
@@ -25,7 +26,11 @@ class RetainControlAccess extends Command
 
             return self::FAILURE;
         }
-        $this->line(json_encode($service->run((bool) $this->option('apply'), (int) $this->option('size'), (int) $this->option('batches')),
+        $result = $service->run((bool) $this->option('apply'), (int) $this->option('size'), (int) $this->option('batches'));
+        if ($this->option('apply')) {
+            Log::channel('daily')->info('control_acceso.retencion', $result);
+        }
+        $this->line(json_encode($result,
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
         return self::SUCCESS;

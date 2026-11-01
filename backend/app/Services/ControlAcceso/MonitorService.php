@@ -101,8 +101,7 @@ class MonitorService
         $data = [];
         foreach ($agents->take(50) as $agent) {
             // Un reporte atrasado recibido despues no reemplaza uno mas reciente del mismo PC.
-            $state = DB::table('control_acceso_estados')->where('agent_id', $agent->id)
-                ->orderByDesc('reported_at_utc')->orderByDesc('id')->first();
+            $state = IngestionSummary::latestState($agent->id);
             $payload = $state ? json_decode($state->payload, true, 64, JSON_THROW_ON_ERROR) : null;
             $reporting = $this->reportingStatus($agent, $state, $now);
             $vigencias = $payload['vigencias'] ?? null;

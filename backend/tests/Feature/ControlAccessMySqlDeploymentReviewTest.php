@@ -11,10 +11,12 @@ class ControlAccessMySqlDeploymentReviewTest extends ControlAccessDeploymentRevi
 {
     protected function prepareDatabase(): void
     {
-        if (!getenv('CA_MYSQL_TRIAL_FILE')) {
+        if (! getenv('CA_MYSQL_TRIAL_FILE')) {
             $this->markTestSkipped('MySQL aislado: habilitar el ensayo local documentado.');
         }
         ControlAccessMySqlTrial::configure();
+        Schema::dropIfExists('control_acceso_salud_actual');
+        Schema::dropIfExists('control_acceso_resumenes');
         // Solo despues de verificar instancia, datadir, base, usuario y marcador exclusivos.
         Schema::dropIfExists('control_acceso_monitor_configuracion');
         (require database_path('migrations/2026_10_23_210000_create_control_acceso_ingestion_tables.php'))->down();

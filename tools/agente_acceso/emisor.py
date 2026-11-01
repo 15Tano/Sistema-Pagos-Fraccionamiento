@@ -77,6 +77,9 @@ class Sender:
             delay = max(delay, server_delay)
         return delay
 
+    def terminal(self, message, status):
+        return None
+
     def once(self):
         message = self.outbox.claim()
         if message is None:
@@ -101,6 +104,9 @@ class Sender:
                                retry_in=self._delay(message['attempts'], retry_after))
             return 'retry'
         if status not in (200, 201):
+            handled = self.terminal(message, status)
+            if handled is not None:
+                return handled
             self.outbox.finish(message, error='http_' + str(status), blocked=True)
             return 'blocked'
         try:

@@ -90,7 +90,7 @@ class ControlAccessRetentionTest extends ControlAccessIngestionTest
         $this->ingest($this->event('1', 27), 91);
         $this->ingest($this->event('2'), 91);
         $this->ingest($this->event('1'), 90);
-        $this->ingest($this->event('1', 255), 7);
+        $this->ingest($this->event('1', 255), config('control_acceso.retention_technical_days'));
         // Captures in fixture are old; receipt age alone determines retention.
         $this->ingest($this->event('2', 20), 0);
         $result = app(RetentionService::class)->run(true);

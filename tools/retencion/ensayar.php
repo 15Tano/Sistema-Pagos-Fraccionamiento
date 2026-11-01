@@ -55,6 +55,9 @@ try {
         throw new RuntimeException('La conexión no corresponde al ensayo MariaDB.');
     }
     echo 'Base aislada verificada: '.$database.' / '.$identity->version.PHP_EOL;
+    if (defined('CA_TRIAL_BOOTSTRAP_ONLY') && CA_TRIAL_BOOTSTRAP_ONLY) {
+        return;
+    }
     $migration = 'database/migrations/2026_10_31_230000_add_control_acceso_retention_markers.php';
     if (Artisan::call('migrate', ['--path' => $migration, '--force' => true]) !== 0) {
         throw new RuntimeException('Falló la migración de ensayo.');

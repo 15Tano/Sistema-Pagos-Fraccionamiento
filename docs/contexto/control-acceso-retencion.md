@@ -130,6 +130,52 @@ PHP, limpia por tandas hasta quedar idle y prueba ACK/rechazo409 con fixture nue
 No publica HTTP, no ejecuta workers ni envía comunicaciones. Lint y rechazo fuera
 de carpeta aislada comprobados localmente; resultado real del ensayo pendiente.
 
+### Ensayo MariaDB aprobado por salida del usuario — 2026-10-31 México
+
+Ejecutor44397f0 extraído en carpeta aislada con vendor propio. Identidad verificada:
+sicar5502802b, MariaDB10.11.14. Migración2026_10_31_230000 DONE. Fecha actual:
+0estados/0status/0eventos/0respuestas retirados. Fecha PHP+100días (sin cambiar reloj
+del servidor):29256estados compactados,40146status eliminados,1559eventos eliminados,
+41705respuestas compactadas. Incluye un agente/respuesta status sintéticos nuevos.
+Monitor de salud y última lectura de cada pluma idénticos antes/después; ACK real
+idéntico tras retirar bytes; identidad modificada rechazada409; repetición idle.
+Salida final ENSAYO MARIADB APROBADO. Esto sustituye el pendiente del párrafo
+anterior. Producción todavía sin migración ni retención aplicada/activada.
+Siguiente paso autorizado: script habitual, solo migración nueva de retención,
+revisión de despliegue/plan productivo y activación posterior al resultado.
+
+### Estructura productiva y primer plan confirmados — 2026-10-31 México
+
+Usuario comparte ejecución desde docroot real de revisar-despliegue: estructura
+backend_structure_ready=true, rutas correctas, sin columnas/migraciones faltantes,
+ambos índices nuevos y anteriores presentes, configuración válida, monitor activo
+y permiso historial vigilanciafalse. Esto confirma migración aplicada y archivos
+nuevos presentes; no se recibió el log completo del script de despliegue ni prueba
+de SHA exacto del docroot. Plan productivo04:47:28UTC del1nov: cuatro contadores0,
+límites técnicos25oct04:47:28UTC/eventos3ago04:47:28UTC. Sin datos vencidos.
+Primera ejecución manual --apply y activación efectiva de bandera pendientes.
+
+### Activación productiva confirmada por salida del usuario — 2026-10-31 México
+
+Primera ejecución manual con usuario sanisidro-back04:48:50UTC del1nov termina
+mode=apply y los cuatro contadores0 (sin datos vencidos), límites UTC correctos.
+Configuración .env actualizada mediante reemplazo atómico con propietario/grupo/
+permisos conservados y respaldo privado previo en /root/backups-sanisidro/;
+config:clear termina correctamente. config:show control_acceso confirma
+retention_enabled=true, technical_days7, event_days90 y monitor_enabled=true.
+schedule:list como sanisidro-back confirma0 * * * * control-acceso:retencion --apply,
+próxima en11minutos (05:00UTC1nov=23:00México31oct). Cron cada minuto ya verificado.
+No se recibió aún evidencia de una corrida automática real: registro y habilitación
+confirmados, primera ejecución automática no observada. No cambiar esa distinción
+sin salida nueva. Los pendientes de activación anteriores quedan resueltos.
+
+Conservados respaldo y copia de ensayo privada /root/ensayo-retencion-5502802b
+con base/usuario sicar5502802b y resultado; limpieza de esos recursos no ejecutada.
+La copia fue alterada por ensayo de+100días y no debe confundirse con respaldo
+intacto. Identidades/ACK productivos siguen acumulándose; no se prometió tamaño
+total constante ni reducción inmediata de archivos InnoDB. Aún no se midió ahorro
+productivo: no había datos elegibles y los índices agregados ocupan espacio.
+
 ## Verificación local
 
 SQLite en memoria y MySQL8.4.13 aislado con helper que exige puerto33379, datadir,

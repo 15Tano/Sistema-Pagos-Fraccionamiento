@@ -51,7 +51,7 @@ def main():
         load_sdk=lambda:(sdk,types.SimpleNamespace(close=lambda:None),{'sha256':operation.closures.SDK_HASH}))
     try:
         request=operation.closures.request_at(args.worker/'request.json')
-        if request['role']=='rt':return operation.rt_worker(args.worker,args.sha256,operation.config.load(args.root),root=args.root,diag=diag)
+        if request['role']=='rt':return operation.rt_worker(args.worker,args.sha256,operation.config.load(args.root),root=args.root,diag=diag,summarize_status=state.get('summarize_status',False))
         return operation.checkpoint.worker(args.worker,args.sha256,diag)
     finally:path.write_text(json.dumps(state))
 

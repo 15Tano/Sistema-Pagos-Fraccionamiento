@@ -17,9 +17,12 @@ class DeploymentReview
         '2026_10_26_070000_add_control_acceso_monitor_indexes',
         '2026_10_30_010000_create_control_acceso_monitor_settings',
         '2026_10_31_230000_add_control_acceso_retention_markers',
+        '2026_11_01_000000_create_control_acceso_summaries',
     ];
 
     private const COLUMNS = [
+        'control_acceso_salud_actual' => ['agent_id', 'state_id', 'reported_at_utc', 'received_at_utc', 'payload', 'signal_sha256'],
+        'control_acceso_resumenes' => ['id', 'agent_id', 'hour_utc', 'source', 'responses', 'statuses', 'last_received_at_utc'],
         'control_acceso_agentes' => ['id', 'device_serial', 'nombre', 'token_hash', 'revoked_at'],
         'control_acceso_estados' => ['id', 'agent_id', 'session_id', 'sequence', 'reported_at_utc', 'received_at_utc', 'payload', 'ack', 'content_sha256', 'retention_pruned_at_utc'],
         'control_acceso_lotes' => ['id', 'agent_id', 'batch_id', 'session_id', 'sequence', 'content_sha256', 'received_at_utc', 'ack'],
@@ -32,6 +35,9 @@ class DeploymentReview
     ];
 
     private const INDEXES = [
+        'ca_expiry_estados' => ['control_acceso_estados', ['agent_id', 'received_at_utc', 'id']],
+        'ca_expiry_lotes' => ['control_acceso_lotes', ['agent_id', 'received_at_utc', 'id']],
+        'ca_status_hour' => ['control_acceso_resumenes', ['agent_id', 'hour_utc', 'source']],
         'ca_retention_estados' => ['control_acceso_estados', ['agent_id', 'retention_pruned_at_utc', 'id']],
         'ca_retention_respuestas' => ['control_acceso_respuestas', ['agent_id', 'retention_pruned_at_utc', 'id']],
         'ca_states_monitor' => ['control_acceso_estados', ['agent_id', 'reported_at_utc', 'id']],
@@ -44,6 +50,7 @@ class DeploymentReview
     {
         $checks = [];
         foreach ([
+            ['GET', 'agente/capacidades', ControlAccessAgentController::class, 'capabilities', ['control-acceso.agente', 'throttle:120,1']],
             ['POST', 'agente/estado', ControlAccessAgentController::class, 'state', ['control-acceso.agente', 'throttle:120,1']],
             ['POST', 'agente/lotes', ControlAccessAgentController::class, 'batch', ['control-acceso.agente', 'throttle:120,1']],
             ['GET', 'monitor/estado', ControlAccessMonitorController::class, 'state'],
@@ -91,9 +98,9 @@ class DeploymentReview
             // No imprimir mensajes SQL: pueden contener rutas, hosts o parametros privados.
             $error = 'database_review_failed';
         }
-        $ready = $error === null && !in_array(false, $checks['routes'], true)
+        $ready = $error === null && ! in_array(false, $checks['routes'], true)
             && count(array_filter($checks['columns'] ?? [], fn ($missing) => $missing !== [])) === 0
-            && !in_array(false, $checks['indexes'] ?? [], true) && ($checks['migrations_missing'] ?? null) === []
+            && ! in_array(false, $checks['indexes'] ?? [], true) && ($checks['migrations_missing'] ?? null) === []
             && ($checks['settings_valid'] ?? false);
 
         return ['scope' => 'backend_structure_readonly_not_activation',

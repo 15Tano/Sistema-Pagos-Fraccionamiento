@@ -30,7 +30,7 @@ def diagnostic(folder,digest,root=session.SYNC):
         load_sdk=original.load_sdk,pc_timezone=original.pc_timezone,maintenance_guard=guard)
 
 
-def rt_worker(folder,digest,settings,*,root=session.SYNC,diag=None):
+def rt_worker(folder,digest,settings,*,root=session.SYNC,diag=None,summarize_status=False):
     folder=Path(folder);request=closures.request_at(folder/'request.json')
     if request['role']!='rt' or hashlib.sha256((folder/'request.json').read_bytes()).hexdigest()!=digest:
         raise ValueError('Turno RT ajeno.')
@@ -62,8 +62,15 @@ def rt_worker(folder,digest,settings,*,root=session.SYNC,diag=None):
                     code=sdk.GetRTLog(handle,buffer,len(buffer));end=closures.now()
                     try: timezone=diag.pc_timezone()
                     except OSError: timezone=None
-                    key=store.put(buffer.raw,code,start,end,local,timezone)
-                    result={'response_id':key}
+                    summary=None
+                    if summarize_status:
+                        from ingesta_resumida import store_status
+                        summary=store_status(store,buffer.raw,code,start,end,local,timezone)
+                    if summary is not None:
+                        result={'status_summary':summary}
+                    else:
+                        key=store.put(buffer.raw,code,start,end,local,timezone)
+                        result={'response_id':key}
                 else: raise ValueError('Comando RT no permitido.')
                 print(json.dumps({'ok':True,'result':result}),flush=True)
             except BaseException as exc:
@@ -105,7 +112,11 @@ class RTClient(captura_rt.RTClient):
         except BaseException: self.originals.close();raise
 
     def read(self):
-        return self.originals.receipt(self._call('read')['response_id'])
+        result=self._call('read')
+        if 'status_summary' in result:
+            from ingesta_resumida import status_receipt
+            return status_receipt(self.originals,result['status_summary'])
+        return self.originals.receipt(result['response_id'])
 
     def close(self):
         try: super().close()
