@@ -250,3 +250,10 @@ Se solicita Ctrl+F5 y ensayo de tag conocido en ampliada. Validacion de datos we
 y latencia fisica todavia pendientes de respuesta; no extrapolar la medicion
 sintetica del recorrido a un SLA de pantalla. Correlacion individual del original
 antiguo con archivo/ACK no consultada; no declarar ese UUID concreto verificado.
+
+Usuario confirma despues de la solicitud de Ctrl+F5 y prueba de tag conocido:
+«Si, conexion y lectura funcionan». Retorno web y lectura visible aceptados por
+confirmacion humana. Instalacion, continuidad operativa, drenaje historico y uso
+web quedan confirmados para esta intervencion. No se aporta cronometraje nuevo
+tag→pantalla: no declarar SLA ni eliminacion de pausas del controlador. No se
+requieren mas reinicios ni pruebas repetidas para cerrar esta instalacion.
