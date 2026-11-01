@@ -204,7 +204,8 @@ def backend_ready(root):
     from emisor import HttpTransport
     transport = HttpTransport(config.URL, credencial.load(Path(root)/'acceso-datos'/'credencial-ingesta.dpapi'))
     request = urllib.request.Request(config.URL + '/capacidades', method='GET',
-        headers={'Authorization': 'Bearer ' + transport.token, 'Accept': 'application/json'})
+        headers={'Authorization': 'Bearer ' + transport.token, 'Accept': 'application/json',
+                 'Content-Type': 'application/json'})
     with transport.opener.open(request, timeout=10) as response:
         raw = response.read(16385)
         if response.code != 200 or len(raw) > 16384:

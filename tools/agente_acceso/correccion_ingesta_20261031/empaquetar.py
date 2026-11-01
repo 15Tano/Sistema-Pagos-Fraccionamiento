@@ -9,7 +9,7 @@ ROOT = HERE.parent
 BASE = ROOT/'Lecturas_Correccion_Almacen_2026.10.31-3.zip'
 BASE_SHA = '22647c03b7e89c464448b24eaa1df5153a23beb84bf16ec9b7ab44e0eeb3a889'
 OLD = '3d16ee4ff08a2844aaddfb8abcafae3795978e1d2e0054ee3a03ff3e7ef903e4'
-RELEASE = '2026.10.31-4'
+RELEASE = '2026.10.31-4a'
 ADDITIONS = {'ingesta_resumida.py', 'actualizar_ingesta.py', 'LEEME_INGESTA_RESUMIDA.md',
              'tests/test_ingesta_resumida.py', 'tests/test_correccion_ingesta.py'}
 
@@ -41,14 +41,14 @@ def entries():
     value = once(value, b'from almacen_operativo import Originals,HotOutbox,Archives',
         b'from almacen_operativo import Originals,Archives\nfrom ingesta_resumida import SummaryOutbox as HotOutbox, MaintenanceService as LatencyService')
     value = once(value, b'from servicio_latencia import LatencyService\n', b'')
-    files['runner_produccion.py'] = once(value, b"version='produccion-r2-2026.10.31-3'", b"version='produccion-r2-2026.10.31-4'")
+    files['runner_produccion.py'] = once(value, b"version='produccion-r2-2026.10.31-3'", f"version='produccion-r2-{RELEASE}'".encode())
     files['produccion_worker.py'] = once(files['produccion_worker.py'],
         b'diag=sdk.diagnostic(args.worker,args.sha256))', b'diag=sdk.diagnostic(args.worker,args.sha256),summarize_status=True)')
     value = once(files['produccion_emisor.py'], b'from emisor import HttpTransport,Sender',
         b'from emisor import HttpTransport\nfrom ingesta_resumida import ResilientSender as Sender, MaintainingSender')
     files['produccion_emisor.py'] = once(value, b'sender=ArchivingSender(Sender(box,transport),box,archives)',
         b'sender=MaintainingSender(ArchivingSender(Sender(box,transport),box,archives),archives,box)')
-    files['produccion_paquete.py'] = once(files['produccion_paquete.py'], b"RELEASE='2026.10.31-3'", b"RELEASE='2026.10.31-4'")
+    files['produccion_paquete.py'] = once(files['produccion_paquete.py'], b"RELEASE='2026.10.31-3'", f"RELEASE='{RELEASE}'".encode())
     changed += ['runner_produccion.py', 'produccion_worker.py', 'produccion_emisor.py', 'produccion_paquete.py']
     files['ingesta_resumida.py'] = (ROOT/'ingesta_resumida.py').read_bytes()
     files['tests/test_ingesta_resumida.py'] = (ROOT/'tests/test_ingesta_resumida.py').read_bytes()
@@ -102,4 +102,4 @@ def write(path):
 
 
 if __name__ == '__main__':
-    print(json.dumps(write(ROOT/'Lecturas_Ingesta_Resumida_2026.10.31-4.zip'), indent=2))
+    print(json.dumps(write(ROOT/f'Lecturas_Ingesta_Resumida_{RELEASE}.zip'), indent=2))

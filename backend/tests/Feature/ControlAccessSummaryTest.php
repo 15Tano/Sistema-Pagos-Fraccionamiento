@@ -172,6 +172,14 @@ class ControlAccessSummaryTest extends ControlAccessRetentionTest
         $this->assertTrue(\Illuminate\Support\Facades\Schema::hasTable('control_acceso_resumenes'));
     }
 
+    public function test_capabilities_raw_get_requires_explicit_json_content_type(): void
+    {
+        $url = '/api/control-acceso/agente/capacidades';
+        $headers = ['Authorization' => 'Bearer '.$this->token, 'Accept' => 'application/json'];
+        $this->get($url, $headers)->assertStatus(415);
+        $this->get($url, $headers + ['Content-Type' => 'application/json'])->assertOk();
+    }
+
     public function test_summary_migration_cannot_remove_active_snapshot(): void
     {
         $this->enable();

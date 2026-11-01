@@ -6,8 +6,8 @@ La documentación permanente de este proyecto está en `docs/contexto/`. Al come
 
 | Documento | Fecha del contexto | Uso |
 | --- | --- | --- |
-| [Ingesta resumida y conservación automática](docs/contexto/control-acceso-ingesta-resumida.md) | 2026-10-31 | Corrección en origen preparada: 255 agregados, salud30s, detalle24h, comprobantes7d y eventos90d. Ensayo MariaDB e instalación pendientes. |
-| [Retención de Lecturas](docs/contexto/control-acceso-retencion.md) | 2026-10-31 | Activa en producción: 7 días técnicos/90 eventos, primera aplicación0 y tarea horaria confirmadas. Ensayo MariaDB aprobado; primera ejecución automática aún no observada. |
+| [Ingesta resumida y conservación automática](docs/contexto/control-acceso-ingesta-resumida.md) | 2026-10-31 | Backend summary-v1 activo, ensayo MariaDB aprobado. Dell4a corrige GET415; verificación real e instalación pendientes. |
+| [Retención de Lecturas](docs/contexto/control-acceso-retencion.md) | 2026-10-31 | Histórico de primera política y respaldo restaurado. Política vigente en Ingesta resumida: detalle24h, comprobantes7d, eventos90d. |
 | [Overview](docs/contexto/overview.md) | 2026-09-27 | Propósito, roles, stack, arquitectura, diseño e infraestructura. |
 | [Ways Of Working](docs/contexto/ways-of-working.md) | 2026-09-15 | Preferencias del usuario para diseño, diagnóstico, cambios, Git y despliegues. |
 | [Learnings](docs/contexto/learnings.md) | 2026-09-15 | Aprendizajes técnicos y precauciones del proyecto. |

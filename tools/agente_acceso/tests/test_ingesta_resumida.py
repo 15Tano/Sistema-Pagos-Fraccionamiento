@@ -139,6 +139,8 @@ class SourceTests(unittest.TestCase):
         transport.opener.open.return_value = response
         with patch.object(credencial, 'load', return_value=transport.token), patch.object(emisor, 'HttpTransport', return_value=transport):
             self.assertEqual(expected, policy.backend_ready(self.root))
+            request = transport.opener.open.call_args.args[0]
+            self.assertEqual('application/json', request.get_header('Content-type'))
             response.read.return_value = json.dumps(dict(expected, retention_enabled=False)).encode()
             with self.assertRaises(PermissionError): policy.backend_ready(self.root)
 

@@ -120,3 +120,70 @@ manifiesto`ef62ef34b371e7e4f452dbbd3dac11407d379413c28d1d24e11bb21675b304ce`.
 Las pruebas generadas de actualización se ejecutaron sobre este ZIP, no un
 directorio con fuentes mezcladas. El generador ordena campos y archivos para
 construcción determinista. No se aplicó ni reinició nada en Dell o producción.
+
+## Ensayo remoto de origen aprobado — 2026-10-31 México
+
+Usuario ejecuta preparador del commit1f737dd en la copia privada sicar5502802b,
+MariaDB10.11.14. Migración2026_11_01_000000 DONE. Salida confirma1000observaciones255:
+0filas,0copias raw individuales,1resumen horario; salud repetida compacta,
+métricas sin doble conteo y último estado conservado.
+Con reloj PHP+8días (sin modificar reloj del servidor) devuelve estados compactados1,
+status/eventos eliminados0, respuestas compactadas0, comprobantes de estado
+eliminados10001, respuestas11001, lotes1498 y resumen1. Son conteos de una tanda
+acotada por fase/agente, incluyen datos previos del ensayo y no certifican vaciado
+total de la copia. Reenvío caducado410 sin reinserción. Salida final
+ENSAYO ORIGEN MARIADB APROBADO. Hora del ensayo real05:33:49UTC1nov=23:33:49México31oct.
+Producción no modificada por el ensayo; despliegue/activación de summary-v1 e
+instalación Dell pendientes. La autorización de esta corrección sigue vigente.
+
+## Estructura productiva de resúmenes confirmada — 2026-10-31 México
+
+Salida del usuario desde docroot real: backend_structure_ready=true, GET capacidades
+y resto de rutas correctos, columnas de snapshot/resúmenes presentes, todos los
+índices (incluidos ca_expiry_estados/lotes y ca_status_hour) correctos y ninguna
+migración faltante. Monitor habilitado, historial vigilanciafalse/revisión1.
+Esto confirma estructura y archivos nuevos, sin log completo del deploy ni
+confirmación del nombre del respaldo actualizado propuesto antes de desplegar.
+Plan05:36:31UTC1nov (=23:36:31México31oct): técnico1día, eventos90días;
+10000estados a compactar,10000status a eliminar,10000respuestas a compactar,
+0eventos a eliminar. Cifras limitadas por tanda, no totales globales. Solo aparecen
+las cuatro fases iniciales: falta confirmar habilitación de summary-v1, primera
+aplicación y capacidades efectivas. Dell todavía con release3.
+
+## Política resumida activa en backend — 2026-10-31 México
+
+Usuario confirma respaldo actualizado verificado mediante gzip -t:
+`/root/backups-sanisidro/antes-resumenes-20261101-053548.sql.gz`. No se repitió su
+restauración (el respaldo anterior sí fue restaurado en ensayo). Configuración
+previa .env respaldada; actualización atómica y config:clear correctos.
+config:show confirma ingestion_summary_enabled=true y retention_enabled=true,
+admisión/reintentos7días para estados/eventos, técnico1día, resúmenes7días,
+eventos90días y monitor=true.
+Aplicación productiva05:38:38UTC1nov (=23:38:38México31oct):10000estados compactados,
+10000status eliminados,10000respuestas compactadas y0eventos eliminados.
+Los cuatro contadores de eliminación de comprobantes/resúmenes son0 (aún sin
+antigüedad7días). schedule:list confirma tarea horaria, siguiente en21minutos.
+La primera aplicación manual y habilitación están confirmadas; ejecución automática
+de esta versión todavía no observada. No repetir tandas manuales como requisito
+mensual. Instalar Dell release4 y aceptar continuidad/lecturas sigue pendiente.
+
+## Verificación Dell y corrección de encabezado4a — 2026-10-31 México
+
+Usuario confirma SHA del ZIP4 y source_update_package_verified/manifiestoef62ef34...
+sdk_opened=false. Preflight HTTPS GET capacidades recibe415 después de autenticar.
+No se pidió pausa ni se aplicó el paquete: Dell conserva release3.
+Causa verificada en AuthenticateControlAccessAgent: isJson se exige también en GET.
+backend_ready enviaba Accept pero omitía Content-Type. Pruebas previas con getJson
+añadían esa cabecera y no detectaron el problema. Nueva aserción sobre la petición
+Python reproduce fallo antes del parche; pasa al añadir Content-Type application/json.
+Prueba Laravel GET sin getJson confirma415 sin cabecera y200 con ella (1prueba/2aserciones).
+6pruebas Python de origen/preflight aprobadas. No se cambia middleware ni se requiere
+otro despliegue backend; solo paquete nuevo Dell4a, preservando el ZIP4 como evidencia.
+
+ZIP4a preparado:196entradas/507712bytes,
+SHA256`201d3c3b448edbd812fdcaa71ef4d824f54e089e51957971a418aea5a9805e92`;
+manifiesto`ddbb02c44725e87f1185cb252137b1da62cd916fbe2c144a0bc00e8bae500363`.
+Generador usa versión4a tanto en paquete como runner; base sigue siendo Almacén-3.
+Verificación real de capacidades y plan/instalación4a aún pendientes de salida Dell.
+Verificación del ZIP4a y sus10pruebas de instalación/reversión sobre copias
+aprobadas. No hubo cambios de código productivo Laravel ni pausa/instalación Dell.

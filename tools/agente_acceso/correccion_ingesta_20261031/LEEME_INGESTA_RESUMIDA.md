@@ -1,4 +1,4 @@
-# Conservación automática de Lecturas, release4
+# Conservación automática de Lecturas, release4a
 
 Preparación candidata. Instalar backend y ensayar MariaDB antes de aplicar en Dell.
 No modifica motor r2, Access, fechas, SDK, tareas de Windows ni cadencia RT.
@@ -41,6 +41,8 @@ python -B .\actualizar_ingesta.py --aplicar --plan-sha256 HASH_DEL_PLAN_REVISADO
 
 El plan consulta capacidades del backend por HTTPS con la credencial DPAPI ya
 instalada. Exige summary-v1 activo,7días de admisión,1día técnico y90días de eventos.
+La revisión4a incluye Content-Type application/json también en el GET de capacidades,
+requerido por el middleware existente. No requiere otro despliegue del backend.
 Si falta compatibilidad, se detiene antes de modificar enlaces. Aplicación solo
 en mantenimiento, con sync.lock, respaldo/enlaces por hash y marcas durables.
 Reanudar desde el gestor y comprobar dos ciclos correctos, lectura web y ACK.
