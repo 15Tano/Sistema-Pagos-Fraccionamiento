@@ -101,6 +101,7 @@ Route::get('/vencimientos', [ZkApiController::class, 'index']);
 // Ingesta del agente: credencial propia; no utiliza cuentas humanas ni corte.bloqueo.
 Route::prefix('control-acceso/agente')->middleware(['control-acceso.agente', 'throttle:120,1'])->group(function () {
     Route::get('capacidades', [\App\Http\Controllers\Api\ControlAccessAgentController::class, 'capabilities']);
+    Route::get('asociaciones', \App\Http\Controllers\Api\ControlAccessLocalDirectoryController::class);
     Route::post('estado', [\App\Http\Controllers\Api\ControlAccessAgentController::class, 'state']);
     Route::post('lotes', [\App\Http\Controllers\Api\ControlAccessAgentController::class, 'batch']);
 });

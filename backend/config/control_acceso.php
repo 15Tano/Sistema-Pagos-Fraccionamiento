@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'local_display_directory_enabled' => env('CONTROL_ACCESO_LOCAL_DIRECTORY_ENABLED', false),
     'ingestion_summary_enabled' => env('CONTROL_ACCESO_INGESTION_SUMMARY_ENABLED', false),
     'retry_event_days' => 7,
     'retry_state_days' => 7,
