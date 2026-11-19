@@ -10,6 +10,7 @@ import {
 import useAuthStore from "../store/authStore";
 import { Icon } from "../lib/icons";
 import { createPortal } from "react-dom";
+import TagAccessPanel from "./Tags/components/TagAccessPanel";
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatSoldAt(soldAt) {
     if (!soldAt) return "Sin fecha";
@@ -858,6 +859,7 @@ export default function Tags() {
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
+    const dataRequest = useRef(0);
     const { user } = useAuthStore();
     const esCapturista = user?.role === "capturista";
 
@@ -867,11 +869,13 @@ export default function Tags() {
     }, []);
 
     const fetchData = useCallback(async () => {
+        const request = ++dataRequest.current;
         try {
             const [tagsRes, salesRes] = await Promise.all([
                 getTags(),
                 getTagSales(),
             ]);
+            if (request !== dataRequest.current) return;
 
             const tagsData = Array.isArray(tagsRes.data)
                 ? tagsRes.data
@@ -896,9 +900,9 @@ export default function Tags() {
                 };
             }));
         } catch {
-            showToast("Error al cargar los datos", "error");
+            if (request === dataRequest.current) showToast("Error al cargar los datos", "error");
         } finally {
-            setLoading(false);
+            if (request === dataRequest.current) setLoading(false);
         }
     }, [showToast]);
 
@@ -1075,6 +1079,16 @@ export default function Tags() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {user?.role === "admin" && (
+                <TagAccessPanel
+                    tags={tags}
+                    onChange={(updatedTag) => {
+                        setTags((current) => current.map((tag) => tag.id === updatedTag.id ? { ...tag, ...updatedTag } : tag));
+                        fetchData();
+                    }}
+                />
             )}
 
             {/* ── Contenido principal ── */}

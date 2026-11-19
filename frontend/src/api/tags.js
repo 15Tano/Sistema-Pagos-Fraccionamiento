@@ -12,6 +12,9 @@ export const createTag = (codigo, asignableSinVenta = false) =>
 /** Toggle activo/inactivo — usa ID entero (no UUID), igual que el backend */
 export const toggleTag = (id) => api.patch(`/tags/${id}/toggle`);
 
+/** Guarda la desactivación manual que aplica el polling de vigencias. */
+export const setTagAccess = (id, desactivado) => api.put(`/tags/${id}/acceso`, { desactivado });
+
 /** Stock: cantidad de tags sin vender */
 export const getTagStock = () => api.get("/tags/stock");
 
