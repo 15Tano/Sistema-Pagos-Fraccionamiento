@@ -47,6 +47,7 @@ Route::middleware(['auth:sanctum', 'corte.bloqueo'])->group(function () {
     // Tags
     Route::get('tags/stock', [TagController::class, 'stock']);
     Route::patch('tags/{id}/toggle', [TagController::class, 'toggle']);
+    Route::put('tags/{id}/acceso', [TagController::class, 'setAccess'])->whereNumber('id');
     Route::resource('tags', TagController::class);
 
     // Tag Sales

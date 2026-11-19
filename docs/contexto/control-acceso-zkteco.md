@@ -62,6 +62,12 @@ Equivalencia de nombres Pluma 1/2 pendiente (ver cierres).
 - Quitar un tag de la API NO lo desactiva: polling conserva lo ultimo guardado.
   Asi se explico expresamente el 20 de octubre. No introducir bloqueo/eliminacion
   por ausencia sin nueva decision del usuario.
+- 2026-11-19, verificado en local: el panel Acceso de tags permite al administrador
+  desactivar y reactivar códigos numéricos. El bloqueo manual publica
+  `2020-01-02 23:59:59` en `/api/vencimientos`, incluso sin vecino asignado.
+  Los pagos y cambios de asociación conservan ese bloqueo. Al reactivar, se vuelve
+  a calcular la vigencia por pagos si hay vecino asignado. La confirmación en web
+  corresponde al guardado en la API. Despliegue y prueba física pendientes.
 - Polling solo actualiza fechas/indicador; no crea tags ni repara niveles/permisos.
 - Usuario confirma que todos los tags deben tener nivel ALTAS Y BAJAS. Lectura
   real del 18 octubre: ID del nivel 1, referencia 6344928 con horario 2/puertas 3.

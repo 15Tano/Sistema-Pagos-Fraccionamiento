@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tag;
 use App\Models\Vecino;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TagController extends Controller
 {
@@ -47,22 +48,37 @@ class TagController extends Controller
 
     public function update(Request $request, $id)
     {
-        $tag = Tag::findOrFail($id);
-        $tag->update($request->all());
+        abort_if($request->has('activo') && $request->user()?->role !== 'admin', 403);
+        $tag = DB::transaction(function () use ($request, $id) {
+            $tag = Tag::lockForUpdate()->findOrFail($id);
+            $tag->fill($request->only($tag->getFillable()));
+            abort_if($tag->desactivado_manualmente && $tag->isDirty('codigo'), 422,
+                'Reactiva el TAG antes de cambiar su código.');
+            $tag->save();
+
+            return $tag;
+        });
+
         return response()->json($tag);
     }
 
     public function destroy($id)
     {
-        Tag::destroy($id);
+        DB::transaction(function () use ($id) {
+            $tag = Tag::lockForUpdate()->find($id);
+            abort_if($tag?->desactivado_manualmente, 422, 'Reactiva el TAG antes de eliminarlo.');
+            $tag?->delete();
+        });
+
         return response()->json(['message' => 'Tag eliminado']);
     }
 
     /**
      * Activar/Desactivar TAG manualmente
      */
-    public function toggle($id)
+    public function toggle(Request $request, $id)
     {
+        abort_unless($request->user()?->role === 'admin', 403);
         $tag = Tag::findOrFail($id);
 
         $tag->activo = !$tag->activo; // alterna activación
@@ -71,6 +87,28 @@ class TagController extends Controller
             'message' => $tag->activo ? 'TAG activado' : 'TAG desactivado',
             'tag' => $tag
         ]);
+    }
+
+    public function setAccess(Request $request, $id)
+    {
+        abort_unless($request->user()?->role === 'admin', 403);
+        $request->validate(['desactivado' => 'required|boolean']);
+
+        $tag = DB::transaction(function () use ($request, $id) {
+            $tag = Tag::lockForUpdate()->findOrFail($id);
+            $disabled = $request->boolean('desactivado');
+            abort_if($disabled && !ctype_digit(trim($tag->codigo)), 422,
+                'El código del TAG debe ser numérico para enviarlo al polling.');
+
+            $tag->desactivado_manualmente = $disabled;
+            if ($tag->isDirty('desactivado_manualmente')) {
+                $tag->save();
+            }
+
+            return $tag;
+        });
+
+        return response()->json(['tag' => $tag]);
     }
 
     // New method to get stock (unsold tags count)

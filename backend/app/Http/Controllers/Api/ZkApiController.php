@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vecino;
+use App\Models\Tag;
 use App\Models\Pago;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 class ZkApiController extends Controller
 {
     private const MENSUALIDAD = 280;
+
+    private const VIGENCIA_DESACTIVADA = '2020-01-02 23:59:59';
 
     // Tags de confianza para pruebas
     private const TAGS_PRUEBA = ['12160354', '6654315', '5308479', '6377078', '6344928'];
@@ -34,27 +36,27 @@ class ZkApiController extends Controller
 
     public function index(Request $request)
     {
-        $vecinos = Vecino::with('tags')->whereHas('tags')->get();
+        $tags = Tag::with('vecinos:id')
+            ->where(fn ($query) => $query->where('desactivado_manualmente', true)->orWhereHas('vecinos'))
+            ->get();
 
         $respuesta = [];
+        $vigencias = [];
+        $soloPruebas = $request->query('test') === 'true';
 
-        foreach ($vecinos as $vecino) {
-            $expirationDate = $this->calculateExpirationDate($vecino->id);
+        foreach ($tags as $tag) {
+            if ($tag->codigo === '' || ($soloPruebas && !in_array($tag->codigo, self::TAGS_PRUEBA))) {
+                continue;
+            }
 
-            foreach ($vecino->tags as $tag) {
-                if (!empty($tag->codigo)) {
-                    // Si es modo test, solo incluir los tags de prueba
-                    if ($request->query('test') === 'true') {
-                        if (!in_array($tag->codigo, self::TAGS_PRUEBA)) {
-                            continue;
-                        }
-                    }
+            if ($tag->desactivado_manualmente) {
+                $respuesta[] = ['card_no' => $tag->codigo, 'expiration' => self::VIGENCIA_DESACTIVADA];
+                continue;
+            }
 
-                    $respuesta[] = [
-                        'card_no'    => $tag->codigo,
-                        'expiration' => $expirationDate->toDateTimeString(),
-                    ];
-                }
+            foreach ($tag->vecinos as $vecino) {
+                $vigencia = $vigencias[$vecino->id] ??= $this->calculateExpirationDate($vecino->id)->toDateTimeString();
+                $respuesta[] = ['card_no' => $tag->codigo, 'expiration' => $vigencia];
             }
         }
 

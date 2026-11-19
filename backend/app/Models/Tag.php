@@ -7,7 +7,10 @@ class Tag extends Model
 {
     use HasFactory;
     protected $fillable = ['codigo', 'activo', 'asignable_sin_venta'];
-    protected $casts = ['asignable_sin_venta' => 'boolean'];
+    protected $casts = [
+        'asignable_sin_venta' => 'boolean',
+        'desactivado_manualmente' => 'boolean',
+    ];
     public function scopeAssignable($query)
     {
         return $query->where(function ($q) {
