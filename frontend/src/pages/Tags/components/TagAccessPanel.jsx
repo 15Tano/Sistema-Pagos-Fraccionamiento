@@ -1,9 +1,10 @@
 import { useId, useMemo, useState } from "react";
-import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-motion";
+import { motion as Motion, useReducedMotion } from "framer-motion";
 import {
-    Check, ChevronRight, LoaderCircle, Power, Radio, Search, ShieldCheck, ShieldOff, Tag, X,
+    Check, ChevronRight, LoaderCircle, Power, Radio, Search, Tag, X,
 } from "lucide-react";
 import { setTagAccess } from "../../../api/tags";
+import TagAccessCard from "./TagAccessCard";
 
 const RESULT_LIMIT = 30;
 
@@ -29,7 +30,7 @@ export default function TagAccessPanel({ tags, onChange }) {
     const [confirming, setConfirming] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
-    const [notice, setNotice] = useState("");
+    const [notice, setNotice] = useState(null);
 
     const query = normalize(search).trim();
     const results = useMemo(() => {
@@ -47,29 +48,31 @@ export default function TagAccessPanel({ tags, onChange }) {
     const disabled = Boolean(selected?.desactivado_manualmente);
     const compatible = disabled || /^\d+$/.test(String(selected?.codigo ?? "").trim());
     const assigned = Boolean(selected?.vecinos?.length);
-    const StatusIcon = disabled ? ShieldOff : ShieldCheck;
 
     function selectTag(tag) {
         setSelectedId(tag.id);
         setConfirming(false);
         setError("");
-        setNotice("");
+        setNotice(null);
     }
 
     async function confirmChange() {
         if (!selected || saving) return;
         setSaving(true);
         setError("");
-        setNotice("");
+        setNotice(null);
         try {
             const { data } = await setTagAccess(selected.id, !disabled);
             onChange(data.tag);
             setConfirming(false);
-            setNotice(disabled
-                ? assigned
-                    ? "Reactivado. El polling volverá a tomar la vigencia por pagos."
-                    : "Desactivación retirada. El tag sigue sin vecino asignado."
-                : "Desactivación guardada. El polling recibirá la fecha vencida.");
+            setNotice({
+                action: disabled ? "unlock" : "lock",
+                message: disabled
+                    ? assigned
+                        ? "Reactivado. El polling volverá a tomar la vigencia por pagos."
+                        : "Desactivación retirada. El tag sigue sin vecino asignado."
+                    : "Desactivación guardada. El polling recibirá la fecha vencida.",
+            });
         } catch (requestError) {
             setError(requestError.response?.data?.message ?? "No se pudo guardar el cambio. Vuelve a intentarlo.");
         } finally {
@@ -144,43 +147,13 @@ export default function TagAccessPanel({ tags, onChange }) {
                         animate={{ opacity: 1, y: 0 }}
                         className="min-w-0"
                     >
-                        <div className="relative isolate overflow-hidden rounded-[1.35rem] border border-stone-700 bg-stone-900 p-4 text-white shadow-[0_10px_24px_rgba(33,24,19,0.17)] sm:p-5">
-                            <Motion.div
-                                aria-hidden="true"
-                                className="pointer-events-none absolute inset-0 -z-10"
-                                animate={{ backgroundColor: disabled ? "#461c29" : "#182f2b" }}
-                                transition={{ duration: reducedMotion ? 0 : 0.4 }}
-                                style={{ backgroundImage: "radial-gradient(ellipse at 100% 0%, #ffffff24, transparent 62%)" }}
-                            />
-                            <AnimatePresence initial={false}>
-                                {!reducedMotion && (
-                                    <Motion.div
-                                        key={String(disabled)}
-                                        aria-hidden="true"
-                                        className="pointer-events-none absolute inset-y-0 left-0 w-1/3 skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/15 to-transparent"
-                                        initial={{ x: "-130%" }}
-                                        animate={{ x: "340%" }}
-                                        transition={{ duration: 0.7, ease: "easeOut" }}
-                                    />
-                                )}
-                            </AnimatePresence>
-                            <div className="relative flex items-center justify-between gap-3">
-                                <Motion.div
-                                    key={String(disabled)}
-                                    initial={reducedMotion ? false : { scale: 0.72, rotate: -12 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{ type: "spring", stiffness: 360, damping: 18 }}
-                                    className="grid size-12 shrink-0 place-items-center rounded-2xl border border-white/25 bg-white/10"
-                                >
-                                    <StatusIcon size={24} aria-hidden="true" />
-                                </Motion.div>
-                                <span className={`rounded-full border border-white/20 px-2.5 py-1 text-xs font-semibold ${disabled ? "bg-rose-400/15 text-rose-100" : "bg-white/10 text-white"}`}>
-                                    {accessLabel(selected)}
-                                </span>
-                            </div>
-                            <p className="mt-4 break-all font-mono text-xl font-bold tracking-wider">{selected.codigo}</p>
-                            <p className="mt-1 break-words text-sm text-white/80">{ownerNames(selected)}</p>
-                        </div>
+                        <TagAccessCard
+                            code={selected.codigo}
+                            owner={ownerNames(selected)}
+                            status={accessLabel(selected)}
+                            disabled={disabled}
+                            feedback={notice?.action}
+                        />
 
                         {!compatible ? (
                             <p className="mt-3 text-sm text-stone-600">Este código no es numérico y el polling no puede procesarlo.</p>
@@ -206,7 +179,7 @@ export default function TagAccessPanel({ tags, onChange }) {
                                 {error && <p role="alert" className="mt-2 text-sm font-medium text-rose-800">{error}</p>}
                             </div>
                         ) : (
-                            <button type="button" onClick={() => { setConfirming(true); setNotice(""); }} className={`mt-3 inline-flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-orange-500 ${disabled ? "border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-100" : "border-rose-200 bg-rose-50 text-rose-900 hover:bg-rose-100"}`}>
+                            <button type="button" onClick={() => { setConfirming(true); setNotice(null); }} className={`mt-3 inline-flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-orange-500 ${disabled ? "border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-100" : "border-rose-200 bg-rose-50 text-rose-900 hover:bg-rose-100"}`}>
                                 <Power size={17} aria-hidden="true" />
                                 {disabled ? "Reactivar tag" : "Desactivar tag"}
                             </button>
@@ -214,7 +187,7 @@ export default function TagAccessPanel({ tags, onChange }) {
                         {notice && (
                             <Motion.p role="status" initial={reducedMotion ? false : { opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="mt-3 flex items-start gap-2 text-sm font-medium text-stone-700">
                                 <Check size={17} className="mt-0.5 shrink-0 text-emerald-700" aria-hidden="true" />
-                                {notice}
+                                {notice.message}
                             </Motion.p>
                         )}
                     </Motion.div>
